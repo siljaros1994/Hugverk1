@@ -3,6 +3,7 @@
 Silja Rós Svansdóttir Þormar <br/>
 Þrándur Orri Ólason <br/>
 Guðrún Ísabella Kjartansdóttir <br/>
+Alexandra Björk Magnúdóttir <br/>
 ## Verkefnið
 **DonorMatch** <br/>
 A website that connects induviduals who seek sperm- or egg donors. 
