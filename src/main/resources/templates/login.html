@@ -2,21 +2,23 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Login</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
 </head>
-<body>
-<h1>Login</h1>
-<form th:action="@{/login}" method="post">
-    <div>
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" />
-    </div>
-    <div>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" />
-    </div>
-    <div>
-        <button type="submit">Login</button>
-    </div>
-</form>
+<body class="align">
+<div class="grid">
+    <h1>Login</h1>
+    <form th:action="@{/login}" method="post" class="form login">
+        <div class="form__field">
+            <input autocomplete="username" id="login__username" type="text" name="username" class="form__input" placeholder="Username" required>
+        </div>
+        <div class="form__field">
+            <input id="login__password" type="password" name="password" class="form__input" placeholder="Password" required>
+        </div>
+        <div class="form__field">
+            <input type="submit" value="Sign In">
+        </div>
+    </form>
+    <p class="text--center">Not a member? <a href="/register">Sign up now</a></p>
+</div>
 </body>
 </html>
