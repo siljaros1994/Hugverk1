@@ -1,0 +1,147 @@
+:root {
+    --border-color: black;
+    --hover-color: #e5e5e5;
+    --body-color: #333;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+.area {
+    display: flex;
+    height: 100vh;
+}
+
+.main-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 100%;
+    background-color: #333;
+    padding-top: 20px;
+}
+
+.main-menu ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.main-menu ul li {
+    padding: 10px;
+}
+
+.main-menu ul li a {
+    text-decoration: none;
+    color: #fff;
+    display: flex;
+    align-items: center;
+}
+
+.main-menu ul li a:hover {
+    background-color: #575757;
+}
+
+.main-menu ul li i {
+    margin-right: 15px;
+}
+
+.nav-text {
+    font-size: 1.2em;
+}
+
+.logout {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+main {
+    margin-left: 220px;
+    padding: 20px;
+    flex: 1;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100%;
+}
+
+header {
+    margin-bottom: 20px;
+}
+
+.cover {
+    background: url('https://images.fineartamerica.com/images/artworkimages/mediumlarge/3/human-fertilization-egg-and-sperm-colorful-watercolor-white-lotus.jpg');
+    background-size: cover;
+    height: 30rem;
+    width: 100%;
+    box-shadow: hsla(0, 0, 0, .2) 0 4px 2px -2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-bar input {
+    padding: 10px;
+    width: 60%;
+    font-size: 1.2em;
+    border: 2px solid var(--border-color);
+    border-radius: 25px;
+    margin: 20px;
+}
+
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.follow {
+    border: 2px solid var(--border-color);
+    border-radius: 25px;
+    color: var(--body-color);
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.follow:hover {
+    background-color: var(--hover-color);
+}
+
+footer {
+    text-align: center;
+    margin-top: auto;
+    padding: 20px;
+}
+
+@media screen and (min-width: 480px) {
+    .cover {
+        width: 28rem;
+    }
+}
+@media screen and (min-width: 767px) {
+    .cover {
+        width: 40rem;
+    }
+}
+@media screen and (min-width: 959px) {
+    .cover {
+        width: 50rem;
+    }
+}

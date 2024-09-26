@@ -1,10 +1,6 @@
 package is.hi.hbv501g.Hugverk1.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 // Here we are defining the user and maps it to a database table. It controls how user information
 // (ID, username, email, password) is stored and retrieved from the database.
@@ -13,11 +9,16 @@ import jakarta.persistence.Id;
 @Table(name = "MyAppUsers")
 public class MyAppUsers {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "user_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     // Here we store the user's username, email, and password, which will be saved in the MyAppUsers table.
+    @Column(unique = true)
     private String username;
+
+    @Column(name = "email")
     private String email;
+
     private String password;
 
     public Long getId() {
