@@ -9,12 +9,15 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+// Here we load the user data during the login process.
+
 @Service
-public class MyAppUserService implements UserDetailsService {
+public class MyAppUserService implements UserDetailsService { // lodes user-specific data like username and password from the database when someone tries to log in.
 
     @Autowired
     private MyAppUserRepository repository;
 
+    // Here we retrieve a user by their username from the database. It finds the user trying to log in
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<MyAppUsers> user = repository.findByUsername(username);

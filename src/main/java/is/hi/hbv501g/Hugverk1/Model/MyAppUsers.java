@@ -6,12 +6,16 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-@Entity
+// Here we are defining the user and maps it to a database table. It controls how user information
+// (ID, username, email, password) is stored and retrieved from the database.
+
+@Entity // lets the program know that this class represents a table in the database.
 @Table(name = "MyAppUsers")
 public class MyAppUsers {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    // Here we store the user's username, email, and password, which will be saved in the MyAppUsers table.
     private String username;
     private String email;
     private String password;
