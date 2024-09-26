@@ -2,12 +2,15 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Register</title>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <script src="/js/register.js" defer></script>
 </head>
 <body class="align">
 <div class="grid">
     <h1>Register</h1>
-    <form action="#" method="post" class="form login">
+    <form id="registerForm">
         <div class="form__field">
             <input autocomplete="username" id="register__username" type="text" name="username" class="form__input" placeholder="Username" required>
         </div>
@@ -18,10 +21,39 @@
             <input id="register__password" type="password" name="password" class="form__input" placeholder="Password" required>
         </div>
         <div class="form__field">
-            <input type="submit" value="Register">
+            <button type="button" id="submit">Register</button>
         </div>
     </form>
     <p class="text--center">Already a member? <a href="/login">Sign in</a></p>
 </div>
 </body>
 </html>
+
+<script>
+    document.getElementById('submit').addEventListener('click', () => {
+        const username = document.getElementById('register__username').value;
+        const email = document.getElementById('register__email').value;
+        const password = document.getElementById('register__password').value;
+
+        const userData = {
+            username: username,
+            email: email,
+            password: password
+        };
+
+        fetch('/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('User registered successfully!');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+</script>

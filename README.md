@@ -7,3 +7,7 @@ Alexandra Björk Magnúsdóttir <br/>
 ## Verkefnið
 **DonorMatch** <br/>
 A website that connects induviduals who seek sperm- or egg donors. 
+
+## Uppsetning og keyrsla
+keyrið pgAdmin 4.
+Farið í terminal og skrifið mvn spring-boot:run til að keyra.
