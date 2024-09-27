@@ -9,5 +9,5 @@ Alexandra Björk Magnúsdóttir <br/>
 A website that connects induviduals who seek sperm- or egg donors. 
 
 ## Uppsetning og keyrsla
-keyrið pgAdmin 4.
-Farið í terminal og skrifið mvn spring-boot:run til að keyra.
+Run pgAdmin 4.
+Go to terminal and write mvn spring-boot:run to run the system. 
