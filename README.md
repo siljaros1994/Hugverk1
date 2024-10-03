@@ -14,6 +14,8 @@ Farið í terminal og skrifið mvn spring-boot:run til að keyra.
 
 ![Login](src/main/resources/static/images/login.png)
 
-![Login](src/main/resources/static/images/signin.png)
+![Login](src/main/resources/static/images/signup.png)
+
+![Login](src/main/resources/static/images/signupsuccessfull.png)
 
 ![Login](src/main/resources/static/images/homepage.png)

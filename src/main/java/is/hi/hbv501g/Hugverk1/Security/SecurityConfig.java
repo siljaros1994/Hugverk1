@@ -16,7 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 // security configuration for the application. It handles login, user registration, password encoding, and more.
 
 @Configuration
-@EnableWebSecurity  // Enables Spring Security.
+@EnableWebSecurity // Enables Spring Security.
 public class SecurityConfig {
     private final MyAppUserService appUserService;
 
@@ -26,21 +26,10 @@ public class SecurityConfig {
         this.appUserService = appUserService;
     }
 
-    // Registers our MyAppUserService as the service that Spring Security will use to load the user data from the database.
-    // like when a user logs in, this service loads the user details like username, password from the MyAppUsers table.
+    // Register the user service with Spring Security
     @Bean
     public UserDetailsService userDetailsService() {
         return appUserService;
-    }
-
-    // authentication provider which validates the user by checking their username and password. It ensures the
-    // username and encoded password stored in the database match the provided credentials during login.
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(appUserService);
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
     }
 
     // Encodes passwords using BCryptPasswordEncoder. This ensures that passwords are stored in a hashed format
@@ -48,6 +37,15 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    // An authentication provider that validates the user by checking their username and password.
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(appUserService); // Uses the MyAppUserService to load the user details
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
     }
 
     // Security configuration that configures what users can and cannot access in the web application.
