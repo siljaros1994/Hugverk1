@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 // Here we load the user data during the login process.
 
+// Here we load the user data during the login process.
 @Service
 public class MyAppUserService implements UserDetailsService { // lodes user-specific data like username and password from the database when someone tries to log in.
 

@@ -58,7 +58,7 @@ public class SecurityConfig {
                     httpForm.defaultSuccessUrl("/Home");  // After successful login, users are redirected to /Home
                 })
                 .authorizeHttpRequests(registry -> {
-                    registry.requestMatchers("/register", "/css/**", "/js/**").permitAll();  // Permit access to register page without logging in.
+                    registry.requestMatchers("/register", "/users/register", "/css/**", "/js/**").permitAll();  // Permit access to register page without logging in.
                     registry.anyRequest().authenticated();  // All other requests require authentication
                 })
                 .build();

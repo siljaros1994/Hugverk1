@@ -1,11 +1,8 @@
 package is.hi.hbv501g.Hugverk1.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
+
+import java.util.UUID;
 
 // Here we are defining the user and maps it to a database table. It controls how user information
 // (ID, username, email, password) is stored and retrieved from the database.
@@ -14,9 +11,9 @@ import jakarta.persistence.GenerationType;
 @Table(name = "MyAppUsers")
 public class MyAppUsers {
     @Id
-    @Column(name = "user_id")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long Id;
     // Here we store the user's username, email, and password, which will be saved in the MyAppUsers table.
     @Column(unique = true)
     private String username;
@@ -24,13 +21,27 @@ public class MyAppUsers {
     @Column(name = "email")
     private String email;
 
+    @Column(nullable = false)
     private String password;
 
-    public Long getUserId() {
-        return userId;
+    // Fields for donorId and recipientId
+    @Column(name = "donor_id", unique = true, nullable = true)
+    private String donorId;
+
+    @Column(name = "recipient_id", unique = true, nullable = true)
+    private String recipientId;
+
+    @Column(nullable = false)
+    private String userType;
+
+    @Transient
+    private String confirmPassword;
+
+    public Long getId() {
+        return Id;
     }
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setId(Long userId) {
+        this.Id = userId;
     }
     public String getUsername() {
         return username;
@@ -49,5 +60,46 @@ public class MyAppUsers {
     }
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
+    }
+
+    public String getDonorId() {
+        return donorId;
+    }
+
+    public void setDonorId(String donorId) {
+        this.donorId = donorId;
+    }
+
+    public String getRecipientId() {
+        return recipientId;
+    }
+
+    public void setRecipientId(String recipientId) {
+        this.recipientId = recipientId;
+    }
+
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
+    }
+
+    // Utility methods for assigning IDs
+    public void assignDonorId() {
+        this.donorId = UUID.randomUUID().toString();  // Generate unique donor ID
+    }
+
+    public void assignRecipientId() {
+        this.recipientId = UUID.randomUUID().toString();  // Generate unique recipient ID
     }
 }
