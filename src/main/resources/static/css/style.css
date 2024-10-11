@@ -8,7 +8,7 @@ body {
   color: var(--baseColor);
   font-family: "Open Sans", sans-serif;
   font-size: 0.875rem;
-  line-height: 1.5;
+  line-height: 2 .5;
   margin: 0;
   min-height: 100vh;
 }
@@ -68,6 +68,24 @@ button:hover {
   border-radius: 4px;
   background-color: #3b4148;
   color: var(--highlightColor);
+}
+
+.form__field label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.form__field select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #333;
+    color: #fff;
+    font-size: 16px;
+    margin-bottom: 20px;
 }
 
 .form__input::placeholder {
