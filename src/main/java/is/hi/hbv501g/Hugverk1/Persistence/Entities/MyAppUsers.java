@@ -1,7 +1,6 @@
 package is.hi.hbv501g.Hugverk1.Persistence.Entities;
 
 import jakarta.persistence.*;
-
 import java.util.UUID;
 
 // Here we are defining the user and maps it to a database table. It controls how user information
@@ -13,9 +12,10 @@ public class MyAppUsers {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
+
     // Here we store the user's username, email, and password, which will be saved in the MyAppUsers table.
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String username;
 
     @Column(name = "email")
@@ -37,27 +37,35 @@ public class MyAppUsers {
     @Transient
     private String confirmPassword;
 
+    // Getters and Setters
     public Long getId() {
-        return Id;
+        return id;
     }
-    public void setId(Long userId) {
-        this.Id = userId;
+
+    public void setId(Long id) {
+        this.id = id;
     }
+
     public String getUsername() {
         return username;
     }
+
     public void setUsername(String username) {
         this.username = username;
     }
+
     public String getEmail() {
         return email;
     }
+
     public void setEmail(String email) {
         this.email = email;
     }
+
     public String getPassword() {
         return password;
     }
+
     public void setPassword(String password) {
         this.password = password;
     }
@@ -96,10 +104,10 @@ public class MyAppUsers {
 
     // Utility methods for assigning IDs
     public void assignDonorId() {
-        this.donorId = UUID.randomUUID().toString();  // Generate unique donor ID
+        this.donorId = UUID.randomUUID().toString();
     }
 
     public void assignRecipientId() {
-        this.recipientId = UUID.randomUUID().toString();  // Generate unique recipient ID
+        this.recipientId = UUID.randomUUID().toString();
     }
 }

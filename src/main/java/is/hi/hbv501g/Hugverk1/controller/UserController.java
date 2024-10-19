@@ -1,63 +1,86 @@
 package is.hi.hbv501g.Hugverk1.controller;
 
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
-import is.hi.hbv501g.Hugverk1.Persistence.Repositories.MyAppUserRepository;
+import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.ui.Model;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Collections;
+import java.util.Optional;
 
 // This controller handles user registration requests from the frontend and interacts with the database.
 //  This is where new users are created and stored in the MyAppUsers table.
 
-@RestController
+@Controller
 @RequestMapping("/users")
 public class UserController {
 
     @Autowired
-    private MyAppUserRepository userRepository;
+    private MyAppUserService myAppUserService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @PostMapping(value = "/register", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<?> createUser(@RequestBody MyAppUsers user) {
-        // Log the received user data
-        System.out.println("Received user data: " + user);
-
-        // Validate if username already exists
-        if (userRepository.existsByUsername(user.getUsername())) {
-            System.out.println("Username already exists!");
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Collections.singletonMap("message", "Username already exists!"));
-        }
-
-        // Validate password match
-        if (!user.getPassword().equals(user.getConfirmPassword())) {
-            System.out.println("Passwords do not match!");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Collections.singletonMap("message", "Passwords do not match!"));
-        }
-
-        // Encode password
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        // Check for user type (Donor or Recipient)
-        if ("donor".equalsIgnoreCase(user.getUserType())) {
-            user.assignDonorId();
-        } else if ("recipient".equalsIgnoreCase(user.getUserType())) {
-            user.assignRecipientId();
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Collections.singletonMap("message", "You must register as either a donor or recipient."));
-        }
-
-        // Save the user to the database
-        userRepository.save(user);
-        System.out.println("User registered successfully!");
-        return ResponseEntity.ok(Collections.singletonMap("message", "User registered successfully!"));
+    @GetMapping("/login")
+    public String showLoginForm(Model model) {
+        model.addAttribute("user", new MyAppUsers());
+        return "login";  // Return the login page
     }
+
+    @GetMapping("/register")
+    public String showRegistrationForm(Model model) {
+        model.addAttribute("user", new MyAppUsers());
+        return "register"; // Return the registration page
+    }
+
+    // Method to handle the registration form submission
+    @PostMapping("/register")
+    public String createUser(@ModelAttribute("user") MyAppUsers user, Model model) {
+        if (myAppUserService.findByUsername(user.getUsername()).isPresent()) {
+            model.addAttribute("message", "Username already exists!");
+            return "register";  // Return registration page with an error message
+        }
+
+        // Validate that passwords match
+        if (!user.getPassword().equals(user.getConfirmPassword())) {
+            model.addAttribute("message", "Passwords do not match!");
+            return "register";  // Return registration page with an error message
+        }
+
+        myAppUserService.saveUser(user);
+        model.addAttribute("message", "User registered successfully!");
+        return "login";  // Redirect to login page with success message
+    }
+
+    // Handle the login form submission
+    @PostMapping("/login")
+    public String loginUser(@ModelAttribute("user") MyAppUsers loginUser, Model model, HttpSession session) {
+        Optional<MyAppUsers> userOptional = myAppUserService.findByUsername(loginUser.getUsername());
+        if (userOptional.isPresent()) {
+            MyAppUsers user = userOptional.get();
+            if (myAppUserService.matchPassword(loginUser.getPassword(), user.getPassword())) {
+                session.setAttribute("LoggedInUser", user);
+                return "redirect:/home";  // Redirect to home page upon successful login
+            } else {
+                model.addAttribute("message", "Invalid password!");
+                model.addAttribute("user", new MyAppUsers());
+                return "login";  // Return to login page with an error message
+            }
+        } else {
+            model.addAttribute("message", "User not found!");
+            model.addAttribute("user", new MyAppUsers());
+            return "login";  // Return to login page with an error message
+        }
+    }
+
+    // Display the logged inn user details
+    //@GetMapping("/loggedin")
+    //public String getLoggedInUser(HttpSession session, Model model) {
+    //MyAppUsers loggedInUser = (MyAppUsers) session.getAttribute("LoggedInUser");
+    //if (loggedInUser != null) {
+    //model.addAttribute("user", loggedInUser);
+    //return "loggedInUser";
+    //} else {
+    //model.addAttribute("message", "No user is logged in.");
+    //return "redirect:/login";  // Redirect to login page if no user is logged in.
+    //}
+    //}
 }

@@ -1,43 +1,44 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="https://thymeleaf.org">
 <head>
-    <title>Register</title>
-    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <meta charset="UTF-8">
+    <title>Signup</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
 </head>
 <body class="align">
 <div class="grid">
-    <h1>Register</h1>
-    <form id="registerForm">
-        <div class="form__field">
-            <input autocomplete="username" id="register__username" type="text" name="username" class="form__input" placeholder="Username" required>
-        </div>
-        <div class="form__field">
-            <input autocomplete="email" id="register__email" type="email" name="email" class="form__input" placeholder="Email" required>
-        </div>
-        <div class="form__field">
-            <input id="register__password" type="password" name="password" class="form__input" placeholder="Password" required>
-        </div>
-        <div class="form__field">
-            <input id="register__confirmPassword" type="password" name="confirmPassword" class="form__input" placeholder="Confirm Password" required>
-        </div>
+    <h1>Signup for an account</h1>
 
+    <div th:if="${message}" class="form__message">
+        <p th:text="${message}"></p>
+    </div>
+
+    <form th:action="@{/users/register}" th:object="${user}" method="post" class="form signup">
+        <div class="form__field">
+            <input type="text" th:field="*{username}" autocomplete="username" id="register__username" placeholder="Username" required>
+        </div>
+        <div class="form__field">
+            <input type="email" th:field="*{email}" autocomplete="email" id="register__email" placeholder="Email" required>
+        </div>
+        <div class="form__field">
+            <input type="password" th:field="*{password}" id="register__password" placeholder="Password" required>
+        </div>
+        <div class="form__field">
+            <input type="password" th:field="*{confirmPassword}" id="register__confirmPassword" placeholder="Confirm Password" required>
+        </div>
         <div class="form__field">
             <label for="donorRecipient">Register as:</label>
-            <select id="donorRecipient" name="donorRecipient" required>
+            <select th:field="*{userType}" id="donorRecipient" required>
                 <option value="">--Select--</option>
                 <option value="donor">Donor</option>
                 <option value="recipient">Recipient</option>
             </select>
         </div>
-
         <div class="form__field">
-            <button type="button" id="submit">Register</button>
+            <button type="submit">Register</button>
         </div>
     </form>
-    <p class="text--center">Already a member? <a href="/login">Sign in</a></p>
+    <p class="text--center">Already a member? <a th:href="@{/users/login}">Sign in</a></p>
 </div>
-<script src="/js/register.js" defer></script>
 </body>
 </html>
