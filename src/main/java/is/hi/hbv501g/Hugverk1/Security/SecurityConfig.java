@@ -1,6 +1,6 @@
 package is.hi.hbv501g.Hugverk1.Security;
 
-import is.hi.hbv501g.Hugverk1.Model.MyAppUserService;
+import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;

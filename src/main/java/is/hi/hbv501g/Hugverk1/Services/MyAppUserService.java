@@ -1,7 +1,9 @@
-package is.hi.hbv501g.Hugverk1.Model;
+package is.hi.hbv501g.Hugverk1.Services;
 
 import java.util.Optional;
 
+import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
+import is.hi.hbv501g.Hugverk1.Persistence.Repositories.MyAppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

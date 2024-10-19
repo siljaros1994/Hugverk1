@@ -1,7 +1,7 @@
 package is.hi.hbv501g.Hugverk1.controller;
 
-import is.hi.hbv501g.Hugverk1.Model.MyAppUsers;
-import is.hi.hbv501g.Hugverk1.Model.MyAppUserRepository;
+import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
+import is.hi.hbv501g.Hugverk1.Persistence.Repositories.MyAppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
-import java.util.List;
 
 // This controller handles user registration requests from the frontend and interacts with the database.
 //  This is where new users are created and stored in the MyAppUsers table.

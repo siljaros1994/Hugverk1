@@ -1,4 +1,4 @@
-package is.hi.hbv501g.Hugverk1.Model;
+package is.hi.hbv501g.Hugverk1.Persistence.Entities;
 
 import jakarta.persistence.*;
 
