@@ -6,11 +6,11 @@ Guðrún Ísabella Kjartansdóttir <br/>
 Alexandra Björk Magnúsdóttir <br/>
 ## Verkefnið
 **DonorMatch** <br/>
-A website that connects induviduals who seek sperm- or egg donors. 
+A website that connects individuals who seek sperm- or egg donors. 
 
-## Uppsetning og keyrsla
-keyrið pgAdmin 4.
-Farið í terminal og skrifið mvn spring-boot:run til að keyra.
+## Structure and Run / Uppsetning og keyrsla
+Run in pgAdmin 4 / keyrið pgAdmin 4
+Go to terminal and write "mvn spring-boot:run" to run the program. / Farið í terminal og skrifið mvn spring-boot:run til að keyra.
 
 ![Login](src/main/resources/static/images/login.png)
 
