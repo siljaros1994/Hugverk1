@@ -11,4 +11,14 @@ public interface MyAppUserService {
     void saveUser(MyAppUsers user);
     Optional<MyAppUsers> findByUsername(String username);
     boolean matchPassword(String rawPassword, String encodedPassword);
+<<<<<<< Updated upstream
+=======
+    List<MyAppUsers> findAllUsers();
+    //favorite
+    void addFavoriteDonor(Long recipientId, Long donorId);
+    List<Long> getFavoriteDonors(Long recipientId);
+
+    @Override
+    UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
+>>>>>>> Stashed changes
 }

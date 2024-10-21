@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Home Page</title>
+    <title>Your Favorites</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/homestyle.css}">
 </head>
-
 <body>
 <div class="area">
     <nav class="main-menu">
         <ul>
-            <li><a href="#"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
-            <li><a href="#"><i class="fa fa-heart fa-2x"></i><span class="nav-text">Donors/Recipients</span></a></li>
+            <li><a th:href="@{/recipientprofile}"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
             <li><a href="#"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Message</span></a></li>
-            <li><a th:href="@{/favorites.html}"><i class="fa fa-star fa-2x"></i><span class="nav-text">Favorite</span></a></li>
+            <li><a th:href="@{/favorites-page}"><i class="fa fa-star fa-2x"></i><span class="nav-text">Favorite</span></a></li>
             <li><a href="#"><i class="fa fa-check fa-2x"></i><span class="nav-text">Match</span></a></li>
             <li><a href="#"><i class="fa fa-book fa-2x"></i><span class="nav-text">Resource</span></a></li>
         </ul>
@@ -24,16 +22,18 @@
     <main>
         <div class="container">
             <header>
-                <h1>Welcome!</h1>
+                <h1>Your Favorite Donors</h1>
             </header>
-            <div class="cover">
-                <div class="search-bar">
-                    <input type="text" placeholder="Search profiles..." />
-                </div>
-                <div class="buttons">
-                    <button class="follow">Date Added</button>
-                    <button class="follow">Most Popular</button>
-                </div>
+
+            <div id="favorites-list">
+                <ul>
+                    <li th:if="${favorites.size() == 0}">
+                        <p>No favorites found.</p>
+                    </li>
+                    <li th:each="favorite : ${favorites}">
+                        Donor ID: <span th:text="${favorite}">Donor ID</span>
+                    </li>
+                </ul>
             </div>
         </div>
     </main>
@@ -42,6 +42,5 @@
 <footer>
     <p>Alexandra, Guðrún, Silja og Þrándur.</p>
 </footer>
-
 </body>
 </html>

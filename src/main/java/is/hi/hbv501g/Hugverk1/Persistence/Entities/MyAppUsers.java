@@ -34,6 +34,11 @@ public class MyAppUsers {
     @Column(nullable = false)
     private String userType;
 
+    //var að bæta við
+    @Column(name = "favorite_donors")
+    private String favoriteDonors; //
+
+
     @Transient
     private String confirmPassword;
 
@@ -109,5 +114,14 @@ public class MyAppUsers {
 
     public void assignRecipientId() {
         this.recipientId = UUID.randomUUID().toString();
+    }
+
+    //favorites getters and setters
+    public String getFavoriteDonors() {
+        return favoriteDonors;
+    }
+
+    public void setFavoriteDonors(String favoriteDonors) {
+        this.favoriteDonors = favoriteDonors;
     }
 }
