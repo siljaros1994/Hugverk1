@@ -10,7 +10,7 @@
     <h1>Login to your account</h1>
 
     <div th:if="${message}" class="form__message">
-        <p th:text="${message}"></p> <!-- This will show the registration success message -->
+        <p th:text="${message}"></p>
     </div>
 
     <form th:action="@{/users/login}" th:object="${user}" method="post" class="form login">

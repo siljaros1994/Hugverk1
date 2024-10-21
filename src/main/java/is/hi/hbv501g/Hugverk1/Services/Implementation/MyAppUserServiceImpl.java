@@ -10,6 +10,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,13 +28,18 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
     }
 
     @Override
+    public Optional<MyAppUsers> findById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<MyAppUsers> user = userRepository.findByUsername(username);
         if (user.isPresent()) {
             MyAppUsers userObj = user.get();
-            return User.builder()
-                    .username(userObj.getUsername())
+            return User.withUsername(userObj.getUsername())
                     .password(userObj.getPassword())
+                    .roles("USER")  // Set roles accordingly
                     .build();
         } else {
             throw new UsernameNotFoundException("User not found");
@@ -40,22 +48,35 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
 
     @Override
     public void saveUser(MyAppUsers user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));  // Encode the password
+        // Encode the password before saving the user
+        user.setPassword(passwordEncoder.encode(user.getPassword())); // The password is hashed
         if ("donor".equalsIgnoreCase(user.getUserType())) {
             user.assignDonorId();
         } else if ("recipient".equalsIgnoreCase(user.getUserType())) {
             user.assignRecipientId();
         }
-        userRepository.save(user);
+        userRepository.save(user); // Save the user to the database
     }
 
+    // Find user by username
     @Override
     public Optional<MyAppUsers> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
+    // Match raw password with the hased password
     @Override
     public boolean matchPassword(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
+    @Override
+    public List<MyAppUsers> findAllUsers() {
+        List<MyAppUsers> users = userRepository.findAll();
+        if (users == null || users.isEmpty()) {
+            System.out.println("No users found in the database.");
+            return Collections.emptyList();  // Return an empty list
+        }
+        return users;
     }
 }

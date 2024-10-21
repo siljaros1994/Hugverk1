@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Home Page</title>
+    <title>Recipient Home Page</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/homestyle.css}">
 </head>
 
@@ -9,8 +9,8 @@
 <div class="area">
     <nav class="main-menu">
         <ul>
-            <li><a href="profile.html"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
-            <li><a href="#"><i class="fa fa-heart fa-2x"></i><span class="nav-text">Donors/Recipients</span></a></li>
+            <li><a th:href="@{/recipientprofile}"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
+            <li><a href="#"><i class="fa fa-heart fa-2x"></i><span class="nav-text">Donors</span></a></li>
             <li><a href="#"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Message</span></a></li>
             <li><a href="#"><i class="fa fa-star fa-2x"></i><span class="nav-text">Favorite</span></a></li>
             <li><a href="#"><i class="fa fa-check fa-2x"></i><span class="nav-text">Match</span></a></li>
@@ -24,11 +24,13 @@
     <main>
         <div class="container">
             <header>
-                <h1>Welcome!</h1>
+                <h1>Welcome Recipient!</h1>
+                <p th:text="'Hello, ' + ${username} + '! This is your recipient homepage.'"></p>
             </header>
+
             <div class="cover">
                 <div class="search-bar">
-                    <input type="text" placeholder="Search profiles..."/>
+                    <input type="text" placeholder="Search donor profiles..." />
                 </div>
                 <div class="buttons">
                     <button class="follow">Date Added</button>
@@ -42,6 +44,5 @@
 <footer>
     <p>Alexandra, Guðrún, Silja og Þrándur.</p>
 </footer>
-
 </body>
 </html>
