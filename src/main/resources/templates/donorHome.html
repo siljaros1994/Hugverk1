@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Donor Home Page</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/homestyle.css}">
+</head>
+
+<body>
+<div class="area">
+    <nav class="main-menu">
+        <ul>
+            <li><a th:href="@{/donorprofile}"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
+            <li><a href="#"><i class="fa fa-heart fa-2x"></i><span class="nav-text">Recipients</span></a></li>
+            <li><a href="#"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Message</span></a></li>
+            <li><a href="#"><i class="fa fa-check fa-2x"></i><span class="nav-text">Match</span></a></li>
+            <li><a href="#"><i class="fa fa-book fa-2x"></i><span class="nav-text">Resource</span></a></li>
+        </ul>
+        <ul class="logout">
+            <li><a href="#"><i class="fa fa-power-off fa-2x"></i><span class="nav-text">Logout</span></a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="container">
+            <header>
+                <h1>Welcome Donor!</h1>
+                <p th:text="'Hello, ' + ${username} + '! This is your donor homepage.'"></p>
+            </header>
+        </div>
+    </main>
+</div>
+
+<footer>
+    <p>Alexandra, Guðrún, Silja og Þrándur.</p>
+</footer>
+</body>
+</html>

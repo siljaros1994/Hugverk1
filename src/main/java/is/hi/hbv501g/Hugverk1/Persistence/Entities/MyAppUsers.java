@@ -32,10 +32,11 @@ public class MyAppUsers {
     private String recipientId;
 
     @Column(nullable = false)
-    private String userType;
+    private String userType; // Either 'donor' or 'recipient'
 
     @Transient
     private String confirmPassword;
+
 
     // Getters and Setters
     public Long getId() {
