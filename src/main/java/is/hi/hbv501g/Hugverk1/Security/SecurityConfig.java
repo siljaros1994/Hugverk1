@@ -31,7 +31,7 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/home", true)
                         .permitAll())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/users/login", "/users/register", "/css/**").permitAll()
+                        .requestMatchers("/users/login", "/users/register", "/css/**", "/dr").permitAll()
                         .anyRequest().authenticated())
                 .build();
     }
