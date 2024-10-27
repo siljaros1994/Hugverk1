@@ -70,9 +70,15 @@ public class UserController {
         Optional<MyAppUsers> foundUser = myAppUserService.findByUsername(user.getUsername());
 
         if (foundUser.isPresent()) {
-            // Check if the password matches
+            // Check if password matches
             if (myAppUserService.matchPassword(user.getPassword(), foundUser.get().getPassword())) {
-                session.setAttribute("LoggedInUser", foundUser.get()); // Set user in session
+                // Store userId and userType in the session
+                session.setAttribute("userId", foundUser.get().getId());
+                session.setAttribute("userType", foundUser.get().getUserType());
+
+                System.out.println("Stored in session - userId: " + session.getAttribute("userId"));
+                System.out.println("Stored in session - userType: " + session.getAttribute("userType"));
+
                 // Redirect based on user type
                 if ("donor".equalsIgnoreCase(foundUser.get().getUserType())) {
                     return "redirect:/home/donor";
@@ -80,15 +86,15 @@ public class UserController {
                     return "redirect:/home/recipient";
                 } else {
                     model.addAttribute("message", "Unexpected user type.");
-                    return "login";  // Return to login page with an error message
+                    return "login";
                 }
             } else {
                 model.addAttribute("message", "Invalid password.");
-                return "login";  // Return to login page with an error message
+                return "login";
             }
         } else {
             model.addAttribute("message", "Invalid username.");
-            return "login";  // Return to login page with an error message
+            return "login";
         }
     }
 

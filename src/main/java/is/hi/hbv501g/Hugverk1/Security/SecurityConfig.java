@@ -46,11 +46,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/users/login", "/users/register", "/css/**", "/api/authenticate").permitAll()
-                        .requestMatchers("/home/donor", "/home/recipient", "/donorprofile", "/recipientprofile").authenticated()  // Allow access to home pages after login
+                        .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers("/home/donor", "/home/recipient", "/donorprofile", "/recipientprofile").authenticated() // Allow access to the home pages after login
+                        .requestMatchers("/messages/donor", "/messages/recipient").authenticated()
                         .anyRequest().authenticated())  // All other requests need authentication
                 .formLogin(login -> login
                         .loginPage("/users/login")
