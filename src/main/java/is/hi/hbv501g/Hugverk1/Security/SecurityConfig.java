@@ -29,7 +29,7 @@ public class SecurityConfig {
                           CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler) {
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.myAppUserService = myAppUserService;
-        this.customAuthenticationSuccessHandler = customAuthenticationSuccessHandler;  // Initialize handler
+        this.customAuthenticationSuccessHandler = customAuthenticationSuccessHandler;
     }
 
     @Bean
@@ -55,7 +55,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated())  // All other requests need authentication
                 .formLogin(login -> login
                         .loginPage("/users/login")
-                        .successHandler(customAuthenticationSuccessHandler)  // Add success handler
+                        .successHandler(customAuthenticationSuccessHandler)
                         .permitAll())
                 .httpBasic(httpBasic -> httpBasic
                         .authenticationEntryPoint(authenticationEntryPoint))
