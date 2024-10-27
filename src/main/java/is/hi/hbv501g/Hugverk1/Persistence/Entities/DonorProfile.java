@@ -17,6 +17,9 @@ public class DonorProfile {
     @JoinColumn(name = "donor_id", referencedColumnName = "donor_id", unique = true)
     private MyAppUsers user;
 
+    @Column(name = "donor_type")
+    private String donorType;
+
     @Column(name = "height")
     private Double height;
 
@@ -79,6 +82,14 @@ public class DonorProfile {
 
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+    }
+
+    public String getDonorType() {
+        return donorType;
+    }
+
+    public void setDonorType(String donorType) {
+        this.donorType = donorType;
     }
 
     public Double getHeight() {
