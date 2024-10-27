@@ -91,6 +91,14 @@
                 </select>
             </div>
             <div class="form__field">
+                <label for="donorType">Donor Type:</label>
+                <select th:field="*{donorType}" id="donorType" required>
+                    <option value="">--Select Donor Type--</option>
+                    <option value="EGG">Egg Donor</option>
+                    <option value="SPERM">Sperm Donor</option>
+                </select>
+            </div>
+            <div class="form__field">
                 <label for="medicalHistory">Family and Donor's Medical History:</label>
                 <select th:field="*{medicalHistory}" id="medicalHistory" multiple>
                     <option value="cancer">Cancer</option>
@@ -139,6 +147,7 @@
         <p>Race: <span th:text="${donorProfile.race ?: 'Not specified'}">Race</span></p>
         <p>Ethnicity: <span th:text="${donorProfile.ethnicity ?: 'Not specified'}">Ethnicity</span></p>
         <p>Blood Type: <span th:text="${donorProfile.bloodType ?: 'Not specified'}">Blood Type</span></p>
+        <p>Donor Type: <span th:text="${donorProfile.donorType ?: 'Not specified'}">Donor Type</span></p>
         <p>Family and Donor's Medical History:
             <span th:if="${donorProfile.medicalHistory != null}" th:text="${donorProfile.medicalHistory}">Medical History</span>
             <span th:if="${donorProfile.medicalHistory == null}">No history specified</span>
