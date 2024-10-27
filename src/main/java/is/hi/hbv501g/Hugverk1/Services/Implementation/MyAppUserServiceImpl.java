@@ -34,26 +34,18 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<MyAppUsers> user = userRepository.findByUsername(username);
-        if (user.isPresent()) {
-            MyAppUsers userObj = user.get();
-            return User.withUsername(userObj.getUsername())
-                    .password(userObj.getPassword())
-                    .roles("USER")  // Set roles accordingly
-                    .build();
-        } else {
-            throw new UsernameNotFoundException("User not found");
-        }
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Override
     public void saveUser(MyAppUsers user) {
         // Encode the password before saving the user
         user.setPassword(passwordEncoder.encode(user.getPassword())); // The password is hashed
-        if ("donor".equalsIgnoreCase(user.getUserType())) {
-            user.assignDonorId();
-        } else if ("recipient".equalsIgnoreCase(user.getUserType())) {
-            user.assignRecipientId();
+        if ("donor".equalsIgnoreCase(user.getUserType()) && user.getDonorId() == null) {
+            user.assignDonorId(); // Assign a unique donorId
+        } else if ("recipient".equalsIgnoreCase(user.getUserType()) && user.getRecipientId() == null) {
+            user.assignRecipientId(); // Assign a unique recipientId
         }
         userRepository.save(user); // Save the user to the database
     }

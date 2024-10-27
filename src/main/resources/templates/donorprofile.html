@@ -2,109 +2,153 @@
 <html xmlns:th="https://thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update Profile</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color:  #2c3338;
-            padding: 20px;
-            color: var(--baseColor);
-            font-family: "Open Sans", sans-serif;
-            font-size: 0.875rem;
-            line-height: 2.5;
-            margin: 0;
-            min-height: 100vh;
-        }
-        .profile-container {
-            max-width: 500px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            text-align: center;
-        }
-        label {
-            display: block;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        textarea {
-            resize: vertical;
-        }
-        button {
-            margin-top: 20px;
-            width: 100%;
-            padding: 10px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #218838;
-        }
-
-
-
-
-    </style>
+    <title>Donor Profile</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/donorprofile.css}">
 </head>
 <body>
 
 <div class="profile-container">
-    <h2>Edit Profile</h2>
-    <form action="/update-profile" method="POST">
-        <label for="name">Full Name</label>
-        <input type="text" id="name" name="name" placeholder="Enter your full name, make sure it's not your real name"
-               required>
+    <div class="profile-edit">
+        <h2>Edit Profile</h2>
 
-        <label for="bio">Bio</label>
-        <textarea id="bio" name="bio" rows="4" placeholder="Tell something about yourself..."></textarea>
+        <form th:action="@{/donorprofile/saveOrEdit}" th:object="${donorProfile}" method="post" enctype="multipart/form-data">
 
-        <label for="tag">Search Tags</label>
-        <textarea id="tag" name="tag" rows="4"
-                  placeholder="Write down keywords to describe your appearance, background, etc...."></textarea>
+            <div class="form__field">
+                <label for="profileImage">Profile Image:</label>
+                <input type="file" id="profileImage" name="profileImage" accept="image/*">
+            </div>
 
-        <label for="profilePicture">Profile Picture (JPG only) (baby pictures only) </label>
-        <input type="file" id="profilePicture" name="profilePicture" accept=".jpg, .jpeg" onchange="previewImage(event)"
-               required>
+            <div class="form__field">
+                <label for="eyeColor">Eye Color:</label>
+                <select th:field="*{eyeColor}" id="eyeColor" required>
+                    <option value="">--Select Eye Color--</option>
+                    <option value="blue">Blue</option>
+                    <option value="green">Green</option>
+                    <option value="brown">Brown</option>
+                    <option value="hazel">Hazel</option>
+                    <option value="heterochromia">Heterochromia</option>
+                </select>
+            </div>
+            <div class="form__field">
+                <label for="hairColor">Hair Color:</label>
+                <select th:field="*{hairColor}" id="hairColor" required>
+                    <option value="">--Select Hair Color--</option>
+                    <option value="blonde">Blonde</option>
+                    <option value="brown">Brown</option>
+                    <option value="black">Black</option>
+                    <option value="red">Red</option>
+                    <option value="strawberry-red">Strawberry Red</option>
+                    <option value="white">White</option>
+                </select>
+            </div>
+            <div class="form__field">
+                <label for="educationLevel">Education Level:</label>
+                <select th:field="*{educationLevel}" id="educationLevel" required>
+                    <option value="">--Select Education Level--</option>
+                    <option value="primary-school">Primary School</option>
+                    <option value="secondary-school">Secondary School</option>
+                    <option value="university">University</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form__field">
+                <label for="race">Race:</label>
+                <select th:field="*{race}" id="race" required>
+                    <option value="">--Select Race--</option>
+                    <option value="asian">Asian</option>
+                    <option value="black">Black</option>
+                    <option value="caucasian">Caucasian</option>
+                    <option value="hispanic">Hispanic</option>
+                    <option value="native-american">Native American</option>
+                    <option value="pacific-islander">Pacific Islander</option>
+                    <option value="mixed">Mixed</option>
+                </select>
+            </div>
+            <div class="form__field">
+                <label for="ethnicity">Ethnicity:</label>
+                <select th:field="*{ethnicity}" id="ethnicity" required>
+                    <option value="">--Select Ethnicity--</option>
+                    <option value="hispanic">Hispanic</option>
+                    <option value="non-hispanic">Non-Hispanic</option>
+                    <option value="african">African</option>
+                    <option value="european">European</option>
+                    <option value="asian">Asian</option>
+                    <option value="middle-eastern">Middle Eastern</option>
+                </select>
+            </div>
+            <div class="form__field">
+                <label for="bloodType">Blood Type:</label>
+                <select th:field="*{bloodType}" id="bloodType" required>
+                    <option value="">--Select Blood Type--</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                </select>
+            </div>
+            <div class="form__field">
+                <label for="medicalHistory">Family and Donor's Medical History:</label>
+                <select th:field="*{medicalHistory}" id="medicalHistory" multiple>
+                    <option value="cancer">Cancer</option>
+                    <option value="heart-disease">Heart Disease</option>
+                    <option value="diabetes">Diabetes</option>
+                    <option value="asthma">Asthma</option>
+                    <option value="high-blood-pressure">High Blood Pressure</option>
+                </select>
+            </div>
 
+            <div class="form__field">
+                <label for="height">Height (cm):</label>
+                <input type="number" id="height" th:field="*{height}" min="50" max="250" required />
+            </div>
+            <div class="form__field">
+                <label for="weight">Weight (kg):</label>
+                <input type="number" id="weight" th:field="*{weight}" min="20" max="200" required />
+            </div>
+            <div class="form__field">
+                <label for="age">Age:</label>
+                <input type="number" id="age" th:field="*{age}" min="18" max="80" required />
+            </div>
 
-        <button type="Apply">Apply Changes</button>
-        <button type="submit">Save Changes</button>
+            <div class="form__field">
+                <label for="getToKnow">Get to Know the Donor:</label>
+                <textarea id="getToKnow" th:field="*{getToKnow}"></textarea>
+            </div>
 
-    </form>
+            <!--  Save/Edit Profile Button -->
+            <div class="form__field">
+                <button type="submit" th:text="${donorProfile.profileId == null ? 'Save Profile' : 'Edit Profile'}"></button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Profile Information is Displayed -->
+    <div class="profile-info">
+        <h2>Profile Information</h2>
+        <div class="profile-image">
+            <img th:src="@{${donorProfile.imagePath}}" alt="Profile Image" th:if="${donorProfile.imagePath != null}">
+        </div>
+        <p>Donor ID: <span th:text="${donorProfile.user?.donorId ?: 'No ID available'}">Donor ID</span></p>
+        <p>Eye Color: <span th:text="${donorProfile.eyeColor ?: 'Not specified'}">Eye Color</span></p>
+        <p>Hair Color: <span th:text="${donorProfile.hairColor ?: 'Not specified'}">Hair Color</span></p>
+        <p>Education Level: <span th:text="${donorProfile.educationLevel ?: 'Not specified'}">Education Level</span></p>
+        <p>Race: <span th:text="${donorProfile.race ?: 'Not specified'}">Race</span></p>
+        <p>Ethnicity: <span th:text="${donorProfile.ethnicity ?: 'Not specified'}">Ethnicity</span></p>
+        <p>Blood Type: <span th:text="${donorProfile.bloodType ?: 'Not specified'}">Blood Type</span></p>
+        <p>Family and Donor's Medical History:
+            <span th:if="${donorProfile.medicalHistory != null}" th:text="${donorProfile.medicalHistory}">Medical History</span>
+            <span th:if="${donorProfile.medicalHistory == null}">No history specified</span>
+        </p>
+        <p>Height: <span th:text="${donorProfile.height}">Height</span> cm</p>
+        <p>Weight: <span th:text="${donorProfile.weight}">Weight</span> kg</p>
+        <p>Age: <span th:text="${donorProfile.age}">Age</span></p>
+        <p>Get to Know the Donor: <span th:text="${donorProfile.getToKnow ?: 'No information provided'}">Get to Know</span></p>
+    </div>
 </div>
-<script>
-    // JavaScript to preview the uploaded image
-    function previewImage(event) {
-        const reader = new FileReader();
-        reader.onload = function(){
-            const output = document.getElementById('profilePicturePreview');
-            output.src = reader.result;
-        };
-        reader.readAsDataURL(event.target.files[0]);
-    }
-
-
-
-
-
-</script>
 
 </body>
 </html>
-

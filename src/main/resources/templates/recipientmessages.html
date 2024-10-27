@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Recipient Messages</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/messagestyle.css}">
+</head>
+
+<body>
+<div id="frame">
+    <div id="sidepanel">
+        <div id="profile">
+            <div class="wrap">
+                <div id="profile-img" style="background: url('https://i.pinimg.com/564x/57/00/c0/5700c04197ee9a4372a35ef16eb78f4e.jpg') no-repeat center center; background-size: cover; width: 60px; height: 60px; border-radius: 50%;"></div>
+                <p th:text="'Recipient: ' + ${username}"></p>
+            </div>
+        </div>
+        <div id="contacts">
+            <ul>
+                <li class="contact">
+                    <div class="wrap">
+                        <span class="contact-status online"></span>
+                        <div style="background: url('https://cdn.vectorstock.com/i/500p/53/42/user-member-avatar-face-profile-icon-vector-22965342.jpg') no-repeat center center; background-size: cover; width: 40px; height: 40px; border-radius: 50%;"></div>
+                        <div class="meta">
+                            <p class="name">Donor ID:</p>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="messages">
+            <ul>
+                <li class="replies">
+                    <div style="background: url('https://i.pinimg.com/564x/57/00/c0/5700c04197ee9a4372a35ef16eb78f4e.jpg') no-repeat center center; background-size: cover; width: 40px; height: 40px; border-radius: 50%;"></div>
+                    <p>Recipient: I would like to know more about your donation history.</p>
+                </li>
+                <li class="sent">
+                    <div style="background: url('https://cdn.vectorstock.com/i/500p/53/42/user-member-avatar-face-profile-icon-vector-22965342.jpg') no-repeat center center; background-size: cover; width: 40px; height: 40px; border-radius: 50%;"></div>
+                    <p>Donor: Sure! I am happy to share more details.</p>
+                </li>
+            </ul>
+        </div>
+        <div class="message-input">
+            <div class="wrap">
+                <input type="text" placeholder="Write your message..." />
+                <button class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
