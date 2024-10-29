@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Donor Profile</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/donorsPage.css}">
+</head>
+<body>
+
+<div class="profile-container">
+    <h1>Donor Profile</h1>
+
+    <div class="profile-image">
+        <img th:src="@{${donorProfile.imagePath}}" alt="Donor Image" />
+    </div>
+
+    <div class="profile-info">
+        <p><strong>Traits:</strong> <span th:text="${donorProfile.traits}">Traits</span></p>
+        <p><strong>Height:</strong> <span th:text="${donorProfile.height}">Height</span> cm</p>
+        <p><strong>Weight:</strong> <span th:text="${donorProfile.weight}">Weight</span> kg</p>
+        <p><strong>Eye Color:</strong> <span th:text="${donorProfile.eyeColor}">Eye Color</span></p>
+        <p><strong>Hair Color:</strong> <span th:text="${donorProfile.hairColor}">Hair Color</span></p>
+        <p><strong>Medical History:</strong> <span th:text="${donorProfile.medicalHistory}">Medical History</span></p>
+        <p><strong>Blood Type:</strong> <span th:text="${donorProfile.bloodType}">Blood Type</span></p>
+        <p><strong>Get to Know:</strong> <span th:text="${donorProfile.getToKnow}">Get to Know</span></p>
+    </div>
+
+    <div class="profile-actions">
+        <a th:href="@{/recipient/favorite/{profileId}(profileId=${donorProfile.profileId})}" class="button">Favorite</a>
+        <a th:href="@{/recipient/match/{profileId}(profileId=${donorProfile.profileId})}" class="button">Request Match</a>
+    </div>
+</div>
+
+</body>
+</html>
