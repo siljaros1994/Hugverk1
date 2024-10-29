@@ -13,9 +13,19 @@
         href="https://use.fontawesome.com/releases/v5.4.1/css/all.css"
         integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz"
         crossorigin="anonymous">
+  <style>
+    #loading {
+        display: none;
+        margin-left: 10px;
+        vertical-align: middle;
+    }
+  </style>
 </head>
 <body>
-<h1>User List</h1>
+<h1>
+  User List
+  <i id="loading" class="fa fa-spinner fa-spin" style="display: none;"></i>
+</h1>
 <table>
   <thead>
   <tr>
@@ -35,12 +45,23 @@
   </tr>
   </tbody>
 </table>
-<div class="pagination">
+<div class="pagination" th:if="${totalPages > 1}">
   <a th:if="${currentPage > 0}"
-     th:href="@{/dr(page=${currentPage - 1}, size=10)}">&laquo; Previous</a>
+     th:href="@{/dr(page=${currentPage - 1}, size=10)}"
+     onclick="showLoading()">&laquo; Previous</a>
   <span>Page <span th:text="${currentPage + 1}"></span> of <span th:text="${totalPages}"></span></span>
   <a th:if="${currentPage < totalPages - 1}"
-     th:href="@{/dr(page=${currentPage + 1}, size=10)}">Next &raquo;</a>
+     th:href="@{/dr(page=${currentPage + 1}, size=10)}"
+     onclick="showLoading()">Next &raquo;</a>
 </div>
+<script>
+  function showLoading() {
+      document.getElementById('loading').style.display = 'inline-block';
+  }
+
+  window.onload = function() {
+      document.getElementById('loading').style.display = 'none';
+  }
+</script>
 </body>
 </html>
