@@ -23,7 +23,6 @@
     <th>Username</th>
     <th>Email</th>
     <th>Delete</th>
-    <!-- Add more columns as necessary -->
   </tr>
   </thead>
   <tbody>
@@ -33,9 +32,15 @@
     <td th:text="${user.email}"></td>
     <td><a th:href="@{/delete/{username}(username=${user.username})}"
            class="btn btn-primary"><i class="fa fa-trash" style="color: white;"></i></a></td>
-    <!-- Add more fields as necessary -->
   </tr>
   </tbody>
 </table>
+<div class="pagination">
+  <a th:if="${currentPage > 0}"
+     th:href="@{/dr(page=${currentPage - 1}, size=10)}">&laquo; Previous</a>
+  <span>Page <span th:text="${currentPage + 1}"></span> of <span th:text="${totalPages}"></span></span>
+  <a th:if="${currentPage < totalPages - 1}"
+     th:href="@{/dr(page=${currentPage + 1}, size=10)}">Next &raquo;</a>
+</div>
 </body>
 </html>
