@@ -15,8 +15,4 @@ public class ContentController {
     public String register(){
         return "register";
     }
-    @GetMapping("/Home")
-    public String home(){
-        return "Home";
-    }
 }

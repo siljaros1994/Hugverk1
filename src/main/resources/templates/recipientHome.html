@@ -10,7 +10,6 @@
     <nav class="main-menu">
         <ul>
             <li><a th:href="@{/recipientprofile}"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
-            <li><a href="#"><i class="fa fa-heart fa-2x"></i><span class="nav-text">Donors</span></a></li>
             <li><a th:href="@{/messages/recipient}"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Message</span></a></li>
             <li><a href="#"><i class="fa fa-star fa-2x"></i><span class="nav-text">Favorite</span></a></li>
             <li><a href="#"><i class="fa fa-check fa-2x"></i><span class="nav-text">Match</span></a></li>
@@ -28,14 +27,35 @@
                 <p th:text="'Hello, ' + ${username} + '!'"></p>
             </header>
 
-            <div class="cover">
-                <div class="search-bar">
-                    <input type="text" placeholder="Search donor profiles..." />
+            <div class="donor-cards" th:if="${donorsPage != null && donorsPage.content.size() > 0}">
+                <div class="card-grid">
+                    <div class="donor-card" th:each="donor : ${donorsPage.content}">
+                        <img th:src="@{${donor.imagePath}}" alt="Donor Image" class="donor-image"/>
+                        <div class="donor-info">
+                            <p><strong>Eye Color:</strong> <span th:text="${donor.eyeColor}">Eye Color</span></p>
+                            <p><strong>Hair Color:</strong> <span th:text="${donor.hairColor}">Hair Color</span></p>
+                            <p><strong>Race:</strong> <span th:text="${donor.race}">Race</span></p>
+                            <p><strong>Blood Type:</strong> <span th:text="${donor.bloodType}">Blood Type</span></p>
+                            <p><strong>Donor Type:</strong> <span th:text="${donor.donorType}">Donor Type</span></p>
+                        </div>
+                        <div class="card-buttons">
+                            <button th:onclick="'location.href=\'/recipient/favorite/' + ${donor.profileId} + '\''">Favorite</button>
+                            <button th:onclick="'location.href=\'/recipient/view/' + ${donor.profileId} + '\''">View Profile</button>
+                            <button th:onclick="'location.href=\'/recipient/match/' + ${donor.profileId} + '\''">Match</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="buttons">
-                    <button class="follow">Date Added</button>
-                    <button class="follow">Most Popular</button>
-                </div>
+            </div>
+
+            <div th:if="${donorsPage != null && donorsPage.content.size() == 0}">
+                <p>No donors found.</p>
+                <p th:text="${testMessage}"></p>
+            </div>
+
+            <div class="pagination" th:if="${donorsPage != null}">
+                <a th:href="@{/home/recipient(page=${donorsPage.number - 1})}" th:if="${donorsPage.hasPrevious()}">Previous</a>
+                <span th:text="'Page ' + (${donorsPage.number} + 1) + ' of ' + ${donorsPage.totalPages}"></span>
+                <a th:href="@{/home/recipient(page=${donorsPage.number + 1})}" th:if="${donorsPage.hasNext()}">Next</a>
             </div>
         </div>
     </main>
