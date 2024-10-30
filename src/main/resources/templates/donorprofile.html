@@ -100,12 +100,27 @@
             </div>
             <div class="form__field">
                 <label for="medicalHistory">Family and Donor's Medical History:</label>
-                <select th:field="*{medicalHistory}" id="medicalHistory" multiple>
+                <select th:field="*{medicalHistory}" id="medicalHistory" name="medicalHistory" multiple>
                     <option value="cancer">Cancer</option>
                     <option value="heart-disease">Heart Disease</option>
                     <option value="diabetes">Diabetes</option>
                     <option value="asthma">Asthma</option>
                     <option value="high-blood-pressure">High Blood Pressure</option>
+                    <option value="sickle cell disease">Sickle Cell Disease</option>
+                    <option value="cystic fibrosis">Cystic Fibrosis</option>
+                    <option value="tay-sachs disease">Tay-Sachs Disease</option>
+                    <option value="spinal muscular atrophy ">Spinal Muscular Atrophy</option>
+                    <option value="fragile x syndrome">Fragile X Syndrome</option>
+                    <option value="thalassemia">Thalassemia</option>
+                    <option value="hemophilia">Hemophilia</option>
+                    <option value="muscular dystrophies">Muscular Dystrophies</option>
+                    <option value="down syndrome">Down Syndrome</option>
+                    <option value="turner syndrome">Turner Syndrome</option>
+                    <option value="alzheimer’s disease">Alzheimer’s Disease</option>
+                    <option value="parkinson’s disease">Parkinson’s Disease</option>
+                    <option value="huntington’s disease">Huntington’s Disease</option>
+                    <option value="rheumatoid arthritis">Rheumatoid Arthritis</option>
+                    <option value="galactosemia">Galactosemia</option>
                 </select>
             </div>
 
@@ -148,7 +163,8 @@
         <p>Blood Type: <span th:text="${donorProfile.bloodType ?: 'Not specified'}">Blood Type</span></p>
         <p>Donor Type: <span th:text="${donorProfile.donorType ?: 'Not specified'}">Donor Type</span></p>
         <p>Family and Donor's Medical History:
-            <span th:if="${donorProfile.medicalHistory != null}" th:text="${donorProfile.medicalHistory}">Medical History</span>
+            <span th:if="${donorProfile.medicalHistory != null}"
+                  th:text="${#strings.arrayJoin(donorProfile.medicalHistory.toArray(), ', ')}">Medical History</span>
             <span th:if="${donorProfile.medicalHistory == null}">No history specified</span>
         </p>
         <p>Height: <span th:text="${donorProfile.height}">Height</span> cm</p>
