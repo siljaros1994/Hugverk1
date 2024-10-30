@@ -2,6 +2,9 @@ package is.hi.hbv501g.Hugverk1.Persistence.Entities;
 
 import jakarta.persistence.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "DonorProfile")
 public class DonorProfile {
@@ -38,8 +41,10 @@ public class DonorProfile {
     @Column(name = "education_level")
     private String educationLevel;
 
-    @Column(name = "medical_history")
-    private String medicalHistory;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "medical_history", joinColumns = @JoinColumn(name = "profile_id"))
+    @Column(name = "history")
+    private Set<String> medicalHistory = new HashSet<>();
 
     @Column(name = "race")
     private String race;
@@ -140,11 +145,11 @@ public class DonorProfile {
         this.educationLevel = educationLevel;
     }
 
-    public String getMedicalHistory() {
+    public Set<String> getMedicalHistory() {
         return medicalHistory;
     }
 
-    public void setMedicalHistory(String medicalHistory) {
+    public void setMedicalHistory(Set<String> medicalHistory) {
         this.medicalHistory = medicalHistory;
     }
 
