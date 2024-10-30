@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/users/login", "/users/register", "/css/**", "/api/authenticate").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
-                        .requestMatchers("/home/donor", "/home/recipient", "/recipient/view/**", "/donorprofile", "/recipientprofile", "/dr").authenticated() // Allow access to the home pages after login
+                        .requestMatchers("/home/donor", "/home/recipient", "/recipient/view/**", "/donorprofile", "/recipientprofile", "/dr", "/favorites").authenticated() // Allow access to the home pages after login
                         .requestMatchers("/messages/donor", "/messages/recipient").authenticated()
                         .anyRequest().authenticated())  // All other requests need authentication
                 .formLogin(login -> login

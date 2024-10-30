@@ -14,6 +14,8 @@ public interface MyAppUserService extends UserDetailsService {
     Optional<MyAppUsers> findById(Long id);
     boolean matchPassword(String rawPassword, String encodedPassword);
     List<MyAppUsers> findAllUsers();
+    void addFavoriteDonor(Long recipientId, Long donorId);
+    List<Long> getFavoriteDonors(Long recipientId);
 
     @Override
     UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;

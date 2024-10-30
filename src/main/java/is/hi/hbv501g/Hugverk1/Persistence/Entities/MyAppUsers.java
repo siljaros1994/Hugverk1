@@ -38,6 +38,9 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
     @Column(nullable = false)
     private String userType; // Either donor or recipient.
 
+    @Column(name = "favorite_donors")
+    private String favoriteDonors;
+
     @Transient
     private String confirmPassword;
 
@@ -155,5 +158,12 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
 
     public void assignRecipientId() {
         this.recipientId = UUID.randomUUID().toString();
+    }
+
+    public String getFavoriteDonors() {
+        return favoriteDonors;
+    }
+    public void setFavoriteDonors(String favoriteDonors) {
+        this.favoriteDonors = favoriteDonors;
     }
 }
