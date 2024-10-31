@@ -62,6 +62,8 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/users/logout")
                         .logoutSuccessUrl("/users/login?logout=true")
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
                         .permitAll())
                 .addFilterBefore(new CustomFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();
