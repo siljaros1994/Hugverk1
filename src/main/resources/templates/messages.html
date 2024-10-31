@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Messages</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/messagestyle.css}">
+</head>
+<body>
+<div id="frame">
+    <div id="sidepanel">
+        <div id="profile">
+            <div class="wrap">
+                <div id="profile-img" th:style="'background: url(' + @{${senderImagePath}} + ') no-repeat center center; background-size: cover; width: 60px; height: 60px; border-radius: 50%;'"></div>
+                <p th:text="'Recipient: ' + ${senderId}"></p>
+            </div>
+        </div>
+    </div>
+    <div class="content">
+        <div class="messages">
+            <ul>
+                <li th:each="chatMessage : ${chats}" th:classappend="${chatMessage.senderId == senderId} ? 'sent' : 'replies'">
+                    <div th:style="'background: url(' + (chatMessage.senderId == senderId ? @{${senderImagePath}} : @{${recipientImagePath}}) + ') no-repeat center center; background-size: cover; width: 40px; height: 40px; border-radius: 50%;'"></div>
+                    <p th:text="${chatMessage.content}"></p>
+                </li>
+            </ul>
+        </div>
+        <div class="message-input">
+            <div class="wrap">
+                <form th:object="${messageForm}" th:action="@{/messages/send}" method="POST">
+                    <input type="hidden" th:field="*{recipientId}" th:value="${recipientId}" />
+                    <input id="text" th:field="*{text}" type="text" placeholder="Write your message..." />
+                    <button type="submit" class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i> Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
