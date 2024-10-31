@@ -120,3 +120,22 @@ body {
 .message-input .submit:hover {
     background-color: #27ae60;
 }
+
+.back-button {
+    display: block;
+    text-align: center;
+    margin-top: 845px;
+}
+
+.back-button button {
+    padding: 15px 20px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+.back-button button:hover {
+    background-color: #2980b9;
+}

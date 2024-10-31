@@ -13,6 +13,11 @@
                 <p th:text="'Recipient: ' + ${senderId}"></p>
             </div>
         </div>
+        <div class="wrap">
+            <a th:href="${userType == 'donor' ? '/home/donor' : '/home/recipient'}" class="back-button">
+                <button>Back to Home</button>
+            </a>
+        </div>
     </div>
     <div class="content">
         <div class="messages">
