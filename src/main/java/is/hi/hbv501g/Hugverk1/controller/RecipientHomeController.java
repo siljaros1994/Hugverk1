@@ -42,7 +42,7 @@ public class RecipientHomeController {
         }
         model.addAttribute("username", loggedInUser.getUsername());
 
-        // Configure sorting direction and attribute
+        // Configure the sorting direction and it's attributes
         Sort sort = Sort.by(sortOrder.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
         Pageable pageable = PageRequest.of(page, 9, sort);
 
@@ -53,7 +53,7 @@ public class RecipientHomeController {
             donorsPage = donorProfileService.findAll(pageable);
         }
 
-        // Log the number of donors in the page
+        // Log the number of donors in the page, i like to see how many donors have created a profile.
         logger.info("Number of donors in donorsPage: {}", donorsPage.getContent().size());
 
         // Add data to the model
