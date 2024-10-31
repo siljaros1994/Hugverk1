@@ -16,7 +16,9 @@
             <li><a href="#"><i class="fa fa-book fa-2x"></i><span class="nav-text">Resource</span></a></li>
         </ul>
         <ul class="logout">
-            <li><a href="#"><i class="fa fa-power-off fa-2x"></i><span class="nav-text">Logout</span></a></li>
+            <li><a th:href="@{/users/logout}" th:onclick="return confirm('Are you sure you want to logout?')">
+                <i class="fa fa-power-off fa-2x"></i><span class="nav-text">Logout</span>
+            </a></li>
         </ul>
     </nav>
 

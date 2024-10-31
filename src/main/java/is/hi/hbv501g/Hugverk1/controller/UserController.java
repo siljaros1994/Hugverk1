@@ -109,16 +109,3 @@ public class UserController {
         return users;
     }
 }
-
-// Display the logged inn user details
-//@GetMapping("/loggedin")
-//public String getLoggedInUser(HttpSession session, Model model) {
-//MyAppUsers loggedInUser = (MyAppUsers) session.getAttribute("LoggedInUser");
-//if (loggedInUser != null) {
-//model.addAttribute("user", loggedInUser);
-//return "loggedInUser";
-//} else {
-//model.addAttribute("message", "No user is logged in.");
-//return "redirect:/login";  // Redirect to login page if no user is logged in.
-//}
-//}
