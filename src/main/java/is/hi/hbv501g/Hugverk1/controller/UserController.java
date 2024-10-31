@@ -104,7 +104,7 @@ public class UserController {
         List<MyAppUsers> users = myAppUserService.findAllUsers();
         if (users == null || users.isEmpty()) {
             System.out.println("No users found.");
-            return Collections.emptyList();  // Return an empty list if no users are found
+            return Collections.emptyList();  // Return an empty list if there are no users to be found.
         }
         return users;
     }

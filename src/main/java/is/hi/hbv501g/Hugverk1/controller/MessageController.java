@@ -29,7 +29,6 @@ public class MessageController {
     @Autowired
     private DonorProfileService donorProfileService;
 
-    // Display recipient messages page with profile images
     @GetMapping("/recipient")
     public String showMessagesRecipient(Model model, Principal principal) {
         Optional<MyAppUsers> currentUserOptional = userService.findByUsername(principal.getName());
@@ -38,7 +37,7 @@ public class MessageController {
             MyAppUsers currentUser = currentUserOptional.get();
             String recipientId = currentUser.getRecipientId();
 
-            // Set the default paths to the uploaded images
+            // Set the default paths to the uploaded images, needs to be updated with match.
             String senderImagePath;
             if ("donor".equalsIgnoreCase(currentUser.getUserType())) {
                 Optional<DonorProfile> donorProfile = donorProfileService.findByUserDonorId(currentUser.getDonorId());
@@ -52,7 +51,7 @@ public class MessageController {
             model.addAttribute("chats", messageService.getConversation(recipientId, recipientId));
             model.addAttribute("messageForm", new MessageForm());
             model.addAttribute("senderImagePath", senderImagePath);
-
+            model.addAttribute("userType", currentUser.getUserType());
         } else {
             model.addAttribute("error", "User not found");
             return "error";
@@ -60,7 +59,6 @@ public class MessageController {
         return "messages";
     }
 
-    // Endpoint for sending messages
     @PostMapping("/send")
     public String sendMessage(@ModelAttribute MessageForm messageForm, Model model, Principal principal) {
         Optional<MyAppUsers> currentUserOptional = userService.findByUsername(principal.getName());
@@ -74,13 +72,13 @@ public class MessageController {
             newMessage.setTimestamp(LocalDateTime.now());
             messageService.saveMessage(newMessage);
 
-            // Re-fetch the conversation and other attributes
+            // Re-fetch the conversation and other attributes so they don't disappear
             model.addAttribute("chats", messageService.getConversation(currentUser.getRecipientId(), messageForm.getRecipientId()));
             model.addAttribute("senderId", currentUser.getRecipientId());
             model.addAttribute("recipientId", messageForm.getRecipientId());
             model.addAttribute("messageForm", new MessageForm());
 
-            // Determine sender image path based on user type and profile image
+            // Determine sender image path based on user type and profile image, needs to be updated with match
             String senderImagePath;
             if ("donor".equalsIgnoreCase(currentUser.getUserType())) {
                 Optional<DonorProfile> donorProfile = donorProfileService.findByUserDonorId(currentUser.getDonorId());
