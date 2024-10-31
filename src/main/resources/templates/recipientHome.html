@@ -27,6 +27,27 @@
                 <p th:text="'Hello, ' + ${username} + '!'"></p>
             </header>
 
+            <div class="search-bar">
+                <form th:action="@{/home/recipient}" method="get">
+                    <input type="text" name="keyword" placeholder="Search by traits or donor type" size="50" th:value="${keyword}">
+                    <button type="submit" class="btn btn-info">Search</button>
+                    <a th:href="@{/home/recipient}" class="btn btn-secondary">Reset</a>
+
+                    <label for="sortBy">Sort By:</label>
+                    <select name="sortBy" id="sortBy" th:value="${sortBy}">
+                        <option value="age" th:selected="${sortBy == 'age'}">Age</option>
+                        <option value="height" th:selected="${sortBy == 'height'}">Height</option>
+                        <option value="weight" th:selected="${sortBy == 'weight'}">Weight</option>
+                    </select>
+
+                    <label for="sortOrder">Order:</label>
+                    <select name="sortOrder" id="sortOrder" th:value="${sortOrder}">
+                        <option value="asc" th:selected="${sortOrder == 'asc'}">Ascending</option>
+                        <option value="desc" th:selected="${sortOrder == 'desc'}">Descending</option>
+                    </select>
+                </form>
+            </div>
+
             <div class="donor-cards" th:if="${donorsPage != null && donorsPage.content.size() > 0}">
                 <div class="card-grid">
                     <div class="donor-card" th:each="donor : ${donorsPage.content}">

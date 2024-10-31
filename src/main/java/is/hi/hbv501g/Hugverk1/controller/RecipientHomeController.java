@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 
 @Controller
 public class RecipientHomeController {
@@ -29,6 +30,8 @@ public class RecipientHomeController {
     public String recipientHome(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "asc") String sortOrder,
+            @RequestParam(defaultValue = "age") String sortBy,
             Model model,
             HttpSession session
     ) {
@@ -39,12 +42,25 @@ public class RecipientHomeController {
         }
         model.addAttribute("username", loggedInUser.getUsername());
 
-        Pageable pageable = PageRequest.of(page, 9);
-        Page<DonorProfile> donorsPage = donorProfileService.findAll(pageable);
+        // Configure sorting direction and attribute
+        Sort sort = Sort.by(sortOrder.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
+        Pageable pageable = PageRequest.of(page, 9, sort);
+
+        Page<DonorProfile> donorsPage;
+        if (keyword != null && !keyword.isEmpty()) {
+            donorsPage = donorProfileService.findByKeyword(keyword, pageable);
+        } else {
+            donorsPage = donorProfileService.findAll(pageable);
+        }
+
+        // Log the number of donors in the page
         logger.info("Number of donors in donorsPage: {}", donorsPage.getContent().size());
 
+        // Add data to the model
         model.addAttribute("donorsPage", donorsPage);
         model.addAttribute("keyword", keyword);
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("sortOrder", sortOrder);
 
         return "recipientHome";
     }

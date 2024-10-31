@@ -39,6 +39,10 @@ public class DonorProfileService {
         return donorProfileRepository.findAll();
     }
 
+    public Page<DonorProfile> findByKeyword(String keyword, Pageable pageable) {
+        return donorProfileRepository.findByKeyword(keyword, pageable);
+    }
+
     // Here we retrieve all donor profiles with pagination
     public Page<DonorProfile> findAll(Pageable pageable) {
         return donorProfileRepository.findAll(pageable);
