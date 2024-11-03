@@ -1,4 +1,4 @@
-package is.hi.hbv501g.Hugverk1.Persistence.Entities;
+package is.hi.hbv501g.Hugverk1.Persistence.forms;
 
 public class MessageForm {
     private String text;

@@ -1,9 +1,9 @@
 package is.hi.hbv501g.Hugverk1.controller;
 
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.DonorProfile;
-import is.hi.hbv501g.Hugverk1.Persistence.Entities.MessageForm;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.Message;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
+import is.hi.hbv501g.Hugverk1.Persistence.forms.MessageForm;
 import is.hi.hbv501g.Hugverk1.Services.DonorProfileService;
 import is.hi.hbv501g.Hugverk1.Services.MessageService;
 import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;

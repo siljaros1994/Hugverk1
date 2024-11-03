@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Donation Booking</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bookingstyle.css}">
+</head>
+<body>
+
+<div class="area">
+    <nav class="side-panel">
+        <ul>
+            <li><a th:href="@{/donorprofile}"><i class="fa fa-user"></i><span class="nav-text">Profile</span></a></li>
+            <li><a th:href="@{/dr}"><i class="fa fa-heart"></i><span class="nav-text">Recipients</span></a></li>
+            <li><a th:href="@{/messages/donor}"><i class="fa fa-envelope"></i><span class="nav-text">Messages</span></a></li>
+            <li><a href="#"><i class="fa fa-check"></i><span class="nav-text">Match</span></a></li>
+            <li><a th:href="@{/bookings}"><i class="fa fa-book"></i><span class="nav-text">Booking</span></a></li>
+        </ul>
+        <ul class="logout">
+            <li><a th:href="@{/users/logout}" onclick="return confirm('Are you sure you want to logout?')">
+                <i class="fa fa-power-off"></i><span class="nav-text">Logout</span>
+            </a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="page-header">
+            <h2>Book a Donation Appointment</h2>
+            <p>Choose a convenient date and time to visit the clinic or choose an alternative delivery option.</p>
+            <p>We recommend booking a visit to the clinic, it offers an Comprehensive Consultations and Personalized Treatment Plans. </p>
+        </header>
+
+        <form th:object="${bookingForm}" th:action="@{/bookings/book}" method="POST">
+            <div class="input-group">
+                <label for="donorId">Donor ID:</label>
+                <input type="text" id="donorId" th:field="*{donorId}" placeholder="Enter Donor ID" required>
+            </div>
+            <div class="input-group">
+                <label for="recipientId">Recipient ID:</label>
+                <input type="text" id="recipientId" th:field="*{recipientId}" placeholder="Enter Recipient ID" required>
+            </div>
+            <div class="input-group">
+                <label for="date">Date:</label>
+                <input type="date" id="date" th:field="*{date}" required>
+            </div>
+            <div class="input-group">
+                <label for="time">Time:</label>
+                <input type="time" id="time" th:field="*{time}" required>
+            </div>
+            <button type="submit" class="btn-submit">Book Appointment</button>
+        </form>
+
+        <section class="appointments">
+            <h3>Current Appointments</h3>
+            <ul>
+                <li th:each="booking : ${bookings}">
+                    <p>
+                        <strong>Donor ID:</strong> <span th:text="${booking.donor.donorId}"></span> |
+                        <strong>Recipient ID:</strong> <span th:text="${booking.recipient.recipientId}"></span> |
+                        <strong>Date:</strong> <span th:text="${booking.date}"></span> |
+                        <strong>Time:</strong> <span th:text="${booking.time}"></span>
+                    <form th:action="@{/bookings/cancel/{id}(id=${booking.id})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn-cancel">Cancel</button>
+                    </form>
+                    </p>
+                </li>
+            </ul>
+        </section>
+    </main>
+</div>
+
+<footer>
+    <p>Alexandra, Guðrún, Silja og Þrándur.</p>
+</footer>
+
+</body>
+</html>
