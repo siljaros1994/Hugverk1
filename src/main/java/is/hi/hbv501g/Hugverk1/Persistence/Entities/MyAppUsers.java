@@ -166,4 +166,13 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
     public void assignRecipientId() {
         this.recipientId = UUID.randomUUID().toString();
     }
+
+    public String getFavoriteDonors() {
+        return favoriteDonors;
+    }
+    public void setFavoriteDonors(String favoriteDonors) {
+        this.favoriteDonors = favoriteDonors;
+    }
+
+
 }
