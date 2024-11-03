@@ -11,7 +11,8 @@
     <div class="profile-edit">
         <h2>Edit Profile</h2>
 
-        <form th:action="@{/donorprofile/saveOrEdit}" th:object="${donorProfile}" method="post" enctype="multipart/form-data">
+        <form th:action="@{/donorprofile/saveOrEdit}" th:object="${donorProfile}" method="post"
+              enctype="multipart/form-data">
 
             <div class="form__field">
                 <label for="profileImage">Profile Image:</label>
@@ -26,6 +27,7 @@
                     <option value="green">Green</option>
                     <option value="brown">Brown</option>
                     <option value="hazel">Hazel</option>
+                    <option value="grey">Hazel</option>
                     <option value="heterochromia">Heterochromia</option>
                 </select>
             </div>
@@ -68,12 +70,26 @@
                 <label for="ethnicity">Ethnicity:</label>
                 <select th:field="*{ethnicity}" id="ethnicity" required>
                     <option value="">--Select Ethnicity--</option>
-                    <option value="hispanic">Hispanic</option>
-                    <option value="non-hispanic">Non-Hispanic</option>
-                    <option value="african">African</option>
-                    <option value="european">European</option>
-                    <option value="asian">Asian</option>
-                    <option value="middle-eastern">Middle Eastern</option>
+                    <option value="German">German</option>
+                    <option value="African-American">African-American</option>
+                    <option value="Mexican">Mexican</option>
+                    <option value="Italian">Italian</option>
+                    <option value="American">American</option>
+                    <option value="English">English</option>
+                    <option value="Mexican">Mexican</option>
+                    <option value="Irish">Irish</option>
+                    <option value="Japanese">Japanese</option>
+                    <option value="Puerto Rican">Puerto Rican</option>
+                    <option value="Polish">Polish</option>
+                    <option value="Native American">Mexican</option>
+                    <option value="French">French</option>
+                    <option value="Scottish">Scottish</option>
+                    <option value="Chinese">Chinese</option>
+                    <option value="Norwegian">Norwegian</option>
+                    <option value="Swedish">Swedish</option>
+                    <option value="Icelandic">Icelandic</option>
+                    <option value="Danish">Danish</option>
+                    <option value="Finnish">Finnish</option>
                 </select>
             </div>
             <div class="form__field">
@@ -94,32 +110,47 @@
                 <label for="donorType">Donor Type:</label>
                 <select th:field="*{donorType}" id="donorType" required>
                     <option value="">--Select Donor Type--</option>
-                    <option value="EGG">Egg Donor</option>
-                    <option value="SPERM">Sperm Donor</option>
+                    <option value="Egg">Egg Donor</option>
+                    <option value="Sperm">Sperm Donor</option>
                 </select>
             </div>
             <div class="form__field">
                 <label for="medicalHistory">Family and Donor's Medical History:</label>
-                <select th:field="*{medicalHistory}" id="medicalHistory" multiple>
+                <select th:field="*{medicalHistory}" id="medicalHistory" name="medicalHistory" multiple>
                     <option value="cancer">Cancer</option>
                     <option value="heart-disease">Heart Disease</option>
                     <option value="diabetes">Diabetes</option>
                     <option value="asthma">Asthma</option>
                     <option value="high-blood-pressure">High Blood Pressure</option>
+                    <option value="sickle cell disease">Sickle Cell Disease</option>
+                    <option value="cystic fibrosis">Cystic Fibrosis</option>
+                    <option value="tay-sachs disease">Tay-Sachs Disease</option>
+                    <option value="spinal muscular atrophy ">Spinal Muscular Atrophy</option>
+                    <option value="fragile x syndrome">Fragile X Syndrome</option>
+                    <option value="thalassemia">Thalassemia</option>
+                    <option value="hemophilia">Hemophilia</option>
+                    <option value="muscular dystrophies">Muscular Dystrophies</option>
+                    <option value="down syndrome">Down Syndrome</option>
+                    <option value="turner syndrome">Turner Syndrome</option>
+                    <option value="alzheimer’s disease">Alzheimer’s Disease</option>
+                    <option value="parkinson’s disease">Parkinson’s Disease</option>
+                    <option value="huntington’s disease">Huntington’s Disease</option>
+                    <option value="rheumatoid arthritis">Rheumatoid Arthritis</option>
+                    <option value="galactosemia">Galactosemia</option>
                 </select>
             </div>
 
             <div class="form__field">
                 <label for="height">Height (cm):</label>
-                <input type="number" id="height" th:field="*{height}" min="50" max="250" required />
+                <input type="number" id="height" th:field="*{height}" min="50" max="250" required/>
             </div>
             <div class="form__field">
                 <label for="weight">Weight (kg):</label>
-                <input type="number" id="weight" th:field="*{weight}" min="20" max="200" required />
+                <input type="number" id="weight" th:field="*{weight}" min="20" max="200" required/>
             </div>
             <div class="form__field">
                 <label for="age">Age:</label>
-                <input type="number" id="age" th:field="*{age}" min="18" max="80" required />
+                <input type="number" id="age" th:field="*{age}" min="18" max="80" required/>
             </div>
 
             <div class="form__field">
@@ -129,12 +160,12 @@
 
             <!--  Save/Edit Profile Button -->
             <div class="form__field">
-                <button type="submit" th:text="${donorProfile.profileId == null ? 'Save Profile' : 'Edit Profile'}"></button>
+                <button type="submit"
+                        th:text="${donorProfile.profileId == null ? 'Save Profile' : 'Edit Profile'}"></button>
             </div>
         </form>
     </div>
 
-    <!-- Profile Information is Displayed -->
     <div class="profile-info">
         <h2>Profile Information</h2>
         <div class="profile-image">
@@ -149,13 +180,15 @@
         <p>Blood Type: <span th:text="${donorProfile.bloodType ?: 'Not specified'}">Blood Type</span></p>
         <p>Donor Type: <span th:text="${donorProfile.donorType ?: 'Not specified'}">Donor Type</span></p>
         <p>Family and Donor's Medical History:
-            <span th:if="${donorProfile.medicalHistory != null}" th:text="${donorProfile.medicalHistory}">Medical History</span>
+            <span th:if="${donorProfile.medicalHistory != null}"
+                  th:text="${#strings.arrayJoin(donorProfile.medicalHistory.toArray(), ', ')}">Medical History</span>
             <span th:if="${donorProfile.medicalHistory == null}">No history specified</span>
         </p>
         <p>Height: <span th:text="${donorProfile.height}">Height</span> cm</p>
         <p>Weight: <span th:text="${donorProfile.weight}">Weight</span> kg</p>
         <p>Age: <span th:text="${donorProfile.age}">Age</span></p>
-        <p>Get to Know the Donor: <span th:text="${donorProfile.getToKnow ?: 'No information provided'}">Get to Know</span></p>
+        <p>Get to Know the Donor: <span
+                th:text="${donorProfile.getToKnow ?: 'No information provided'}">Get to Know</span></p>
     </div>
 </div>
 

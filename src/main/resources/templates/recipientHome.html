@@ -10,14 +10,15 @@
     <nav class="main-menu">
         <ul>
             <li><a th:href="@{/recipientprofile}"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
-            <li><a href="#"><i class="fa fa-heart fa-2x"></i><span class="nav-text">Donors</span></a></li>
-            <li><a th:href="@{/messages/recipient}"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Message</span></a></li>
-            <li><a href="#"><i class="fa fa-star fa-2x"></i><span class="nav-text">Favorite</span></a></li>
+            <li><a th:href="@{/messages/recipient}"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Messages</span></a></li>
+            <li><a th:href="@{/favorites}"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Favorites</span></a></li>
             <li><a href="#"><i class="fa fa-check fa-2x"></i><span class="nav-text">Match</span></a></li>
-            <li><a href="#"><i class="fa fa-book fa-2x"></i><span class="nav-text">Resource</span></a></li>
+            <li><a th:href="@{/bookings}"><i class="fa fa-book"></i><span class="nav-text">Booking</span></a></li>
         </ul>
         <ul class="logout">
-            <li><a href="#"><i class="fa fa-power-off fa-2x"></i><span class="nav-text">Logout</span></a></li>
+            <li><a th:href="@{/users/logout}" th:onclick="return confirm('Are you sure you want to logout?')">
+                <i class="fa fa-power-off fa-2x"></i><span class="nav-text">Logout</span>
+            </a></li>
         </ul>
     </nav>
 
@@ -25,17 +26,59 @@
         <div class="container">
             <header>
                 <h1>Welcome Recipient!</h1>
-                <p th:text="'Hello, ' + ${username} + '! This is your recipient homepage.'"></p>
+                <p th:text="'Hello, ' + ${username} + '!'"></p>
             </header>
 
-            <div class="cover">
-                <div class="search-bar">
-                    <input type="text" placeholder="Search donor profiles..." />
+            <div class="search-bar">
+                <form th:action="@{/home/recipient}" method="get">
+                    <input type="text" name="keyword" placeholder="Search by traits or donor type" size="50" th:value="${keyword}">
+                    <button type="submit" class="btn btn-info">Search</button>
+                    <a th:href="@{/home/recipient}" class="btn btn-secondary">Reset</a>
+
+                    <label for="sortBy">Sort By:</label>
+                    <select name="sortBy" id="sortBy" th:value="${sortBy}">
+                        <option value="age" th:selected="${sortBy == 'age'}">Age</option>
+                        <option value="height" th:selected="${sortBy == 'height'}">Height</option>
+                        <option value="weight" th:selected="${sortBy == 'weight'}">Weight</option>
+                    </select>
+
+                    <label for="sortOrder">Order:</label>
+                    <select name="sortOrder" id="sortOrder" th:value="${sortOrder}">
+                        <option value="asc" th:selected="${sortOrder == 'asc'}">Ascending</option>
+                        <option value="desc" th:selected="${sortOrder == 'desc'}">Descending</option>
+                    </select>
+                </form>
+            </div>
+
+            <div class="donor-cards" th:if="${donorsPage != null && donorsPage.content.size() > 0}">
+                <div class="card-grid">
+                    <div class="donor-card" th:each="donor : ${donorsPage.content}">
+                        <img th:src="@{${donor.imagePath}}" alt="Donor Image" class="donor-image"/>
+                        <div class="donor-info">
+                            <p><strong>Eye Color:</strong> <span th:text="${donor.eyeColor}">Eye Color</span></p>
+                            <p><strong>Hair Color:</strong> <span th:text="${donor.hairColor}">Hair Color</span></p>
+                            <p><strong>Race:</strong> <span th:text="${donor.race}">Race</span></p>
+                            <p><strong>Blood Type:</strong> <span th:text="${donor.bloodType}">Blood Type</span></p>
+                            <p><strong>Donor Type:</strong> <span th:text="${donor.donorType}">Donor Type</span></p>
+                        </div>
+                        <div class="card-buttons">
+                            <button th:onclick="'location.href=\'/recipient/favorite/' + ${donor.profileId} + '\''">Favorite</button>
+                            <button th:onclick="'location.href=\'/recipient/view/' + ${donor.profileId} + '\''">View Profile</button>
+                            <button th:onclick="'location.href=\'/recipient/match/' + ${donor.profileId} + '\''">Match</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="buttons">
-                    <button class="follow">Date Added</button>
-                    <button class="follow">Most Popular</button>
-                </div>
+            </div>
+
+            <div th:if="${donorsPage != null && donorsPage.content.size() == 0}">
+                <p>No donors found.</p>
+                <p th:text="${testMessage}"></p>
+            </div>
+
+            <div class="pagination" th:if="${donorsPage != null}">
+                <a th:href="@{/home/recipient(page=${donorsPage.number - 1})}" th:if="${donorsPage.hasPrevious()}">Previous</a>
+                <span th:text="'Page ' + (${donorsPage.number} + 1) + ' of ' + ${donorsPage.totalPages}"></span>
+                <a th:href="@{/home/recipient(page=${donorsPage.number + 1})}" th:if="${donorsPage.hasNext()}">Next</a>
             </div>
         </div>
     </main>

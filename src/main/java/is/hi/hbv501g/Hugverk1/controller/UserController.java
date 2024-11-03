@@ -104,21 +104,8 @@ public class UserController {
         List<MyAppUsers> users = myAppUserService.findAllUsers();
         if (users == null || users.isEmpty()) {
             System.out.println("No users found.");
-            return Collections.emptyList();  // Return an empty list if no users are found
+            return Collections.emptyList();  // Return an empty list if there are no users to be found.
         }
         return users;
     }
 }
-
-// Display the logged inn user details
-//@GetMapping("/loggedin")
-//public String getLoggedInUser(HttpSession session, Model model) {
-//MyAppUsers loggedInUser = (MyAppUsers) session.getAttribute("LoggedInUser");
-//if (loggedInUser != null) {
-//model.addAttribute("user", loggedInUser);
-//return "loggedInUser";
-//} else {
-//model.addAttribute("message", "No user is logged in.");
-//return "redirect:/login";  // Redirect to login page if no user is logged in.
-//}
-//}

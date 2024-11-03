@@ -13,4 +13,6 @@ public interface MyAppUserRepository extends JpaRepository<MyAppUsers, Long> {
     List<MyAppUsers> findByUserType(String userType);
     List<MyAppUsers> findAll();
     boolean existsByUsername(String username);
+    Optional<MyAppUsers> findByDonorId(String donorId);
+    Optional<MyAppUsers> findByRecipientId(String recipientId);
 }

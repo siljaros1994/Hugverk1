@@ -10,6 +10,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -89,7 +92,7 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
         }
         return users;
     }
-
+  
     @Override
     public void addFavoriteDonor(Long recipientId, Long donorId) {
         MyAppUsers recipient = userRepository.findById(recipientId)
@@ -119,4 +122,3 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
                 .collect(Collectors.toList());
     }
 }
-
