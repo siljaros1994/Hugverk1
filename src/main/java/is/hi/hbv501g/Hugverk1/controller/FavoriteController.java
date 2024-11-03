@@ -1,6 +1,5 @@
 package is.hi.hbv501g.Hugverk1.controller;
 
-import is.hi.hbv501g.Hugverk1.Persistence.Repositories.MyAppUserRepository;
 import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import org.springframework.ui.Model;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;

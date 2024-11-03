@@ -13,7 +13,7 @@
             <li><a th:href="@{/messages/recipient}"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Messages</span></a></li>
             <li><a th:href="@{/favorites}"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Favorites</span></a></li>
             <li><a href="#"><i class="fa fa-check fa-2x"></i><span class="nav-text">Match</span></a></li>
-            <li><a href="#"><i class="fa fa-book fa-2x"></i><span class="nav-text">Resource</span></a></li>
+            <li><a th:href="@{/bookings}"><i class="fa fa-book"></i><span class="nav-text">Booking</span></a></li>
         </ul>
         <ul class="logout">
             <li><a th:href="@{/users/logout}" th:onclick="return confirm('Are you sure you want to logout?')">
