@@ -1,10 +1,11 @@
 package is.hi.hbv501g.Hugverk1.Persistence.Repositories;
 
-import java.util.List;
-import java.util.Optional;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MyAppUserRepository extends JpaRepository<MyAppUsers, Long> {

@@ -19,6 +19,7 @@ public interface MyAppUserService extends UserDetailsService {
     void addFavoriteDonor(Long recipientId, Long donorId);
     List<Long> getFavoriteDonors(Long recipientId);
 
+
     @Override
     UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 }
