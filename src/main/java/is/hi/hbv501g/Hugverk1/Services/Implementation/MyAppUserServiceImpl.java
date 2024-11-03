@@ -3,8 +3,8 @@ package is.hi.hbv501g.Hugverk1.Services.Implementation;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
 import is.hi.hbv501g.Hugverk1.Persistence.Repositories.MyAppUserRepository;
 import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,9 +14,8 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsService {
@@ -28,6 +27,25 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
     public MyAppUserServiceImpl(MyAppUserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    public void createAdminUser() {
+        if (userRepository.findByUsername("admin").isEmpty()) {
+            MyAppUsers user = new MyAppUsers();
+            user.setUsername("admin");
+            user.setPassword(passwordEncoder.encode("password"));  // Encode the password here
+            user.setUserType("admin");
+            userRepository.save(user);
+            System.out.println("Admin user created with username 'admin' and encoded password.");
+        } else {
+            System.out.println("Admin user already exists.");
+        }
+    }
+
+    @PostConstruct
+    public void initializeAdminUser() {
+        System.out.println("Initializing admin user...");
+        createAdminUser();
     }
 
     @Override
@@ -74,6 +92,7 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
         }
         return users;
     }
+  
     @Override
     public void addFavoriteDonor(Long recipientId, Long donorId) {
         MyAppUsers recipient = userRepository.findById(recipientId)

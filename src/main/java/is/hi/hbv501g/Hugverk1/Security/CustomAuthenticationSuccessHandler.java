@@ -1,17 +1,16 @@
 package is.hi.hbv501g.Hugverk1.Security;
 
-import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.stereotype.Component;
+import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 
 @Component
@@ -40,7 +39,9 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         if ("donor".equalsIgnoreCase(user.getUserType())) {
             response.sendRedirect("/home/donor");
         } else if ("recipient".equalsIgnoreCase(user.getUserType())) {
-            response.sendRedirect("/home/recipient");
+            response.sendRedirect("/home/recipient");}
+        else if ("admin".equalsIgnoreCase(user.getUserType())) {
+            response.sendRedirect("/home/donor");
         } else {
             response.sendRedirect("/users/login?error=true");
         }

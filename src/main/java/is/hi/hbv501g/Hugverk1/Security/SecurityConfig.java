@@ -50,6 +50,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/users/login", "/users/register", "/css/**", "/api/authenticate").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers("/admin/**", "/delete/{username}").hasRole("ADMIN")
                         .requestMatchers("/home/donor", "/home/recipient", "/recipient/view/**", "/donorprofile", "/recipientprofile", "/dr", "/favorites").authenticated() // Allow access to the home pages after login
                         .requestMatchers("/messages/**", "/bookings/**").authenticated()
                         .anyRequest().authenticated())  // All other requests need authentication
@@ -69,3 +70,4 @@ public class SecurityConfig {
                 .build();
     }
 }
+
