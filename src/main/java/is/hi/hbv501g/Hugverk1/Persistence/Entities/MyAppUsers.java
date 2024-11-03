@@ -2,9 +2,12 @@ package is.hi.hbv501g.Hugverk1.Persistence.Entities;
 
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 // Here we are defining the user and maps it to a database table. It controls how user information
@@ -48,9 +51,16 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
     // Implementations for UserDetails methods
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Here, we could add custom roles/authorities if needed
-        return Collections.emptyList(); // Returns an empty list if no specific roles are defined
+        if ("admin".equalsIgnoreCase(userType)) {
+            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        } else if ("donor".equalsIgnoreCase(userType)) {
+            return List.of(new SimpleGrantedAuthority("ROLE_DONOR"));
+        } else if ("recipient".equalsIgnoreCase(userType)) {
+            return List.of(new SimpleGrantedAuthority("ROLE_RECIPIENT"));
+        }
+        return Collections.emptyList();
     }
+
 
     @Override
     public boolean isAccountNonExpired() {
