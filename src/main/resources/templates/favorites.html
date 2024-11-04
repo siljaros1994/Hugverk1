@@ -26,7 +26,6 @@
             </header>
 
             <div id="favorites-list" th:if="${favorites != null && favorites.size() > 0}">
-                <p>Your favorite donors:</p>
                 <div class="donor-cards">
                     <div class="donor-card" th:each="profile : ${favorites}">
                         <img th:src="@{${profile.imagePath}}" alt="Donor Image" class="donor-image"/>
