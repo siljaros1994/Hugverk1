@@ -155,8 +155,7 @@
                 <textarea id="getToKnow" th:field="*{getToKnow}"
                           placeholder="Tell us something about yourself..."></textarea>
             </div>
-
-            <!--  Save/Edit Profile Button -->
+            
             <div class="form__field">
                 <button type="submit"
                         th:text="${recipientProfile.profileId == null ? 'Save Profile' : 'Edit Profile'}"></button>
@@ -194,9 +193,6 @@
 </div>
 </form>
 </div>
-
-
-</script>
 
 </body>
 </html>
