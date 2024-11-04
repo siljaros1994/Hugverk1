@@ -19,7 +19,7 @@ public interface MyAppUserService extends UserDetailsService {
     void createAdminUser();
     void addFavoriteDonor(String recipientId, String donorId);
     List<String> getFavoriteDonors(String recipientId);
-
+    List<MyAppUsers> getRecipientsWhoFavoritedTheDonor(String donorId);
     @Override
     UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 }

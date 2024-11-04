@@ -109,6 +109,7 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
         // Save to database
         userRepository.save(recipient);
     }
+
     @Override
     public List<String> getFavoriteDonors(String recipientId) {
         MyAppUsers recipient = userRepository.findByRecipientId(recipientId)
@@ -118,5 +119,11 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
             return new ArrayList<>();
         }
         return Arrays.asList(favoriteDonors.split(","));
+    }
+
+    // Here we fetch all recipients who have this donor's ID in their favorites list
+    @Override
+    public List<MyAppUsers> getRecipientsWhoFavoritedTheDonor(String donorId) {
+        return userRepository.findRecipientsWhoFavoritedDonor(donorId);
     }
 }

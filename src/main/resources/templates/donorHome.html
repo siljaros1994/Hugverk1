@@ -28,6 +28,32 @@
                 <h1>Welcome Donor!</h1>
                 <p th:text="'Hello, ' + ${username} + '!'"></p>
             </header>
+
+            <section th:if="${recipientsWhoFavorited != null && recipientsWhoFavorited.size() > 0}">
+                <h2>Recipients Who Favorited You</h2>
+                <div class="recipient-cards">
+                    <div class="recipient-card" th:each="recipient : ${recipientsWhoFavorited}">
+                        <div class="profile-image">
+                            <img th:src="@{${recipient.imagePath}}" alt="Recipient Image" class="recipient-image" th:if="${recipient.imagePath != null}"/>
+                        </div>
+                        <div class="recipient-info">
+                            <p><strong>Eye Color:</strong> <span th:text="${recipient.eyeColor ?: 'Not specified'}"></span></p>
+                            <p><strong>Hair Color:</strong> <span th:text="${recipient.hairColor ?: 'Not specified'}"></span></p>
+                            <p><strong>Race:</strong> <span th:text="${recipient.race ?: 'Not specified'}"></span></p>
+                            <p><strong>Ethnicity:</strong> <span th:text="${recipient.ethnicity ?: 'Not specified'}"></span></p>
+                            <p><strong>Age:</strong> <span th:text="${recipient.age}"></span></p>
+                        </div>
+                        <div class="card-buttons">
+                            <button th:onclick="'location.href=\'/donor/view/' + ${recipient.id} + '\''">View</button>
+                            <button th:onclick="'location.href=\'/donor/match/' + ${recipient.id} + '\''">Match</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section th:if="${recipientsWhoFavorited == null || recipientsWhoFavorited.size() == 0}">
+                <p>No recipients have added you to favorites yet.</p>
+            </section>
         </div>
     </main>
 </div>
@@ -35,5 +61,6 @@
 <footer>
     <p>Alexandra, Guðrún, Silja og Þrándur.</p>
 </footer>
+
 </body>
 </html>
