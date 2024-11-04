@@ -66,7 +66,7 @@ public class RecipientHomeController {
     }
 
     @GetMapping("/recipient/view/{profileId}")
-    public String viewDonorProfile(@PathVariable Long profileId, Model model) {
+    public String viewDonorProfile(@PathVariable String profileId, Model model) {
         Optional<DonorProfile> donorProfile = donorProfileService.findByProfileId(profileId);
         if (donorProfile.isPresent()) {
             model.addAttribute("donorProfile", donorProfile.get());

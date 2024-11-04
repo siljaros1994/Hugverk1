@@ -12,10 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
-
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 @Service
 public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsService {
@@ -49,7 +47,7 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
     }
 
     @Override
-    public Optional<MyAppUsers> findById(Long id) {
+    public Optional<MyAppUsers> findById(String id) {
         return userRepository.findById(id);
     }
 
@@ -94,31 +92,31 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
     }
   
     @Override
-    public void addFavoriteDonor(Long recipientId, Long donorId) {
-        MyAppUsers recipient = userRepository.findById(recipientId)
+    public void addFavoriteDonor(String recipientId, String donorId) {
+        MyAppUsers recipient = userRepository.findByRecipientId(recipientId)
                 .orElseThrow(() -> new RuntimeException("Recipient not found"));
         String currentFavorites = recipient.getFavoriteDonors();
+
         // Add the new donor ID
         if (currentFavorites == null || currentFavorites.isEmpty()) {
-            currentFavorites = donorId.toString();
+            currentFavorites = donorId;
         } else {
             currentFavorites += "," + donorId;
         }
         // Update recipient entity
+        System.out.println("Updated Favorite Donors: " + currentFavorites);
         recipient.setFavoriteDonors(currentFavorites);
         // Save to database
         userRepository.save(recipient);
     }
     @Override
-    public List<Long> getFavoriteDonors(Long recipientId) {
-        MyAppUsers recipient = userRepository.findById(recipientId)
+    public List<String> getFavoriteDonors(String recipientId) {
+        MyAppUsers recipient = userRepository.findByRecipientId(recipientId)
                 .orElseThrow(() -> new RuntimeException("Recipient not found"));
         String favoriteDonors = recipient.getFavoriteDonors();
         if (favoriteDonors == null || favoriteDonors.isEmpty()) {
             return new ArrayList<>();
         }
-        return Arrays.stream(favoriteDonors.split(","))
-                .map(Long::valueOf)
-                .collect(Collectors.toList());
+        return Arrays.asList(favoriteDonors.split(","));
     }
 }

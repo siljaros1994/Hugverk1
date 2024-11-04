@@ -1,53 +1,60 @@
 package is.hi.hbv501g.Hugverk1.controller;
 
+import is.hi.hbv501g.Hugverk1.Persistence.Entities.DonorProfile;
+import is.hi.hbv501g.Hugverk1.Services.DonorProfileService;
 import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import jakarta.servlet.http.HttpSession;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@RequestMapping("/favorites")
+@RequestMapping("/recipient")
 public class FavoriteController {
 
     @Autowired
     private MyAppUserService myAppUserService;
 
     @Autowired
-    public FavoriteController(MyAppUserService myAppUserService) {
-        this.myAppUserService = myAppUserService;
-    }
+    private DonorProfileService donorProfileService;
+
     @GetMapping("/favorites")
     public String favorites(Model model, HttpSession session) {
-        Long recipientId = (Long) session.getAttribute("recipientId");
+        String recipientId = (String) session.getAttribute("recipientId");
+        List<DonorProfile> favoriteProfiles = new ArrayList<>();  // Here we initialize an empty list
+
         if (recipientId != null) {
-            List<Long> favorites = myAppUserService.getFavoriteDonors(recipientId);
-            model.addAttribute("favorites", favorites);
+            List<String> favoriteIds = myAppUserService.getFavoriteDonors(recipientId);
+            System.out.println("Favorite Donor IDs for Recipient " + recipientId + ": " + favoriteIds);
+            favoriteProfiles = donorProfileService.getProfilesByIds(favoriteIds);
         }
+
+        model.addAttribute("favorites", favoriteProfiles);
         return "favorites";
     }
 
+    @GetMapping("/favorite/{profileId}")
+    public String addFavoriteDonor(@PathVariable String profileId, HttpSession session) {
+        String recipientId = (String) session.getAttribute("recipientId");
+        System.out.println("Adding Favorite Donor ID: " + profileId + " to Recipient ID: " + recipientId);
 
-    @PostMapping("/add")
-    public ResponseEntity<String> addFavoriteDonor(@RequestParam Long recipientId, @RequestParam Long donorId) {
-        try {
-            myAppUserService.addFavoriteDonor(recipientId, donorId);
-            return ResponseEntity.ok("Donor added to favorites");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        if (recipientId != null){
+            myAppUserService.addFavoriteDonor(recipientId, profileId);
         }
+        return "redirect:/home/recipient";
     }
-    @GetMapping
-    public ResponseEntity<List<Long>> getFavoriteDonors(@RequestParam Long recipientId) {
+
+    @GetMapping("/list")
+    public ResponseEntity<List<String>> getFavoriteDonors(@RequestParam String recipientId) {
         try {
-            List<Long> favorites = myAppUserService.getFavoriteDonors(recipientId);
+            List<String> favorites = myAppUserService.getFavoriteDonors(recipientId);
+            System.out.println("Favorite Donor IDs for Recipient " + recipientId + ": " + favorites);
             return ResponseEntity.ok(favorites);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

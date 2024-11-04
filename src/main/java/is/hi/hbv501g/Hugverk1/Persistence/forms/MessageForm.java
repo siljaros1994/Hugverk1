@@ -2,7 +2,7 @@ package is.hi.hbv501g.Hugverk1.Persistence.forms;
 
 public class MessageForm {
     private String text;
-    private String recipientId;
+    private String receiverId;
 
     // Getters and Setters
     public String getText() {
@@ -13,11 +13,11 @@ public class MessageForm {
         this.text = text;
     }
 
-    public String getRecipientId() {
-        return recipientId;
+    public String getReceiverId() {
+        return receiverId;
     }
 
-    public void setRecipientId(String recipientId) {
-        this.recipientId = recipientId;
+    public void setReceiverId(String recipientId) {
+        this.receiverId = recipientId;
     }
 }

@@ -26,7 +26,7 @@ public class DonorProfileService {
         return donorProfileRepository.findByUserDonorId(donorId);
     }
 
-    public Optional<DonorProfile> findByProfileId(Long profileId) {
+    public Optional<DonorProfile> findByProfileId(String profileId) {
         return donorProfileRepository.findById(profileId);
     }
 
@@ -37,6 +37,10 @@ public class DonorProfileService {
 
     public List<DonorProfile> getAllDonors() {
         return donorProfileRepository.findAll();
+    }
+
+    public List<DonorProfile> getProfilesByIds(List<String> ids) {
+        return donorProfileRepository.findAllById(ids);
     }
 
     public Page<DonorProfile> findByKeyword(String keyword, Pageable pageable) {

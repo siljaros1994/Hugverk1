@@ -14,8 +14,8 @@ public class Message {
     @Column(name = "sender_id", nullable = false)
     private String senderId;
 
-    @Column(name = "recipient_id", nullable = false)
-    private String recipientId;
+    @Column(name = "receiver_id", nullable = false)
+    private String receiverId;
 
     @Column(name = "content", length = 1000)
     private String content;
@@ -40,12 +40,12 @@ public class Message {
         this.senderId = senderId;
     }
 
-    public String getRecipientId() {
-        return recipientId;
+    public String getReceiverId() {
+        return receiverId;
     }
 
-    public void setRecipientId(String recipientId) {
-        this.recipientId = recipientId;
+    public void setReceiverId(String receiverId) {
+        this.receiverId = receiverId;
     }
 
     public String getContent() {

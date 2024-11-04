@@ -27,7 +27,7 @@
                     <option value="green">Green</option>
                     <option value="brown">Brown</option>
                     <option value="hazel">Hazel</option>
-                    <option value="grey">Hazel</option>
+                    <option value="grey">Grey</option>
                     <option value="heterochromia">Heterochromia</option>
                 </select>
             </div>
@@ -158,7 +158,6 @@
                 <textarea id="getToKnow" th:field="*{getToKnow}"></textarea>
             </div>
 
-            <!--  Save/Edit Profile Button -->
             <div class="form__field">
                 <button type="submit"
                         th:text="${donorProfile.profileId == null ? 'Save Profile' : 'Edit Profile'}"></button>
