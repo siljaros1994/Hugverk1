@@ -5,6 +5,7 @@ import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,9 +32,17 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         // Store the user in the session
-        request.getSession().setAttribute("LoggedInUser", user);
-        request.getSession().setAttribute("userId", user.getId());
-        request.getSession().setAttribute("userType", user.getUserType());
+        HttpSession session = request.getSession();
+        session.setAttribute("LoggedInUser", user);
+        session.setAttribute("userId", user.getId());
+        session.setAttribute("userType", user.getUserType());
+
+        // Here we set recipientId or donorId based on the user type
+        if ("recipient".equalsIgnoreCase(user.getUserType()) && user.getRecipientId() != null) {
+            session.setAttribute("recipientId", user.getRecipientId());
+        } else if ("donor".equalsIgnoreCase(user.getUserType()) && user.getDonorId() != null) {
+            session.setAttribute("donorId", user.getDonorId());
+        }
 
         // Redirect based on user type
         if ("donor".equalsIgnoreCase(user.getUserType())) {

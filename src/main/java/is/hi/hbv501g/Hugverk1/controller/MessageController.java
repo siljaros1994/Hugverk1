@@ -29,7 +29,6 @@ public class MessageController {
     @Autowired
     private DonorProfileService donorProfileService;
 
-    // needs to be updated with match.
     @GetMapping("/{userType}")
     public String showMessages(@PathVariable("userType") String userType, Model model, Principal principal) {
         Optional<MyAppUsers> currentUserOptional = userService.findByUsername(principal.getName());
@@ -37,7 +36,7 @@ public class MessageController {
         if (currentUserOptional.isPresent()) {
             MyAppUsers currentUser = currentUserOptional.get();
             String senderId = "donor".equalsIgnoreCase(userType) ? currentUser.getDonorId() : currentUser.getRecipientId();
-            String recipientId = senderId;
+            String receiverId = senderId;  // For now, set to senderId. This can be replaced with the actual receiver's ID when available.
 
             // Set sender's image path based on userType, donor or recipient.
             String senderImagePath = "/uploads/default-recipient-avatar.png";
@@ -47,8 +46,8 @@ public class MessageController {
             }
 
             model.addAttribute("senderId", senderId);
-            model.addAttribute("recipientId", recipientId);
-            model.addAttribute("chats", messageService.getConversation(senderId, recipientId));
+            model.addAttribute("receiverId", receiverId);
+            model.addAttribute("chats", messageService.getConversation(senderId, receiverId));
             model.addAttribute("messageForm", new MessageForm());
             model.addAttribute("senderImagePath", senderImagePath);
             model.addAttribute("userType", userType);
@@ -59,7 +58,6 @@ public class MessageController {
         return "messages";
     }
 
-    // needs to be updated with match.
     @PostMapping("/send")
     public String sendMessage(@ModelAttribute MessageForm messageForm, Model model, Principal principal) {
         Optional<MyAppUsers> currentUserOptional = userService.findByUsername(principal.getName());
@@ -67,18 +65,18 @@ public class MessageController {
         if (currentUserOptional.isPresent()) {
             MyAppUsers currentUser = currentUserOptional.get();
             String senderId = currentUser.getUserType().equalsIgnoreCase("donor") ? currentUser.getDonorId() : currentUser.getRecipientId();
-            String recipientId = messageForm.getRecipientId();
+            String receiverId = messageForm.getReceiverId();
 
             Message newMessage = new Message();
             newMessage.setSenderId(senderId);
-            newMessage.setRecipientId(recipientId);
+            newMessage.setReceiverId(receiverId);
             newMessage.setContent(messageForm.getText());
             newMessage.setTimestamp(LocalDateTime.now());
             messageService.saveMessage(newMessage);
 
-            model.addAttribute("chats", messageService.getConversation(senderId, recipientId));
+            model.addAttribute("chats", messageService.getConversation(senderId, receiverId));
             model.addAttribute("senderId", senderId);
-            model.addAttribute("recipientId", recipientId);
+            model.addAttribute("receiverId", receiverId);
             model.addAttribute("messageForm", new MessageForm());
 
             String senderImagePath = "donor".equalsIgnoreCase(currentUser.getUserType())

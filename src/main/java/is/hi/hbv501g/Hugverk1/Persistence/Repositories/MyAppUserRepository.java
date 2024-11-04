@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface MyAppUserRepository extends JpaRepository<MyAppUsers, Long> {
+public interface MyAppUserRepository extends JpaRepository<MyAppUsers, String> {
     Optional<MyAppUsers> findByUsername(String username);
     List<MyAppUsers> findByUserType(String userType);
     List<MyAppUsers> findAll();

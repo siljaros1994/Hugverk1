@@ -17,9 +17,8 @@ import java.util.UUID;
 public class MyAppUsers implements UserDetails { // Implement UserDetails
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    @Column(name = "id", nullable = false, unique = true)
+    private String id;
 
     // Here we store the user's username, email, and password, which will be saved in the MyAppUsers table.
     @Column(unique = true, nullable = false)
@@ -64,6 +63,12 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
         return Collections.emptyList();
     }
 
+    @PrePersist // Here we assign a UUID string manually
+    public void initializeId() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID().toString();
+        }
+    }
 
     @Override
     public boolean isAccountNonExpired() {
@@ -86,11 +91,11 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
     }
 
     // Getters and Setters
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

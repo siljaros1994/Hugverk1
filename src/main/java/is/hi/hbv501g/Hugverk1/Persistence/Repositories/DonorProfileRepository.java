@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 
 @Repository
-public interface DonorProfileRepository extends JpaRepository<DonorProfile, Long> {
+public interface DonorProfileRepository extends JpaRepository<DonorProfile, String> {
     Optional<DonorProfile> findByUserDonorId(String donorId); // Custom query to find a donor profile by the donor id
     Page<DonorProfile> findByDonorType(String donorType, Pageable pageable); // For filtering by donor type
     Page<DonorProfile> findAll(Pageable pageable); // For all donors
