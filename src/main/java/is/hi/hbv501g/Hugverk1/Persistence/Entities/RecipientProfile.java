@@ -1,8 +1,6 @@
 package is.hi.hbv501g.Hugverk1.Persistence.Entities;
 
-
 import jakarta.persistence.*;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,16 +10,12 @@ public class RecipientProfile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "profile_id")
-    private Long profileId;
-
+    @Column(name = "recipient_profile_id", nullable = false, unique = true)
+    private Long recipientProfileId;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recipient_id", referencedColumnName = "recipient_id", unique = true)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true)
     private MyAppUsers user;
-
-    @Column(name = "recipient_type")
-
 
     @Column(name = "height")
     private Double height;
@@ -42,7 +36,7 @@ public class RecipientProfile {
     private String educationLevel;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "medical_history", joinColumns = @JoinColumn(name = "profile_id"))
+    @CollectionTable(name = "recipient_medical_history", joinColumns = @JoinColumn(name = "recipient_profile_id"))
     @Column(name = "history")
     private Set<String> medicalHistory = new HashSet<>();
 
@@ -64,13 +58,12 @@ public class RecipientProfile {
     @Column(name = "image_path")
     private String imagePath;
 
-
-    public Long getProfileId() {
-        return profileId;
+    public Long getRecipientProfileId() {
+        return recipientProfileId;
     }
 
-    public void setProfileId(Long profileId) {
-        this.profileId = profileId;
+    public void setRecipientProfileId(Long recipientProfileId) {
+        this.recipientProfileId = recipientProfileId;
     }
 
     public MyAppUsers getUser() {
@@ -81,19 +74,12 @@ public class RecipientProfile {
         this.user = user;
     }
 
+    public String getImagePath() {
+        return imagePath;
+    }
 
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
-    }
-
-
-    public String getRecipientType() {
-        return recipientType;
-    }
-
-    public void setRecipientType(String recipientType) {
-        this.recipientType = recipientType;
-
     }
 
     public Double getHeight() {
@@ -176,7 +162,6 @@ public class RecipientProfile {
     public String getGetToKnow() {
         return getToKnow;
     }
-
 
     public String getTraits() {
         return traits;

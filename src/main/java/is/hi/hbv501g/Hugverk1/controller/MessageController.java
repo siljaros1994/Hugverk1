@@ -35,14 +35,15 @@ public class MessageController {
 
         if (currentUserOptional.isPresent()) {
             MyAppUsers currentUser = currentUserOptional.get();
-            String senderId = "donor".equalsIgnoreCase(userType) ? currentUser.getDonorId() : currentUser.getRecipientId();
-            String receiverId = senderId;  // For now, set to senderId. This can be replaced with the actual receiver's ID when available.
+            Long senderId = "donor".equalsIgnoreCase(userType) ? currentUser.getDonorId() : currentUser.getRecipientId();
+            Long receiverId = senderId; // For now, set to senderId. This can be replaced with the actual receiver's ID when available.
 
             // Set sender's image path based on userType, donor or recipient.
             String senderImagePath = "/uploads/default-recipient-avatar.png";
             if ("donor".equalsIgnoreCase(currentUser.getUserType())) {
-                Optional<DonorProfile> donorProfile = donorProfileService.findByUserDonorId(currentUser.getDonorId());
-                senderImagePath = donorProfile.map(DonorProfile::getImagePath).orElse("/uploads/default-donor-avatar.png");
+                senderImagePath = donorProfileService.findByUserDonorId(currentUser.getDonorId())
+                        .map(DonorProfile::getImagePath)
+                        .orElse("/uploads/default-donor-avatar.png");
             }
 
             model.addAttribute("senderId", senderId);
@@ -64,8 +65,8 @@ public class MessageController {
 
         if (currentUserOptional.isPresent()) {
             MyAppUsers currentUser = currentUserOptional.get();
-            String senderId = currentUser.getUserType().equalsIgnoreCase("donor") ? currentUser.getDonorId() : currentUser.getRecipientId();
-            String receiverId = messageForm.getReceiverId();
+            Long senderId = currentUser.getUserType().equalsIgnoreCase("donor") ? currentUser.getDonorId() : currentUser.getRecipientId();
+            Long receiverId = messageForm.getReceiverId();
 
             Message newMessage = new Message();
             newMessage.setSenderId(senderId);

@@ -26,35 +26,30 @@ public class FavoriteController {
 
     @GetMapping("/favorites")
     public String favorites(Model model, HttpSession session) {
-        String recipientId = (String) session.getAttribute("recipientId");
+        Long recipientId = (Long) session.getAttribute("recipientId");
         List<DonorProfile> favoriteProfiles = new ArrayList<>();  // Here we initialize an empty list
 
         if (recipientId != null) {
-            List<String> favoriteIds = myAppUserService.getFavoriteDonors(recipientId);
-            System.out.println("Favorite Donor IDs for Recipient " + recipientId + ": " + favoriteIds);
+            List<Long> favoriteIds = myAppUserService.getFavoriteDonors(recipientId);
             favoriteProfiles = donorProfileService.getProfilesByIds(favoriteIds);
         }
-
         model.addAttribute("favorites", favoriteProfiles);
         return "favorites";
     }
 
-    @GetMapping("/favorite/{profileId}")
-    public String addFavoriteDonor(@PathVariable String profileId, HttpSession session) {
-        String recipientId = (String) session.getAttribute("recipientId");
-        System.out.println("Adding Favorite Donor ID: " + profileId + " to Recipient ID: " + recipientId);
-
+    @GetMapping("/favorite/{donorProfileId}")
+    public String addFavoriteDonor(@PathVariable Long donorProfileId, HttpSession session) {
+        Long recipientId = (Long) session.getAttribute("recipientId");
         if (recipientId != null){
-            myAppUserService.addFavoriteDonor(recipientId, profileId);
+            myAppUserService.addFavoriteDonor(recipientId, donorProfileId);
         }
         return "redirect:/home/recipient";
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<String>> getFavoriteDonors(@RequestParam String recipientId) {
+    public ResponseEntity<List<Long>> getFavoriteDonors(@RequestParam Long recipientId) {
         try {
-            List<String> favorites = myAppUserService.getFavoriteDonors(recipientId);
-            System.out.println("Favorite Donor IDs for Recipient " + recipientId + ": " + favorites);
+            List<Long> favorites = myAppUserService.getFavoriteDonors(recipientId);
             return ResponseEntity.ok(favorites);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

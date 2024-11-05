@@ -12,14 +12,14 @@ import java.util.Optional;
 public interface MyAppUserService extends UserDetailsService {
     void saveUser(MyAppUsers user);
     Optional<MyAppUsers> findByUsername(String username);
-    Optional<MyAppUsers> findById(String id);
+    Optional<MyAppUsers> findById(Long id);
     boolean matchPassword(String rawPassword, String encodedPassword);
     List<MyAppUsers> findAllUsers();
 
     void createAdminUser();
-    void addFavoriteDonor(String recipientId, String donorId);
-    List<String> getFavoriteDonors(String recipientId);
-    List<MyAppUsers> getRecipientsWhoFavoritedTheDonor(String donorId);
+    void addFavoriteDonor(Long recipientId, Long donorId);
+    List<Long> getFavoriteDonors(Long recipientId);
+    List<MyAppUsers> getRecipientsWhoFavoritedTheDonor(Long donorId);
     @Override
     UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 }

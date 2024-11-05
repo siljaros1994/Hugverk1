@@ -8,17 +8,18 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 // Here we are defining the user and maps it to a database table. It controls how user information
 // (ID, username, email, password) is stored and retrieved from the database.
-@Entity // lets the program know that this class represents a table in the database.
+// lets the program know that this class represents a table in the database.
+@Entity
 @Table(name = "MyAppUsers")
 public class MyAppUsers implements UserDetails { // Implement UserDetails
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true)
-    private String id;
+    private Long id;
 
     // Here we store the user's username, email, and password, which will be saved in the MyAppUsers table.
     @Column(unique = true, nullable = false)
@@ -32,10 +33,10 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
 
     // Fields for donorId and recipientId
     @Column(name = "donor_id", unique = true, nullable = true)
-    private String donorId;
+    private Long donorId;
 
     @Column(name = "recipient_id", unique = true, nullable = true)
-    private String recipientId;
+    private Long recipientId;
 
     @Column(nullable = false)
     private String userType; // Either donor or recipient.
@@ -50,6 +51,9 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private DonorProfile donorProfile;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private RecipientProfile recipientProfile;
+
     // Implementations for UserDetails methods
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -61,13 +65,6 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
             return List.of(new SimpleGrantedAuthority("ROLE_RECIPIENT"));
         }
         return Collections.emptyList();
-    }
-
-    @PrePersist // Here we assign a UUID string manually
-    public void initializeId() {
-        if (this.id == null) {
-            this.id = UUID.randomUUID().toString();
-        }
     }
 
     @Override
@@ -91,11 +88,11 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
     }
 
     // Getters and Setters
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -133,19 +130,19 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
         this.confirmPassword = confirmPassword;
     }
 
-    public String getDonorId() {
+    public Long getDonorId() {
         return donorId;
     }
 
-    public void setDonorId(String donorId) {
+    public void setDonorId(Long donorId) {
         this.donorId = donorId;
     }
 
-    public String getRecipientId() {
+    public Long getRecipientId() {
         return recipientId;
     }
 
-    public void setRecipientId(String recipientId) {
+    public void setRecipientId(Long recipientId) {
         this.recipientId = recipientId;
     }
 
@@ -164,15 +161,6 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
 
     public void setDonorProfile(DonorProfile donorProfile) {
         this.donorProfile = donorProfile;
-    }
-
-    // Utility methods for assigning IDs
-    public void assignDonorId() {
-        this.donorId = UUID.randomUUID().toString();
-    }
-
-    public void assignRecipientId() {
-        this.recipientId = UUID.randomUUID().toString();
     }
 
     public String getFavoriteDonors() {

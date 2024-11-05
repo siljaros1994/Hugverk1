@@ -8,14 +8,14 @@ import jakarta.persistence.*;
 public class Message {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(name = "sender_id", nullable = false)
-    private String senderId;
+    private Long senderId;
 
     @Column(name = "receiver_id", nullable = false)
-    private String receiverId;
+    private Long receiverId;
 
     @Column(name = "content", length = 1000)
     private String content;
@@ -32,19 +32,19 @@ public class Message {
         this.id = id;
     }
 
-    public String getSenderId() {
+    public Long getSenderId() {
         return senderId;
     }
 
-    public void setSenderId(String senderId) {
+    public void setSenderId(Long senderId) {
         this.senderId = senderId;
     }
 
-    public String getReceiverId() {
+    public Long getReceiverId() {
         return receiverId;
     }
 
-    public void setReceiverId(String receiverId) {
+    public void setReceiverId(Long receiverId) {
         this.receiverId = receiverId;
     }
 

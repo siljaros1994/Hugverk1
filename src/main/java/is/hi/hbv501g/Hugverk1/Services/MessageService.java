@@ -19,7 +19,7 @@ public class MessageService {
         return messageRepository.save(message);
     }
 
-    public List<Message> getConversation(String senderId, String receiverId) {
+    public List<Message> getConversation(Long senderId, Long receiverId) {
         List<Message> sentMessages = messageRepository.findBySenderIdAndReceiverIdOrderByTimestamp(senderId, receiverId);
         List<Message> receivedMessages = messageRepository.findByReceiverIdAndSenderIdOrderByTimestamp(receiverId, senderId);
         sentMessages.addAll(receivedMessages);

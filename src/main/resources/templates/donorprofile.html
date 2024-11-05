@@ -165,8 +165,7 @@
             </div>
 
             <div class="form__field">
-                <button type="submit"
-                        th:text="${donorProfile.profileId == null ? 'Save Profile' : 'Edit Profile'}"></button>
+                <button type="submit" th:text="${donorProfile.donorProfileId == null ? 'Save Profile' : 'Edit Profile'}"></button>
             </div>
         </form>
     </div>
@@ -192,8 +191,7 @@
         <p>Height: <span th:text="${donorProfile.height}">Height</span> cm</p>
         <p>Weight: <span th:text="${donorProfile.weight}">Weight</span> kg</p>
         <p>Age: <span th:text="${donorProfile.age}">Age</span></p>
-        <p>Get to Know the Donor: <span
-                th:text="${donorProfile.getToKnow ?: 'No information provided'}">Get to Know</span></p>
+        <p>Get to Know the Donor: <span th:text="${donorProfile.getToKnow ?: 'No information provided'}">Get to Know</span></p>
     </div>
 </div>
 
