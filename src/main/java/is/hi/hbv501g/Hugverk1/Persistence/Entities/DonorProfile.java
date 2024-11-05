@@ -1,7 +1,6 @@
 package is.hi.hbv501g.Hugverk1.Persistence.Entities;
 
 import jakarta.persistence.*;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,15 +8,14 @@ import java.util.Set;
 @Table(name = "DonorProfile")
 public class DonorProfile {
 
-    // creates a Unique identifier for each profile
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "profile_id")
-    private Long profileId;
+    @Column(name = "donor_profile_id", nullable = false, unique = true)
+    private Long donorProfileId;
 
     // Links each profile to a unique donor
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "donor_id", referencedColumnName = "donor_id", unique = true)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true)
     private MyAppUsers user;
 
     @Column(name = "donor_type")
@@ -42,7 +40,7 @@ public class DonorProfile {
     private String educationLevel;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "medical_history", joinColumns = @JoinColumn(name = "profile_id"))
+    @CollectionTable(name = "donor_medical_history", joinColumns = @JoinColumn(name = "donor_profile_id"))
     @Column(name = "history")
     private Set<String> medicalHistory = new HashSet<>();
 
@@ -65,12 +63,13 @@ public class DonorProfile {
     private String imagePath;
 
     // Getters and Setters
-    public Long getProfileId() {
-        return profileId;
+
+    public Long getDonorProfileId() {
+        return donorProfileId;
     }
 
-    public void setProfileId(Long profileId) {
-        this.profileId = profileId;
+    public void setDonorProfileId(Long donorProfileId) {
+        this.donorProfileId = donorProfileId;
     }
 
     public MyAppUsers getUser() {

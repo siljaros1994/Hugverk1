@@ -21,7 +21,7 @@ public class DonorHomeController {
         if (loggedInUser == null || !"donor".equalsIgnoreCase(loggedInUser.getUserType())) {
             return "redirect:/users/login";
         }
-        String donorId = loggedInUser.getDonorId();
+        Long donorId = loggedInUser.getDonorId();
         List<MyAppUsers> recipientsWhoFavorited = myAppUserService.getRecipientsWhoFavoritedTheDonor(donorId);
 
         model.addAttribute("username", loggedInUser.getUsername());

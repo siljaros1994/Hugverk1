@@ -10,14 +10,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface MyAppUserRepository extends JpaRepository<MyAppUsers, String> {
+public interface MyAppUserRepository extends JpaRepository<MyAppUsers, Long> {
     Optional<MyAppUsers> findByUsername(String username);
     List<MyAppUsers> findByUserType(String userType);
     List<MyAppUsers> findAll();
     boolean existsByUsername(String username);
-    Optional<MyAppUsers> findByDonorId(String donorId);
-    Optional<MyAppUsers> findByRecipientId(String recipientId);
+    Optional<MyAppUsers> findByDonorId(Long donorId);
+    Optional<MyAppUsers> findByRecipientId(Long recipientId);
 
     @Query("SELECT u FROM MyAppUsers u WHERE u.favoriteDonors LIKE %:donorId% AND u.userType = 'recipient'")
-    List<MyAppUsers> findRecipientsWhoFavoritedDonor(@Param("donorId") String donorId);
+    List<MyAppUsers> findRecipientsWhoFavoritedDonor(@Param("donorId") Long donorId);
 }

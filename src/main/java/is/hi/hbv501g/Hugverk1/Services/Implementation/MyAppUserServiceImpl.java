@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.*;
-
+import java.util.stream.Collectors;
 
 @Service
 public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsService {
@@ -47,7 +47,7 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
     }
 
     @Override
-    public Optional<MyAppUsers> findById(String id) {
+    public Optional<MyAppUsers> findById(Long id) {
         return userRepository.findById(id);
     }
 
@@ -60,12 +60,7 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
     @Override
     public void saveUser(MyAppUsers user) {
         // Encode the password before saving the user
-        user.setPassword(passwordEncoder.encode(user.getPassword())); // The password is hashed
-        if ("donor".equalsIgnoreCase(user.getUserType()) && user.getDonorId() == null) {
-            user.assignDonorId(); // Assign a unique donorId
-        } else if ("recipient".equalsIgnoreCase(user.getUserType()) && user.getRecipientId() == null) {
-            user.assignRecipientId(); // Assign a unique recipientId
-        }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user); // Save the user to the database
     }
 
@@ -90,16 +85,16 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
         }
         return users;
     }
-  
+
     @Override
-    public void addFavoriteDonor(String recipientId, String donorId) {
+    public void addFavoriteDonor(Long recipientId, Long donorId) {
         MyAppUsers recipient = userRepository.findByRecipientId(recipientId)
                 .orElseThrow(() -> new RuntimeException("Recipient not found"));
         String currentFavorites = recipient.getFavoriteDonors();
 
         // Add the new donor ID
         if (currentFavorites == null || currentFavorites.isEmpty()) {
-            currentFavorites = donorId;
+            currentFavorites = donorId.toString();
         } else {
             currentFavorites += "," + donorId;
         }
@@ -111,19 +106,22 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
     }
 
     @Override
-    public List<String> getFavoriteDonors(String recipientId) {
+    public List<Long> getFavoriteDonors(Long recipientId) {
         MyAppUsers recipient = userRepository.findByRecipientId(recipientId)
                 .orElseThrow(() -> new RuntimeException("Recipient not found"));
         String favoriteDonors = recipient.getFavoriteDonors();
         if (favoriteDonors == null || favoriteDonors.isEmpty()) {
             return new ArrayList<>();
         }
-        return Arrays.asList(favoriteDonors.split(","));
+        return Arrays.stream(favoriteDonors.split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
     }
+
 
     // Here we fetch all recipients who have this donor's ID in their favorites list
     @Override
-    public List<MyAppUsers> getRecipientsWhoFavoritedTheDonor(String donorId) {
+    public List<MyAppUsers> getRecipientsWhoFavoritedTheDonor(Long donorId) {
         return userRepository.findRecipientsWhoFavoritedDonor(donorId);
     }
 }

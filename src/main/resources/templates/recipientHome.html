@@ -62,9 +62,9 @@
                             <p><strong>Donor Type:</strong> <span th:text="${donor.donorType}">Donor Type</span></p>
                         </div>
                         <div class="card-buttons">
-                            <button th:onclick="'location.href=\'/recipient/favorite/' + ${donor.profileId} + '\''">Favorite</button>
-                            <button th:onclick="'location.href=\'/recipient/view/' + ${donor.profileId} + '\''">View Profile</button>
-                            <button th:onclick="'location.href=\'/recipient/match/' + ${donor.profileId} + '\''">Match</button>
+                            <button th:onclick="'location.href=\'/recipient/favorite/' + ${donor.donorProfileId} + '\''">Favorite</button>
+                            <button th:onclick="'location.href=\'/recipient/view/' + ${donor.donorProfileId} + '\''">View Profile</button>
+                            <button th:onclick="'location.href=\'/recipient/match/' + ${donor.donorProfileId} + '\''">Match</button>
                         </div>
                     </div>
                 </div>
