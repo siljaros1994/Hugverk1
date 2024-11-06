@@ -62,6 +62,12 @@ public class DonorProfile {
     @Column(name = "image_path")
     private String imagePath;
 
+    @Column(name = "donation_limit")
+    private int donationLimit = 5;
+
+    @Column(name = "donations_completed")
+    private int donationsCompleted = 0;
+
     // Getters and Setters
 
     public Long getDonorProfileId() {
@@ -190,5 +196,19 @@ public class DonorProfile {
 
     public void setTraits(String traits) {
         this.traits = traits;
+    }
+
+    public int getDonationLimit() {
+        return donationLimit;
+    }
+    public void setDonationLimit(int donationLimit) {
+        this.donationLimit = donationLimit;
+    }
+    public int getDonationsCompleted() { return donationsCompleted; }
+
+    public void setDonationsCompleted(int donationsCompleted) { this.donationsCompleted = donationsCompleted; }
+
+    public void incrementDonationsCompleted() {
+        this.donationsCompleted++;
     }
 }
