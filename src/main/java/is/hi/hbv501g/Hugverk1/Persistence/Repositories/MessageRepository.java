@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
-    List<Message> findBySenderIdAndRecipientIdOrderByTimestamp(String senderId, String recipientId);
-    List<Message> findByRecipientIdAndSenderIdOrderByTimestamp(String recipientId, String senderId);
+    List<Message> findBySenderIdAndReceiverIdOrderByTimestamp(Long senderId, Long receiverId);
+    List<Message> findByReceiverIdAndSenderIdOrderByTimestamp(Long receiverId, Long senderId);
 }

@@ -11,14 +11,14 @@ import java.time.LocalTime;
 public class Booking {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(name = "donor_id", nullable = false)
-    private String donorId;
+    private Long donorId;
 
     @Column(name = "recipient_id", nullable = false)
-    private String recipientId;
+    private Long recipientId;
 
     @Column(name = "date", nullable = false)
     private LocalDate date;
@@ -38,19 +38,19 @@ public class Booking {
         this.id = id;
     }
 
-    public String getDonorId() {
+    public Long getDonorId() {
         return donorId;
     }
 
-    public void setDonorId(String donorId) {
+    public void setDonorId(Long donorId) {
         this.donorId = donorId;
     }
 
-    public String getRecipientId() {
+    public Long getRecipientId() {
         return recipientId;
     }
 
-    public void setRecipientId(String recipientId) {
+    public void setRecipientId(Long recipientId) {
         this.recipientId = recipientId;
     }
 
