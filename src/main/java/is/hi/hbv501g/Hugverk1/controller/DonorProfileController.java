@@ -13,6 +13,8 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.io.File;
 import java.io.IOException;
@@ -96,5 +98,19 @@ public class DonorProfileController {
         }
         donorProfileService.saveOrUpdateProfile(profileData); // Save or update the profile in the database
         return "redirect:/donorprofile";
+    }
+    @PutMapping("/{id}/setDonationLimit")
+    public ResponseEntity<String> setDonationLimit(@PathVariable Long id, @RequestParam int limit) {
+        Optional<DonorProfile> donorProfileOpt = donorProfileService.findByProfileId(id);
+
+        if (donorProfileOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Donor profile not found");
+        }
+
+        DonorProfile donorProfile = donorProfileOpt.get();
+        donorProfile.setDonationLimit(limit);
+        donorProfileService.saveOrUpdateProfile(donorProfile);
+
+        return ResponseEntity.ok("Donation limit updated.");
     }
 }
