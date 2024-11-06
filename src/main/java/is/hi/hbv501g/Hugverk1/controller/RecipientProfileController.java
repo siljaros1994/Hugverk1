@@ -76,20 +76,20 @@ public class RecipientProfileController {
             profileData.setRecipientProfileId(existingProfile.get().getRecipientProfileId());
             profileData.setImagePath(existingProfile.get().getImagePath());
         }
-
+      
         if (!profileImage.isEmpty()) { //Save uploaded image if it's included
-          try {
-              String originalFileName = StringUtils.cleanPath(profileImage.getOriginalFilename());
-              String filePath = uploadPath + originalFileName;
-              File destinationFile = new File(filePath);
-              destinationFile.getParentFile().mkdirs();
-              profileImage.transferTo(destinationFile);
-              profileData.setImagePath("/uploads/" + originalFileName); //Here is the image path (so it displays)
+            try {
+                String originalFileName = StringUtils.cleanPath(profileImage.getOriginalFilename());
+                String filePath = uploadPath + originalFileName;
+                File destinationFile = new File(filePath);
+                destinationFile.getParentFile().mkdirs();
+                profileImage.transferTo(destinationFile);
+                profileData.setImagePath("/uploads/" + originalFileName); //Here is the image path (so it displays)
 
-          } catch (IOException e) {
-              e.printStackTrace();
-          }
-        }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } 
         // Save or update the profile
         recipientProfileService.saveOrUpdateProfile(profileData);
 

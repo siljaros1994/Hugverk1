@@ -189,5 +189,8 @@ public class RecipientProfile {
         this.traits = traits;
     }
 
+    public String getImagePath() {
+        this.imagePath = imagePath;
+    }
 }
 
