@@ -1,4 +1,4 @@
-# [HBV501G] Hugbúnaðarverkefni 1 - Team 27 
+#  Hugbúnaðarverkefni 1 [HBV501G] - Team 27 - DonorMatch 
 ## Authors
 Silja Rós Svansdóttir Þormar <br/>
 Þrándur Orri Ólason <br/>
@@ -6,7 +6,7 @@ Guðrún Ísabella Kjartansdóttir <br/>
 Alexandra Björk Magnúsdóttir <br/>
 ## Verkefnið
 **DonorMatch** <br/>
-A website that connects individuals who seek sperm- or egg donors. 
+A website that connects individuals who seek sperm- or egg donors. User registers as a Donor (egg or sperm) or as a Recipient. Recipients can search for Donors via search bar and can favorite them. The donor can see recipients who have favorited them and can match with them. Matched donors and recipients can then message each other via Messages. If both parties are interested in booking a donation ...
 
 ## Structure and Run / Uppsetning og keyrsla
 Run in pgAdmin 4 / keyrið pgAdmin 4
