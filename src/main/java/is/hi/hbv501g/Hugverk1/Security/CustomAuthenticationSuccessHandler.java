@@ -42,6 +42,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             session.setAttribute("recipientId", user.getRecipientId());
         } else if ("donor".equalsIgnoreCase(user.getUserType()) && user.getDonorId() != null) {
             session.setAttribute("donorId", user.getDonorId());
+        } else if ("admin".equalsIgnoreCase(user.getUserType()) && user.getDonorId() != null) {
+            session.setAttribute("adminId", user.getDonorId());
         }
 
         // Redirect based on user type
@@ -50,7 +52,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         } else if ("recipient".equalsIgnoreCase(user.getUserType())) {
             response.sendRedirect("/home/recipient");}
         else if ("admin".equalsIgnoreCase(user.getUserType())) {
-            response.sendRedirect("/home/donor");
+            response.sendRedirect("/home/admin");
         } else {
             response.sendRedirect("/users/login?error=true");
         }
