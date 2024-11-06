@@ -3,6 +3,8 @@ package is.hi.hbv501g.Hugverk1.Persistence.Entities;
 import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Optional;
+
 
 @Entity
 @Table(name = "RecipientProfile")
