@@ -63,7 +63,23 @@ public class RecipientProfileController {
         MyAppUsers currentUser = user.get();
         profileData.setUser(currentUser);
 
+        if (!profileImage.isEmpty()) { //Save uploaded image if it's included
+            try {
+                String originalFileName = StringUtils.cleanPath(profileImage.getOriginalFilename());
+                String filePath = uploadPath + originalFileName;
+                File destinationFile = new File(filePath);
+                destinationFile.getParentFile().mkdirs();
+                profileImage.transferTo(destinationFile);
+                profileData.setImagePath("/uploads/" + originalFileName); //Here is the image path (so it displays)
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (existingProfile.isPresent()) { //Here is the existing image, if no new image is uploaded
+            profileData.setImagePath(existingProfile.get().getImagePath());
+
         RecipientProfile savedProfile = recipientProfileService.saveOrUpdateProfile(profileData);
+
 
         if (currentUser.getRecipientId() == null) {
             currentUser.setRecipientId(profileData.getRecipientProfileId());
