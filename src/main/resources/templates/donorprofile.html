@@ -27,7 +27,7 @@
                     <option value="green">Green</option>
                     <option value="brown">Brown</option>
                     <option value="hazel">Hazel</option>
-                    <option value="grey">Hazel</option>
+                    <option value="grey">Grey</option>
                     <option value="heterochromia">Heterochromia</option>
                 </select>
             </div>
@@ -76,12 +76,12 @@
                     <option value="Italian">Italian</option>
                     <option value="American">American</option>
                     <option value="English">English</option>
-                    <option value="Mexican">Mexican</option>
+                    <option value="Spanish">Spanish</option>
                     <option value="Irish">Irish</option>
                     <option value="Japanese">Japanese</option>
                     <option value="Puerto Rican">Puerto Rican</option>
                     <option value="Polish">Polish</option>
-                    <option value="Native American">Mexican</option>
+                    <option value="Native American">Native American</option>
                     <option value="French">French</option>
                     <option value="Scottish">Scottish</option>
                     <option value="Chinese">Chinese</option>
@@ -90,6 +90,12 @@
                     <option value="Icelandic">Icelandic</option>
                     <option value="Danish">Danish</option>
                     <option value="Finnish">Finnish</option>
+                    <option value="Filipinos">Filipinos</option>
+                    <option value="Tibetans">Tibetans</option>
+                    <option value="Korean">Korean</option>
+                    <option value="Indian">Indian</option>
+                    <option value="Nepal">Nepal</option>
+
                 </select>
             </div>
             <div class="form__field">
@@ -158,10 +164,8 @@
                 <textarea id="getToKnow" th:field="*{getToKnow}"></textarea>
             </div>
 
-            <!--  Save/Edit Profile Button -->
             <div class="form__field">
-                <button type="submit"
-                        th:text="${donorProfile.profileId == null ? 'Save Profile' : 'Edit Profile'}"></button>
+                <button type="submit" th:text="${donorProfile.donorProfileId == null ? 'Save Profile' : 'Edit Profile'}"></button>
             </div>
         </form>
     </div>
@@ -187,8 +191,7 @@
         <p>Height: <span th:text="${donorProfile.height}">Height</span> cm</p>
         <p>Weight: <span th:text="${donorProfile.weight}">Weight</span> kg</p>
         <p>Age: <span th:text="${donorProfile.age}">Age</span></p>
-        <p>Get to Know the Donor: <span
-                th:text="${donorProfile.getToKnow ?: 'No information provided'}">Get to Know</span></p>
+        <p>Get to Know the Donor: <span th:text="${donorProfile.getToKnow ?: 'No information provided'}">Get to Know</span></p>
     </div>
 </div>
 

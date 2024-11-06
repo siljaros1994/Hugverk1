@@ -1,8 +1,9 @@
 package is.hi.hbv501g.Hugverk1.controller;
 
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.DonorProfile;
-import is.hi.hbv501g.Hugverk1.Services.DonorProfileService;
+import is.hi.hbv501g.Hugverk1.Persistence.Repositories.MyAppUserRepository;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
+import is.hi.hbv501g.Hugverk1.Services.DonorProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -24,6 +25,9 @@ public class DonorProfileController {
     @Autowired
     private DonorProfileService donorProfileService;
 
+    @Autowired
+    private MyAppUserRepository myAppUserRepository;
+
     @Value("${upload.path}") // the Path to where uploaded images are stored
     private String uploadPath;
 
@@ -32,14 +36,21 @@ public class DonorProfileController {
     public String showDonorProfilePage(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication(); // Here we get the logged-in user from the security context
         MyAppUsers loggedInUser = (MyAppUsers) authentication.getPrincipal();
+
         if (loggedInUser == null || !"donor".equalsIgnoreCase(loggedInUser.getUserType())) { // Here we redirect to login if the user is not a donor.
             return "redirect:/users/login";
         }
 
-        Optional<DonorProfile> donorProfile = donorProfileService.findByUserDonorId(loggedInUser.getDonorId()); // Here we find the donor profile by the user's donor id.
+        // Retrieve profile based on the unique user ID to avoid mixing profiles
+        Optional<DonorProfile> donorProfile = donorProfileService.findByUserId(loggedInUser.getId()); // Here we find the donor profile by the user's donor id.
+
         model.addAttribute("donorProfile", donorProfile.orElseGet(() -> {  // If profile exists, we use it. Otherwise we create a new profile for the donor
             DonorProfile newProfile = new DonorProfile();
             newProfile.setUser(loggedInUser);
+            // Assign donorId if not already set
+            if (loggedInUser.getDonorId() == null) {
+                myAppUserRepository.save(loggedInUser);
+            }
             return newProfile;
         }));
         return "donorprofile";
@@ -52,13 +63,23 @@ public class DonorProfileController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         MyAppUsers loggedInUser = (MyAppUsers) authentication.getPrincipal();
 
-        Optional<DonorProfile> existingProfile = donorProfileService.findByUserDonorId(loggedInUser.getDonorId()); // Here we retrieve the existing profile by donor id to check if it exists.
-
-        if (existingProfile.isPresent()) { // If the profile already exists, we use its id to update.
-            profileData.setProfileId(existingProfile.get().getProfileId());
+        // Ensure the logged-in user has a valid ID and is fully loaded from the database
+        Optional<MyAppUsers> user = myAppUserRepository.findById(loggedInUser.getId());
+        if (user.isEmpty()) {
+            throw new IllegalStateException("User not found");
         }
 
-        profileData.setUser(loggedInUser);
+        MyAppUsers currentUser = user.get();
+        profileData.setUser(currentUser);
+
+        // Here we save the profile to get the generated donorProfileId
+        DonorProfile savedProfile = donorProfileService.saveOrUpdateProfile(profileData);
+
+        // Assign donorId in MyAppUsers.
+        if (currentUser.getDonorId() == null) {
+            currentUser.setDonorId(profileData.getDonorProfileId());
+            myAppUserRepository.save(currentUser);
+        }
 
         if (!profileImage.isEmpty()) { // Save uploaded image if it is included.
             try {
@@ -72,10 +93,7 @@ public class DonorProfileController {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else if (existingProfile.isPresent()) { // Here we use the existing image if no new image is uploaded.
-            profileData.setImagePath(existingProfile.get().getImagePath());
         }
-
         donorProfileService.saveOrUpdateProfile(profileData); // Save or update the profile in the database
         return "redirect:/donorprofile";
     }

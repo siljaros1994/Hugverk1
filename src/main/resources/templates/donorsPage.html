@@ -25,8 +25,8 @@
     </div>
 
     <div class="profile-actions">
-        <a th:href="@{/recipient/favorite/{profileId}(profileId=${donorProfile.profileId})}" class="button">Favorite</a>
-        <a th:href="@{/recipient/match/{profileId}(profileId=${donorProfile.profileId})}" class="button">Request Match</a>
+        <a th:href="@{/recipient/favorite/{donorProfileId}(donorProfileId=${donorProfile.donorProfileId})}" class="button">Favorite</a>
+        <a th:href="@{/recipient/match/{donorProfileId}(donorProfileId=${donorProfile.donorProfileId})}" class="button">Request Match</a>
     </div>
 </div>
 

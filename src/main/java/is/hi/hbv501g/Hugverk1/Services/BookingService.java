@@ -15,7 +15,7 @@ public class BookingService {
     @Autowired
     private BookingRepository bookingRepository;
 
-    public Booking createBooking(String donorId, String recipientId, LocalDate date, LocalTime time) {
+    public Booking createBooking(Long donorId, Long recipientId, LocalDate date, LocalTime time) {
         Booking booking = new Booking();
         booking.setDonorId(donorId);
         booking.setRecipientId(recipientId);
