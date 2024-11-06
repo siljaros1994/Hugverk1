@@ -1,6 +1,5 @@
 package is.hi.hbv501g.Hugverk1.Services;
 
-import is.hi.hbv501g.Hugverk1.Persistence.Entities.DonorProfile;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.RecipientProfile;
 import is.hi.hbv501g.Hugverk1.Persistence.Repositories.RecipientProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +24,18 @@ public class RecipientProfileService {
     //Finds a recipient profile by the recipient ID, unique identifier for each recipient
     public Optional<RecipientProfile> findByUserRecipientId(Long recipientId) {
         return recipientProfileRepository.findByUserRecipientId(recipientId);
+    }
+
+    public Optional<RecipientProfile> findByUserId(Long userId) {
+        return recipientProfileRepository.findByUserId(userId);
+    }
+
+    public Page<RecipientProfile> getRecipientByType(String recipientType, Pageable pageable) {
+        return recipientProfileRepository.findByRecipientType(recipientType, pageable);
+    }
+
+    public List<RecipientProfile> getProfilesByIds(List<Long> ids) {
+        return recipientProfileRepository.findAllById(ids);
     }
 
     // Finds by profile ID
