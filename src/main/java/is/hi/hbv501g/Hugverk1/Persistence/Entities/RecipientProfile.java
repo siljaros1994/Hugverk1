@@ -58,6 +58,9 @@ public class RecipientProfile {
     @Column(name = "image_path")
     private String imagePath;
 
+    @Column(name = "recipient_type")
+    private String recipientType;
+
     public Long getRecipientProfileId() {
         return recipientProfileId;
     }
@@ -90,6 +93,9 @@ public class RecipientProfile {
         this.height = height;
     }
 
+    public Double getWeight() {
+        return weight;
+    }
 
     public void setWeight(Double weight) {
         this.weight = weight;
@@ -151,6 +157,14 @@ public class RecipientProfile {
         this.ethnicity = ethnicity;
     }
 
+    public String getRecipientType() {
+        return recipientType;
+    }
+
+    public void setRecipientType(String recipientType) {
+        this.recipientType = recipientType;
+    }
+
     public String getBloodType() {
         return bloodType;
     }
@@ -161,6 +175,10 @@ public class RecipientProfile {
 
     public String getGetToKnow() {
         return getToKnow;
+    }
+
+    public void setGetToKnow(String getToKnow) {
+        this.getToKnow = getToKnow;
     }
 
     public String getTraits() {

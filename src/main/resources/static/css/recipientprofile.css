@@ -8,13 +8,13 @@ body {
 
 .profile-container {
     display: flex;
-    max-width: 900px;
-    margin: 0 auto;
+    max-width: 940px;
+    margin: 15px auto;
     background-color: white;
-    padding: 20px;
+    padding: 40px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    gap: 20px;
+    gap: 40px;
 }
 
 .profile-edit, .profile-info {
@@ -45,9 +45,10 @@ textarea {
 
 button {
     display: inline-block;
-        padding: 10px 20px;
-        margin: 10px 5px;
-        background-color: #28a745; /* Green background */
+        padding: 10px;
+        margin-top: 20px;
+        width: 100%;
+        background-color: #28a745;
         color: white;
         border: none;
         border-radius: 5px;
@@ -67,10 +68,6 @@ button:hover {
     transform: translateY(-2px);
 }
 
-.button:hover {
-    background-color: #218838;
-    transform: translateY(-2px);
-}
 .profile-info {
     padding: 20px;
     background-color: #f9f9f9;
@@ -94,5 +91,10 @@ button:hover {
     display: block;
 }
 
-
-
+input, textarea, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}

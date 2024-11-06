@@ -39,10 +39,18 @@ public class RecipientProfileController {
             return "redirect:/user/login";
         }
 
-        Optional<RecipientProfile> recipientProfile = recipientProfileService.findByUserRecipientId(loggedInUser.getRecipientId()); //Here we find the recipient profile by the user's recipient id
+        // Retrieve profile based on the unique user ID
+        Optional<RecipientProfile> recipientProfile = recipientProfileService.findByUserId(loggedInUser.getId()); //Here we find the recipient profile by the user's recipient id
+
         model.addAttribute("recipientProfile", recipientProfile.orElseGet(() -> { //If the profile exists, we use it. Otherwise, we create a new profile for the recipient
             RecipientProfile newProfile = new RecipientProfile();
             newProfile.setUser(loggedInUser);
+
+            if (loggedInUser.getRecipientId() == null) {
+                RecipientProfile savedProfile = recipientProfileService.saveOrUpdateProfile(newProfile);
+                loggedInUser.setRecipientId(savedProfile.getRecipientProfileId());
+                myAppUserRepository.save(loggedInUser);
+            }
             return newProfile;
         }));
         return "recipientprofile";
@@ -63,11 +71,10 @@ public class RecipientProfileController {
         MyAppUsers currentUser = user.get();
         profileData.setUser(currentUser);
 
-        RecipientProfile savedProfile = recipientProfileService.saveOrUpdateProfile(profileData);
-
-        if (currentUser.getRecipientId() == null) {
-            currentUser.setRecipientId(profileData.getRecipientProfileId());
-            myAppUserRepository.save(currentUser);
+        Optional<RecipientProfile> existingProfile = recipientProfileService.findByUserId(currentUser.getId());
+        if (existingProfile.isPresent()) {
+            profileData.setRecipientProfileId(existingProfile.get().getRecipientProfileId());
+            profileData.setImagePath(existingProfile.get().getImagePath());
         }
 
         if (!profileImage.isEmpty()) { //Save uploaded image if it's included
@@ -82,6 +89,14 @@ public class RecipientProfileController {
           } catch (IOException e) {
               e.printStackTrace();
           }
+        }
+        // Save or update the profile
+        recipientProfileService.saveOrUpdateProfile(profileData);
+
+        // Assign recipientId in MyAppUsers if not already set
+        if (currentUser.getRecipientId() == null) {
+            currentUser.setRecipientId(profileData.getRecipientProfileId());
+            myAppUserRepository.save(currentUser);
         }
         return "redirect:/recipientprofile";
     }
