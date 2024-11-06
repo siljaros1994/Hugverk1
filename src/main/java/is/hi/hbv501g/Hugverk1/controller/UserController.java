@@ -84,6 +84,8 @@ public class UserController {
                     return "redirect:/home/donor";
                 } else if ("recipient".equalsIgnoreCase(foundUser.get().getUserType())) {
                     return "redirect:/home/recipient";
+                } else if ("admin".equalsIgnoreCase(foundUser.get().getUserType())) {
+                    return "redirect:/home/admin";
                 } else {
                     model.addAttribute("message", "Unexpected user type.");
                     return "login";

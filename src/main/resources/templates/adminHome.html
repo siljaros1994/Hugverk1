@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Donor Home Page</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/homestyle.css}">
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+          crossorigin="anonymous">
+    <link rel="stylesheet"
+          href="https://use.fontawesome.com/releases/v5.4.1/css/all.css"
+          integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz"
+          crossorigin="anonymous">
+    <style>
+        #loading {
+            display: none;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+<div class="area">
+    <nav class="main-menu">
+        <ul>
+            <li><a th:href="@{/dr}"><i class="fa fa-user"></i><span class="nav-text">User list</span></a></li>
+            <li><a th:href="@{/reports}"><i class="fa fa-flag"></i><span class="nav-text">Reports</span></a></li>
+            <li><a th:href="@{/donationhistory}"><i class="fa fa-history"></i><span class="nav-text">Donation history</span></a></li>
+        </ul>
+        <ul class="logout">
+            <li><a th:href="@{/users/logout}" th:onclick="return confirm('Are you sure you want to logout?')">
+                <i class="fa fa-power-off"></i><span class="nav-text">Logout</span>
+            </a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="container">
+            <header>
+                <h1>Welcome Admin!</h1>
+                <p th:text="'Hello, ' + ${username} + '!'"></p>
+            </header>
+        </div>
+    </main>
+</div>
+
+<footer>
+    <p>Alexandra, Guðrún, Silja og Þrándur.</p>
+</footer>
+
+</body>
+</html>
