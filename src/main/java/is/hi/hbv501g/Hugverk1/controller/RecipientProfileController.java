@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -64,7 +65,7 @@ public class RecipientProfileController {
                 String originalFileName = StringUtils.cleanPath(profileImage.getOriginalFilename());
                 String filePath = uploadPath + originalFileName;
                 File destinationFile = new File(filePath);
-                destinationFile.getParaentFile().mkdirs();
+                destinationFile.getParentFile().mkdirs();
                 profileImage.transferTo(destinationFile);
                 profileData.setImagePath("/uploads/" + originalFileName); //Here is the image path (so it displays)
 
