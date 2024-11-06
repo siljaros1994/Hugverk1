@@ -9,6 +9,7 @@
 <div class="area">
     <nav class="main-menu">
         <ul>
+            <li><a th:href="@{/home/recipient}"><i class="fa fa-home fa-2x"></i><span class="nav-text">Home</span></a></li>
             <li><a th:href="@{/recipientprofile}"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
             <li><a th:href="@{/messages/recipient}"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Messages</span></a></li>
             <li><a th:href="@{/recipient/favorites}"><i class="fa fa-star fa-2x"></i><span class="nav-text">Favorite</span></a></li>
@@ -64,7 +65,6 @@
                         <div class="card-buttons">
                             <button th:onclick="'location.href=\'/recipient/favorite/' + ${donor.donorProfileId} + '\''">Favorite</button>
                             <button th:onclick="'location.href=\'/recipient/view/' + ${donor.donorProfileId} + '\''">View Profile</button>
-                            <button th:onclick="'location.href=\'/recipient/match/' + ${donor.donorProfileId} + '\''">Match</button>
                         </div>
                     </div>
                 </div>

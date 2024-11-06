@@ -6,10 +6,65 @@ body {
     min-height: 100vh;
 }
 
+.area {
+    width: 250px;
+    background-color: #333;
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    padding-top: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.main-menu ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.main-menu li {
+    width: 100%;
+}
+
+.main-menu a {
+    text-decoration: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    width: 100%;
+    transition: background-color 0.3s;
+}
+
+.main-menu a:hover {
+    background-color: #444;
+}
+
+.main-menu i {
+    margin-right: 10px;
+}
+
+.nav-text {
+    font-size: 1.1em;
+}
+
+.logout {
+    margin-top: auto;
+    width: 100%;
+}
+
 .profile-container {
     display: flex;
     max-width: 940px;
     margin: 15 auto;
+    margin-left: 270px;
     background-color: white;
     padding: 40px;
     border-radius: 10px;
