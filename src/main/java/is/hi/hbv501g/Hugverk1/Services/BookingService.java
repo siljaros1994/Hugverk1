@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BookingService {
@@ -22,9 +23,6 @@ public class BookingService {
     private DonorProfileRepository donorProfileRepository;
 
     public Booking createBooking(Long donorId, Long recipientId, LocalDate date, LocalTime time) {
-        DonorProfile donorProfile = donorProfileRepository.findByUserDonorId(donorId)
-                .orElseThrow(() -> new IllegalArgumentException("Donor not found"));
-
         //if (donorProfile.getDonationsCompleted() >= donorProfile.getDonationLimit()) {
           //  throw new IllegalStateException("Donor has reached the donation limit.");
         //}
@@ -34,12 +32,29 @@ public class BookingService {
         booking.setDate(date);
         booking.setTime(time);
         //donorProfile.incrementDonationsCompleted();
-        donorProfileRepository.save(donorProfile);
+        booking.setConfirmed(false);
         return bookingRepository.save(booking);
     }
 
     public List<Booking> getAllBookings() {
         return bookingRepository.findAll();
+    }
+
+    public List<Booking> getBookingsByRecipientId(Long recipientId) {
+        return bookingRepository.findByRecipientId(recipientId);
+    }
+
+    public List<Booking> getPendingBookingsForDonor(Long donorId) {
+        return bookingRepository.findByDonorIdAndConfirmedFalse(donorId);
+    }
+
+    public void confirmBooking(Long id) {
+        Optional<Booking> bookingOpt = bookingRepository.findById(id);
+        if (bookingOpt.isPresent()) {
+            Booking booking = bookingOpt.get();
+            booking.setConfirmed(true);
+            bookingRepository.save(booking);
+        }
     }
 
     public void cancelBooking(Long id) {

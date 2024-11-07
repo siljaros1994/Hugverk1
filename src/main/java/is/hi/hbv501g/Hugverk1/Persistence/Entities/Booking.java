@@ -27,7 +27,10 @@ public class Booking {
     private LocalTime time;
 
     @Column(name = "status", nullable = false)
-    private String status = "Booked";
+    private String status = "Pending Confirmation";
+
+    @Column(name = "confirmed", nullable = false)
+    private boolean confirmed = false;
 
     // Getters and Setters
     public Long getId() {
@@ -77,4 +80,8 @@ public class Booking {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public boolean isConfirmed() { return confirmed; }
+
+    public void setConfirmed(boolean confirmed) { this.confirmed = confirmed; }
 }
