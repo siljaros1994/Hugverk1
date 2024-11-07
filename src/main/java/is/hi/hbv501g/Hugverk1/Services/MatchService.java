@@ -1,17 +1,24 @@
 package is.hi.hbv501g.Hugverk1.Services;
 
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.DonorProfile;
+import is.hi.hbv501g.Hugverk1.Persistence.Entities.RecipientProfile;
 import is.hi.hbv501g.Hugverk1.Persistence.Repositories.DonorProfileRepository;
 import is.hi.hbv501g.Hugverk1.Persistence.Repositories.RecipientProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
+//Matching Service for Donor Match
+//A recipient favorites a donor
+//Donor can see in Matches tab in the Sidebar that a Recipient favorited him
+//Donor has a match button and can match him
+
 @Service
-public class MatchingService {
+public class MatchService {
     @Autowired
     private DonorProfileRepository donorProfileRepository;
 
-```
+
     @Autowired
     private RecipientProfileRepository recipientProfileRepository;
 
@@ -35,6 +42,5 @@ public class MatchingService {
         return donorId.getFavoritedRecipientsId().contains(recipientId) && recipientId.getFavoritedDonors().contains(donorId);
     }
 
-```
 
 }
