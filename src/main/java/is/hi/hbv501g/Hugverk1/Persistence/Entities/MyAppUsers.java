@@ -51,7 +51,7 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private DonorProfile donorProfile;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private RecipientProfile recipientProfile;
 
     // Implementations for UserDetails methods
@@ -161,6 +161,14 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
 
     public void setDonorProfile(DonorProfile donorProfile) {
         this.donorProfile = donorProfile;
+    }
+
+    public RecipientProfile getRecipientProfile() {
+        return recipientProfile;
+    }
+
+    public void setRecipientProfile(RecipientProfile recipientProfile) {
+        this.recipientProfile = recipientProfile;
     }
 
     public String getFavoriteDonors() {

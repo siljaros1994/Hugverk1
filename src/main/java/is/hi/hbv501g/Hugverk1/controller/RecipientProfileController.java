@@ -36,7 +36,7 @@ public class RecipientProfileController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication(); //Here we get the logged-in user from the security context
         MyAppUsers loggedInUser = (MyAppUsers) authentication.getPrincipal();
         if (loggedInUser == null || !"recipient".equalsIgnoreCase(loggedInUser.getUserType())) { //Here we redirect to login if the user is not a recipient
-            return "redirect:/user/login";
+            return "redirect:/users/login";
         }
 
         // Retrieve profile based on the unique user ID
@@ -72,9 +72,14 @@ public class RecipientProfileController {
         profileData.setUser(currentUser);
 
         Optional<RecipientProfile> existingProfile = recipientProfileService.findByUserId(currentUser.getId());
+
         if (existingProfile.isPresent()) {
-            profileData.setRecipientProfileId(existingProfile.get().getRecipientProfileId());
-            profileData.setImagePath(existingProfile.get().getImagePath());
+            RecipientProfile profileToUpdate = existingProfile.get();
+            profileData.setRecipientProfileId(profileToUpdate.getRecipientProfileId());
+
+            if (profileToUpdate.getImagePath() != null && profileImage.isEmpty()) {
+                profileData.setImagePath(profileToUpdate.getImagePath());
+            }
         }
       
         if (!profileImage.isEmpty()) { //Save uploaded image if it's included

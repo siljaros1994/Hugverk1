@@ -50,8 +50,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         if ("donor".equalsIgnoreCase(user.getUserType())) {
             response.sendRedirect("/home/donor");
         } else if ("recipient".equalsIgnoreCase(user.getUserType())) {
-            response.sendRedirect("/home/recipient");}
-        else if ("admin".equalsIgnoreCase(user.getUserType())) {
+            response.sendRedirect("/home/recipient");
+        } else if ("admin".equalsIgnoreCase(user.getUserType())) {
             response.sendRedirect("/home/admin");
         } else {
             response.sendRedirect("/users/login?error=true");

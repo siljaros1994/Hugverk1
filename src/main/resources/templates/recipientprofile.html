@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Recipient Profile</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/recipientprofile.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/profile.css}">
 </head>
+
 <body>
     <div class="container">
         <div class="area">
@@ -192,7 +193,7 @@
             <div class="profile-info">
                 <h2>Profile Information</h2>
                 <div class="profile-image">
-                    <img th:src="@{${recipientProfile.imagePath}}" alt="Profile Image" th:if="${recipientProfile.imagePath != null}">
+                    <img th:src="${recipientProfile.imagePath != null ? recipientProfile.imagePath : '/uploads/default-recipient-avatar.jpg'}" alt="Recipient Image"/>
                 </div>
                 <p>Recipient ID: <span th:text="${recipientProfile.user?.recipientId ?: 'No ID available'}">Recipient ID</span></p>
                 <p>Eye Color: <span th:text="${recipientProfile.eyeColor ?: 'Not specified'}">Eye Color</span></p>
