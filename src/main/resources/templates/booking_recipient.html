@@ -9,11 +9,12 @@
 <div class="area">
     <nav class="side-panel">
         <ul>
-            <li><a th:href="@{/donorprofile}"><i class="fa fa-user"></i><span class="nav-text">Profile</span></a></li>
+            <li><a th:href="@{/home/recipient}"><i class="fa fa-home fa-2x"></i><span class="nav-text">Home</span></a></li>
+            <li><a th:href="@{/recipientprofile}"><i class="fa fa-user"></i><span class="nav-text">Profile</span></a></li>
             <li><a th:href="@{/dr}"><i class="fa fa-heart"></i><span class="nav-text">Recipients</span></a></li>
-            <li><a th:href="@{/messages/donor}"><i class="fa fa-envelope"></i><span class="nav-text">Messages</span></a></li>
+            <li><a th:href="@{/messages/recipient}"><i class="fa fa-envelope"></i><span class="nav-text">Messages</span></a></li>
             <li><a href="#"><i class="fa fa-check"></i><span class="nav-text">Match</span></a></li>
-            <li><a th:href="@{/bookings}"><i class="fa fa-book"></i><span class="nav-text">Booking</span></a></li>
+            <li><a th:href="@{/bookings/recipient}"><i class="fa fa-book"></i><span class="nav-text">Booking</span></a></li>
         </ul>
         <ul class="logout">
             <li><a th:href="@{/users/logout}" onclick="return confirm('Are you sure you want to logout?')">
@@ -54,8 +55,8 @@
             <ul>
                 <li th:each="booking : ${bookings}">
                     <p>
-                        <strong>Donor ID:</strong> <span th:text="${booking.donor.donorId}"></span> |
-                        <strong>Recipient ID:</strong> <span th:text="${booking.recipient.recipientId}"></span> |
+                        <strong>Donor ID:</strong> <span th:text="${booking.donorId}"></span> |
+                        <strong>Recipient ID:</strong> <span th:text="${booking.recipientId}"></span> |
                         <strong>Date:</strong> <span th:text="${booking.date}"></span> |
                         <strong>Time:</strong> <span th:text="${booking.time}"></span>
                     <form th:action="@{/bookings/cancel/{id}(id=${booking.id})}" method="post" style="display: inline;">
