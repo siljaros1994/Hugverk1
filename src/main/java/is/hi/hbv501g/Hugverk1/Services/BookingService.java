@@ -25,16 +25,15 @@ public class BookingService {
         DonorProfile donorProfile = donorProfileRepository.findByUserDonorId(donorId)
                 .orElseThrow(() -> new IllegalArgumentException("Donor not found"));
 
-        if (donorProfile.getDonationsCompleted() >= donorProfile.getDonationLimit()) {
-            throw new IllegalStateException("Donor has reached the donation limit.");
-        }
-
+        //if (donorProfile.getDonationsCompleted() >= donorProfile.getDonationLimit()) {
+          //  throw new IllegalStateException("Donor has reached the donation limit.");
+        //}
         Booking booking = new Booking();
         booking.setDonorId(donorId);
         booking.setRecipientId(recipientId);
         booking.setDate(date);
         booking.setTime(time);
-        donorProfile.incrementDonationsCompleted();
+        //donorProfile.incrementDonationsCompleted();
         donorProfileRepository.save(donorProfile);
         return bookingRepository.save(booking);
     }

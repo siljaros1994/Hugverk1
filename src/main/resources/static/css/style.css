@@ -126,3 +126,9 @@ a {
 a:hover {
   text-decoration: underline;
 }
+
+.logout {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}

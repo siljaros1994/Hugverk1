@@ -4,6 +4,7 @@ import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
 import is.hi.hbv501g.Hugverk1.Persistence.Repositories.MyAppUserRepository;
 import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import jakarta.annotation.PostConstruct;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -122,6 +123,12 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
     // Here we fetch all recipients who have this donor's ID in their favorites list
     @Override
     public List<MyAppUsers> getRecipientsWhoFavoritedTheDonor(Long donorId) {
-        return userRepository.findRecipientsWhoFavoritedDonor(donorId);
+        List<MyAppUsers> recipients = userRepository.findRecipientsWhoFavoritedDonor(donorId);
+        recipients.forEach(recipient -> {
+            if (recipient.getRecipientProfile() != null) {
+                Hibernate.initialize(recipient.getRecipientProfile());
+            }
+        });
+        return recipients;
     }
 }
