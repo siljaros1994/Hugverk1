@@ -1,5 +1,6 @@
 package is.hi.hbv501g.Hugverk1.Persistence.Entities;
 
+
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -9,19 +10,18 @@ import java.util.Set;
 @Table(name = "RecipientProfile")
 public class RecipientProfile {
 
-    // creates a Unique identifier for each profile
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "profile_id")
     private Long profileId;
 
-    // Links each profile to a unique donor
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipient_id", referencedColumnName = "recipient_id", unique = true)
     private MyAppUsers user;
 
     @Column(name = "recipient_type")
-    private String donorType;
+
 
     @Column(name = "height")
     private Double height;
@@ -64,7 +64,7 @@ public class RecipientProfile {
     @Column(name = "image_path")
     private String imagePath;
 
-    // Getters and Setters
+
     public Long getProfileId() {
         return profileId;
     }
@@ -81,20 +81,19 @@ public class RecipientProfile {
         this.user = user;
     }
 
-    public String getImagePath() {
-        return imagePath;
-    }
 
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
     }
 
-    public String getDonorType() {
-        return donorType;
+
+    public String getRecipientType() {
+        return recipientType;
     }
 
-    public void setDonorType(String donorType) {
-        this.donorType = donorType;
+    public void setRecipientType(String recipientType) {
+        this.recipientType = recipientType;
+
     }
 
     public Double getHeight() {
@@ -105,9 +104,6 @@ public class RecipientProfile {
         this.height = height;
     }
 
-    public Double getWeight() {
-        return weight;
-    }
 
     public void setWeight(Double weight) {
         this.weight = weight;
@@ -181,9 +177,6 @@ public class RecipientProfile {
         return getToKnow;
     }
 
-    public void setGetToKnow(String getToKnow) {
-        this.getToKnow = getToKnow;
-    }
 
     public String getTraits() {
         return traits;
@@ -192,5 +185,6 @@ public class RecipientProfile {
     public void setTraits(String traits) {
         this.traits = traits;
     }
+
 }
 

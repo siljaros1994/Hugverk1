@@ -2,7 +2,7 @@ package is.hi.hbv501g.Hugverk1.controller;
 
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.RecipientProfile;
-import is.hi.hbv501g.Hugverk1.Services.Implementation.RecipientProfileService;
+import is.hi.hbv501g.Hugverk1.Services.RecipientProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
