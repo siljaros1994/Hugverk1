@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Confirm Donation Appointments</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bookingstyle.css}">
+</head>
+<body>
+
+<div class="area">
+    <nav class="side-panel">
+        <ul>
+            <li><a th:href="@{/home/donor}"><i class="fa fa-home fa-2x"></i><span class="nav-text">Home</span></a></li>
+            <li><a th:href="@{/donorprofile}"><i class="fa fa-user"></i><span class="nav-text">Profile</span></a></li>
+            <li><a th:href="@{/messages/donor}"><i class="fa fa-envelope"></i><span class="nav-text">Messages</span></a></li>
+            <li><a href="#"><i class="fa fa-check"></i><span class="nav-text">Match</span></a></li>
+            <li><a th:href="@{/bookings/donor}"><i class="fa fa-book"></i><span class="nav-text">Booking</span></a></li>
+        </ul>
+        <ul class="logout">
+            <li><a th:href="@{/users/logout}" onclick="return confirm('Are you sure you want to logout?')">
+                <i class="fa fa-power-off"></i><span class="nav-text">Logout</span>
+            </a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="page-header">
+            <h2>Confirm Donation Appointment</h2>
+            <p>Review the scheduled appointment details below, including the date and time set by the recipient.</p>
+            <p>To confirm your participation, please click the "Confirm" button.</p>
+            <p>We appreciate your commitment and look forward to supporting you through this process.</p>
+        </header>
+
+        <section class="appointments">
+            <h2>Confirm Appointments</h2>
+            <ul>
+                <li th:each="booking : ${pendingBookings}">
+                    <p>
+                        <strong>Donor ID:</strong> <span th:text="${booking.donorId}"></span> |
+                        <strong>Recipient ID:</strong> <span th:text="${booking.recipientId}"></span> |
+                        <strong>Date:</strong> <span th:text="${booking.date}"></span> |
+                        <strong>Time:</strong> <span th:text="${booking.time}"></span>
+                    <form th:action="@{/bookings/confirm/{id}(id=${booking.id})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn-submit">Confirm</button>
+                    </form>
+                    </p>
+                </li>
+            </ul>
+        </section>
+    </main>
+</div>
+
+<footer>
+    <p>Alexandra, Guðrún, Silja og Þrándur.</p>
+</footer>
+
+</body>
+</html>

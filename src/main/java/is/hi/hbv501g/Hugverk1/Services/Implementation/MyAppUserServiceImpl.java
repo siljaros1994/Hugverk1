@@ -4,6 +4,7 @@ import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
 import is.hi.hbv501g.Hugverk1.Persistence.Repositories.MyAppUserRepository;
 import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import jakarta.annotation.PostConstruct;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,8 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,12 +61,7 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
     @Override
     public void saveUser(MyAppUsers user) {
         // Encode the password before saving the user
-        user.setPassword(passwordEncoder.encode(user.getPassword())); // The password is hashed
-        if ("donor".equalsIgnoreCase(user.getUserType()) && user.getDonorId() == null) {
-            user.assignDonorId(); // Assign a unique donorId
-        } else if ("recipient".equalsIgnoreCase(user.getUserType()) && user.getRecipientId() == null) {
-            user.assignRecipientId(); // Assign a unique recipientId
-        }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user); // Save the user to the database
     }
 
@@ -92,12 +86,13 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
         }
         return users;
     }
-  
+
     @Override
     public void addFavoriteDonor(Long recipientId, Long donorId) {
-        MyAppUsers recipient = userRepository.findById(recipientId)
+        MyAppUsers recipient = userRepository.findByRecipientId(recipientId)
                 .orElseThrow(() -> new RuntimeException("Recipient not found"));
         String currentFavorites = recipient.getFavoriteDonors();
+
         // Add the new donor ID
         if (currentFavorites == null || currentFavorites.isEmpty()) {
             currentFavorites = donorId.toString();
@@ -105,20 +100,35 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
             currentFavorites += "," + donorId;
         }
         // Update recipient entity
+        System.out.println("Updated Favorite Donors: " + currentFavorites);
         recipient.setFavoriteDonors(currentFavorites);
         // Save to database
         userRepository.save(recipient);
     }
+
     @Override
     public List<Long> getFavoriteDonors(Long recipientId) {
-        MyAppUsers recipient = userRepository.findById(recipientId)
+        MyAppUsers recipient = userRepository.findByRecipientId(recipientId)
                 .orElseThrow(() -> new RuntimeException("Recipient not found"));
         String favoriteDonors = recipient.getFavoriteDonors();
         if (favoriteDonors == null || favoriteDonors.isEmpty()) {
             return new ArrayList<>();
         }
         return Arrays.stream(favoriteDonors.split(","))
-                .map(Long::valueOf)
+                .map(Long::parseLong)
                 .collect(Collectors.toList());
+    }
+
+
+    // Here we fetch all recipients who have this donor's ID in their favorites list
+    @Override
+    public List<MyAppUsers> getRecipientsWhoFavoritedTheDonor(Long donorId) {
+        List<MyAppUsers> recipients = userRepository.findRecipientsWhoFavoritedDonor(donorId);
+        recipients.forEach(recipient -> {
+            if (recipient.getRecipientProfile() != null) {
+                Hibernate.initialize(recipient.getRecipientProfile());
+            }
+        });
+        return recipients;
     }
 }

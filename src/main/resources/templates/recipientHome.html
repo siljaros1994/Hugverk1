@@ -9,11 +9,12 @@
 <div class="area">
     <nav class="main-menu">
         <ul>
+            <li><a th:href="@{/home/recipient}"><i class="fa fa-home fa-2x"></i><span class="nav-text">Home</span></a></li>
             <li><a th:href="@{/recipientprofile}"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
             <li><a th:href="@{/messages/recipient}"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Messages</span></a></li>
-            <li><a th:href="@{/favorites}"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Favorites</span></a></li>
+            <li><a th:href="@{/recipient/favorites}"><i class="fa fa-star fa-2x"></i><span class="nav-text">Favorite</span></a></li>
             <li><a href="#"><i class="fa fa-check fa-2x"></i><span class="nav-text">Match</span></a></li>
-            <li><a th:href="@{/bookings}"><i class="fa fa-book"></i><span class="nav-text">Booking</span></a></li>
+            <li><a th:href="@{/bookings/recipient}"><i class="fa fa-book"></i><span class="nav-text">Booking</span></a></li>
         </ul>
         <ul class="logout">
             <li><a th:href="@{/users/logout}" th:onclick="return confirm('Are you sure you want to logout?')">
@@ -53,7 +54,8 @@
             <div class="donor-cards" th:if="${donorsPage != null && donorsPage.content.size() > 0}">
                 <div class="card-grid">
                     <div class="donor-card" th:each="donor : ${donorsPage.content}">
-                        <img th:src="@{${donor.imagePath}}" alt="Donor Image" class="donor-image"/>
+                        <img th:src="${donor.imagePath != null ? donor.imagePath : '/uploads/default-donor-avatar.jpg'}"
+                             alt="Donor Image" class="donor-image"/>
                         <div class="donor-info">
                             <p><strong>Eye Color:</strong> <span th:text="${donor.eyeColor}">Eye Color</span></p>
                             <p><strong>Hair Color:</strong> <span th:text="${donor.hairColor}">Hair Color</span></p>
@@ -62,9 +64,8 @@
                             <p><strong>Donor Type:</strong> <span th:text="${donor.donorType}">Donor Type</span></p>
                         </div>
                         <div class="card-buttons">
-                            <button th:onclick="'location.href=\'/recipient/favorite/' + ${donor.profileId} + '\''">Favorite</button>
-                            <button th:onclick="'location.href=\'/recipient/view/' + ${donor.profileId} + '\''">View Profile</button>
-                            <button th:onclick="'location.href=\'/recipient/match/' + ${donor.profileId} + '\''">Match</button>
+                            <button th:onclick="'location.href=\'/recipient/favorite/' + ${donor.donorProfileId} + '\''">Favorite</button>
+                            <button th:onclick="'location.href=\'/recipient/view/' + ${donor.donorProfileId} + '\''">View Profile</button>
                         </div>
                     </div>
                 </div>

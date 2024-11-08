@@ -31,7 +31,7 @@
         <div class="message-input">
             <div class="wrap">
                 <form th:object="${messageForm}" th:action="@{/messages/send}" method="POST">
-                    <input type="hidden" th:field="*{recipientId}" th:value="${recipientId}" />
+                    <input type="hidden" th:field="*{receiverId}" th:value="${receiverId}" />
                     <input id="text" th:field="*{text}" type="text" placeholder="Write your message..." />
                     <button type="submit" class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i> Send</button>
                 </form>

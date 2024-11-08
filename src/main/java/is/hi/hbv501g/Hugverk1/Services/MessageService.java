@@ -19,9 +19,9 @@ public class MessageService {
         return messageRepository.save(message);
     }
 
-    public List<Message> getConversation(String senderId, String recipientId) {
-        List<Message> sentMessages = messageRepository.findBySenderIdAndRecipientIdOrderByTimestamp(senderId, recipientId);
-        List<Message> receivedMessages = messageRepository.findByRecipientIdAndSenderIdOrderByTimestamp(senderId, recipientId);
+    public List<Message> getConversation(Long senderId, Long receiverId) {
+        List<Message> sentMessages = messageRepository.findBySenderIdAndReceiverIdOrderByTimestamp(senderId, receiverId);
+        List<Message> receivedMessages = messageRepository.findByReceiverIdAndSenderIdOrderByTimestamp(receiverId, senderId);
         sentMessages.addAll(receivedMessages);
         sentMessages.sort(Comparator.comparing(Message::getTimestamp));
         return sentMessages;

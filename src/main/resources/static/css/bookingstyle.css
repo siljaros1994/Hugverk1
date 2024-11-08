@@ -101,6 +101,11 @@ body, html {
     padding: 10px 20px;
     cursor: pointer;
     border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.btn-submit:hover {
+    background-color: #0da7a1;
 }
 
 .btn-cancel {
@@ -131,6 +136,12 @@ footer {
     padding: 10px 0;
     background-color: #333;
     color: white;
+    width: 100%;
+}
+
+.logout {
+    position: absolute;
+    bottom: 0;
     width: 100%;
 }
 
