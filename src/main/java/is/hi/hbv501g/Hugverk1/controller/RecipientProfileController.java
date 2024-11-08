@@ -62,13 +62,7 @@ public class RecipientProfileController {
     public String saveOrEditProfile(@ModelAttribute("recipientProfile") RecipientProfile profileData,
                                   @RequestParam("profileImage") MultipartFile profileImage) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication();
-
-        Optional<RecipientProfile> existingProfile = recipientProfileService.findByUserRecipientId(loggedInUser.getRecipientId()); //Retrieves the existing profile by recipient id to check if it exists
-
         MyAppUsers loggedInUser = (MyAppUsers) authentication.getPrincipal();
-
 
         Optional<MyAppUsers> user = myAppUserRepository.findById(loggedInUser.getId());
         if (user.isEmpty()) {

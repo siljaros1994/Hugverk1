@@ -19,7 +19,6 @@ public class MatchService {
     @Autowired
     private DonorProfileRepository donorProfileRepository;
 
-
     @Autowired
     private RecipientProfileRepository recipientProfileRepository;
 
@@ -71,7 +70,4 @@ public class MatchService {
 //        DonorProfile donorProfile = donorProfileRepository.findById(recipientId).orElseThrow();
 //        return donorId.getFavoritedRecipientsId().contains(recipientId) && recipientId.getFavoritedDonors().contains(donorId);
 //    }
-
-
-
-//}
+}
