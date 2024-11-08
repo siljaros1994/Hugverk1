@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -49,7 +50,7 @@ public class RecipientProfileController {
     public String saveOrEditProfile(@ModelAttribute("recipientProfile") RecipientProfile profileData,
                                     @RequestParam("profileImage") MultipartFile profileImage) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        MyAppUsers loggedInUser = SecurityContextHolder.getContext().getAuthentication();
+        MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication();
 
         Optional<RecipientProfile> existingProfile = recipientProfileService.findByUserRecipientId(loggedInUser.getRecipientId()); //Retrieves the existing profile by recipient id to check if it exists
 
@@ -64,7 +65,7 @@ public class RecipientProfileController {
                 String originalFileName = StringUtils.cleanPath(profileImage.getOriginalFilename());
                 String filePath = uploadPath + originalFileName;
                 File destinationFile = new File(filePath);
-                destinationFile.getParaentFile().mkdirs();
+                destinationFile.getParentFile().mkdirs();
                 profileImage.transferTo(destinationFile);
                 profileData.setImagePath("/uploads/" + originalFileName); //Here is the image path (so it displays)
 

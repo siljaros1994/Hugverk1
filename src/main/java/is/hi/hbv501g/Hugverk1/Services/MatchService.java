@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 //Matching Service for Donor Match
 //A recipient favorites a donor
-//Donor can see in Matches tab in the Sidebar that a Recipient favorited him
+//can see in Matches tab in the Sidebar that a Recipient favorited him
 //Donor has a match button and can match him
 
 @Service
@@ -23,8 +23,8 @@ public class MatchService {
     private RecipientProfileRepository recipientProfileRepository;
 
     public void favoriteRecipient(Long donorId, Long recipientId) {
-        donorId donorid = donorProfileRepository.findById(donorId).orElseThrow();
-        recipientId recipientid = recipientProfileRepository.findById(recipientId).orElseThrow();
+        DonorProfile donorProfile = donorProfileRepository.findById(donorId).orElseThrow();
+        RecipientProfile recipientProfile = recipientProfileRepository.findById(recipientId).orElseThrow();
         donorId.getFavoritedRecipients().add(recipientid);
         donorProfileRepository.save(donorid);
     }

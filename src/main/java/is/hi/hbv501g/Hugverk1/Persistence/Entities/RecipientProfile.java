@@ -21,7 +21,7 @@ public class RecipientProfile {
     private MyAppUsers user;
 
     @Column(name = "recipient_type")
-
+    private String recipientType;
 
     @Column(name = "height")
     private Double height;
@@ -186,5 +186,8 @@ public class RecipientProfile {
         this.traits = traits;
     }
 
+    public String getImagePath() {
+        return imagePath;
+    }
 }
 
