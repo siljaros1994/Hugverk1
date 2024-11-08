@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
@@ -61,7 +62,13 @@ public class RecipientProfileController {
     public String saveOrEditProfile(@ModelAttribute("recipientProfile") RecipientProfile profileData,
                                   @RequestParam("profileImage") MultipartFile profileImage) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication();
+
+        Optional<RecipientProfile> existingProfile = recipientProfileService.findByUserRecipientId(loggedInUser.getRecipientId()); //Retrieves the existing profile by recipient id to check if it exists
+
         MyAppUsers loggedInUser = (MyAppUsers) authentication.getPrincipal();
+
 
         Optional<MyAppUsers> user = myAppUserRepository.findById(loggedInUser.getId());
         if (user.isEmpty()) {
