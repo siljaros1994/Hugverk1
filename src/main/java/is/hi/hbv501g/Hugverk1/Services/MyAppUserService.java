@@ -10,6 +10,9 @@ import java.util.Optional;
 
 // Here we load the user data during the login process.
 public interface MyAppUserService extends UserDetailsService {
+    static List<Long> getMatchRecipients(Long donorId) {
+    }
+
     void saveUser(MyAppUsers user);
     Optional<MyAppUsers> findByUsername(String username);
     Optional<MyAppUsers> findById(Long id);
@@ -22,4 +25,8 @@ public interface MyAppUserService extends UserDetailsService {
 
     @Override
     UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
+
+    void addMatchRecipient();
+
+    void addMatchRecipient(Long donorId, Long recipientId);
 }
