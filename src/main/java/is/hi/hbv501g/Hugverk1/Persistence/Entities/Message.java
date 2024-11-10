@@ -23,6 +23,15 @@ public class Message {
     @Column(name = "timestamp")
     private LocalDateTime timestamp;
 
+    public Message() {}
+
+    public Message(Long senderId, Long receiverId, String content, LocalDateTime timestamp) {
+        this.senderId = senderId;
+        this.receiverId = receiverId;
+        this.content = content;
+        this.timestamp = timestamp;
+    }
+
     // Getters and setters
     public Long getId() {
         return id;

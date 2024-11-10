@@ -5,6 +5,12 @@ public class MessageForm {
     private Long receiverId;
     private Long senderId;
 
+    public MessageForm() {}
+
+    public MessageForm(Long receiverId) {
+        this.receiverId = receiverId;
+    }
+
     // Getters and Setters
     public String getText() {
         return text;

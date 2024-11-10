@@ -53,7 +53,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**", "/home/admin", "/delete/{username}").authenticated()
                         .requestMatchers("/home/donor", "/donorprofile", "/donor/view/**", "/bookings/donor").authenticated()
                         .requestMatchers("/home/recipient", "/recipientprofile",  "/recipient/view/**", "/bookings/recipient", "/recipient/favorite/**").authenticated()
-                        .requestMatchers("/messages/**", "/dr").authenticated() // Allow access to the home pages after login
+                        .requestMatchers("/messages/**", "/messages/{userType}/{id}", "/dr").authenticated()
                         .anyRequest().authenticated())  // All other requests need authentication
                 .formLogin(login -> login
                         .loginPage("/users/login")

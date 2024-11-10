@@ -40,6 +40,7 @@ public class RecipientHomeController {
             logger.warn("LoggedInUser not found in session. Redirecting to login.");
             return "redirect:/users/login";
         }
+        model.addAttribute("user", loggedInUser);
         model.addAttribute("username", loggedInUser.getUsername());
 
         // Configure the sorting direction and it's attributes
