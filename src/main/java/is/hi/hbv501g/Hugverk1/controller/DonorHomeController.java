@@ -32,11 +32,14 @@ public class DonorHomeController {
         if (loggedInUser == null || !"donor".equalsIgnoreCase(loggedInUser.getUserType())) {
             return "redirect:/users/login";
         }
+
         Long donorId = loggedInUser.getDonorId();
         List<MyAppUsers> recipientsWhoFavorited = myAppUserService.getRecipientsWhoFavoritedTheDonor(donorId);
 
+        model.addAttribute("user", loggedInUser);
         model.addAttribute("username", loggedInUser.getUsername());
         model.addAttribute("recipientsWhoFavorited", recipientsWhoFavorited);
+
         return "donorHome";  // Returns the donor-specific homepage
     }
 

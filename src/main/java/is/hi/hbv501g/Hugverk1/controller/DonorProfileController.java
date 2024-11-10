@@ -43,6 +43,8 @@ public class DonorProfileController {
             return "redirect:/users/login";
         }
 
+        model.addAttribute("user", loggedInUser);
+
         // Retrieve profile based on the unique user ID to avoid mixing profiles
         Optional<DonorProfile> donorProfile = donorProfileService.findByUserId(loggedInUser.getId()); // Here we find the donor profile by the user's donor id.
 

@@ -5,39 +5,75 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/messagestyle.css}">
 </head>
 <body>
-<div id="frame">
-    <div id="sidepanel">
-        <div id="profile">
-            <div class="wrap">
-                <div id="profile-img" th:style="'background: url(' + @{${senderImagePath}} + ') no-repeat center center; background-size: cover; width: 60px; height: 60px; border-radius: 50%;'"></div>
-                <p th:text="'Recipient: ' + ${senderId}"></p>
+<div class="container">
+    <div class="area">
+        <nav class="main-menu">
+            <ul>
+                <li><a th:href="@{${userType == 'donor' ? '/home/donor' : '/home/recipient'}}"><i class="fa fa-home fa-2x"></i><span class="nav-text">Home</span></a></li>
+                <li th:if="${userType == 'donor'}"><a th:href="@{/donorprofile}"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
+                <li th:if="${userType == 'recipient'}"><a th:href="@{/recipientprofile}"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
+                <li><a th:href="@{/messages/{userType}/{id}(userType=${user.userType}, id=${user.id})}"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Messages</span></a></li>
+                <li><a href="#"><i class="fa fa-check fa-2x"></i><span class="nav-text">Match</span></a></li>
+                <li th:if="${userType == 'donor'}"><a th:href="@{/bookings/donor}"><i class="fa fa-book fa-2x"></i><span class="nav-text">Booking</span></a></li>
+                <li th:if="${userType == 'recipient'}"><a th:href="@{/bookings/recipient}"><i class="fa fa-book fa-2x"></i><span class="nav-text">Booking</span></a></li>
+            </ul>
+            <ul class="logout">
+                <li><a th:href="@{/users/logout}" th:onclick="return confirm('Logout?')">
+                    <i class="fa fa-power-off fa-2x"></i><span class="nav-text">Logout</span>
+                </a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div id="frame">
+        <div id="sidepanel">
+            <div id="profile">
+                <div class="wrap">
+                    <div id="profile-img"
+                         th:style="'background: url(' + @{${senderImagePath}} + ') no-repeat center center; background-size: cover;'">
+                    </div>
+                    <p th:text="'ID: ' + ${senderId}"></p>
+                </div>
+            </div>
+
+            <div id="contacts">
+                <ul>
+                    <li th:each="matchedUser : ${matchedUsers}">
+                        <a th:href="@{/messages/recipient/{id}(id=${matchedUser.id})}"th:onclick="setReceiverId(${matchedUser.id})">
+                            <div class="user-details">
+                                <img th:src="${matchedUser.donorProfile != null ? matchedUser.donorProfile.imagePath : matchedUser.recipientProfile.imagePath}"
+                                     alt="Profile Picture" class="user-img"/>
+                                <span th:text="'ID: ' + ${matchedUser.id}"></span>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
-        <div class="wrap">
-            <a th:href="${userType == 'donor' ? '/home/donor' : '/home/recipient'}" class="back-button">
-                <button>Back to Home</button>
-            </a>
-        </div>
-    </div>
-    <div class="content">
-        <div class="messages">
-            <ul>
-                <li th:each="chatMessage : ${chats}" th:classappend="${chatMessage.senderId == senderId} ? 'sent' : 'replies'">
-                    <div th:style="'background: url(' + (chatMessage.senderId == senderId ? @{${senderImagePath}} : @{${recipientImagePath}}) + ') no-repeat center center; background-size: cover; width: 40px; height: 40px; border-radius: 50%;'"></div>
-                    <p th:text="${chatMessage.content}"></p>
-                </li>
-            </ul>
-        </div>
-        <div class="message-input">
-            <div class="wrap">
-                <form th:object="${messageForm}" th:action="@{/messages/send}" method="POST">
+
+        <div class="content">
+            <div class="messages">
+                <ul>
+                    <li th:each="chatMessage : ${chats}" th:class="${chatMessage.senderId == senderId ? 'sent' : 'replies'}">
+                        <div th:style="'background: url(' + (chatMessage.senderId == senderId ? @{${senderImagePath}} : @{${recipientImagePath}}) + ') no-repeat center center; background-size: cover;'"></div>
+                        <p th:text="${chatMessage.content}"></p>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="message-input">
+                <form th:object="${messageForm}" th:action="@{/messages/send}" method="POST" onsubmit="this.querySelector('button[type=submit]').disabled = true;">
                     <input type="hidden" th:field="*{receiverId}" th:value="${receiverId}" />
-                    <input id="text" th:field="*{text}" type="text" placeholder="Write your message..." />
+                    <input th:field="*{text}" type="text" placeholder="Write your message..." />
                     <button type="submit" class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i> Send</button>
+                </form>
+                <form th:action="@{/messages/report/{receiverId}(receiverId=${receiverId})}" method="POST">
+                    <button type="submit" class="report-button"><i class="fa fa-flag"></i> Report</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
 </body>
 </html>

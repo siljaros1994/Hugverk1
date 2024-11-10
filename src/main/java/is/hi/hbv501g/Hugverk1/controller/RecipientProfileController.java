@@ -40,6 +40,8 @@ public class RecipientProfileController {
             return "redirect:/users/login";
         }
 
+        model.addAttribute("user", loggedInUser);
+
         // Retrieve profile based on the unique user ID
         Optional<RecipientProfile> recipientProfile = recipientProfileService.findByUserId(loggedInUser.getId()); //Here we find the recipient profile by the user's recipient id
 
