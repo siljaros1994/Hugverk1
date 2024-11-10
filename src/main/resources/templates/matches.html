@@ -8,8 +8,15 @@
 <div class="area">
     <nav class="main-menu">
         <ul>
-            <li><a th:href="@{/home/recipient}"><i class="fa fa-home fa-2x"></i><span class="nav-text">Home</span></a></li>
             <li><a th:href="@{/match/matches}"><i class="fa fa-check fa-2x"></i><span class="nav-text">Matches</span></a></li>
+
+            <li><a th:href="@{${userType == 'donor' ? '/home/donor' : '/home/recipient'}}"><i class="fa fa-home fa-2x"></i><span class="nav-text">Home</span></a></li>
+            <li th:if="${userType == 'donor'}"><a th:href="@{/donorprofile}"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
+            <li th:if="${userType == 'recipient'}"><a th:href="@{/recipientprofile}"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
+            <li><a th:href="@{/messages/{userType}/{id}(userType=${user.userType}, id=${user.id})}"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Messages</span></a></li>
+            <li><a th:href="@{${userType == 'donor' ? '/match/donor/matches' : '/match/recipient/matches'}}"><i class="fa fa-check fa-2x"></i><span class="nav-text">Matches</span></a></li>
+            <li th:if="${userType == 'donor'}"><a th:href="@{/bookings/donor}"><i class="fa fa-book fa-2x"></i><span class="nav-text">Booking</span></a></li>
+            <li th:if="${userType == 'recipient'}"><a th:href="@{/bookings/recipient}"><i class="fa fa-book fa-2x"></i><span class="nav-text">Booking</span></a></li>
         </ul>
     </nav>
 
