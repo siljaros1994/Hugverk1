@@ -1,6 +1,11 @@
 package is.hi.hbv501g.Hugverk1.controller;
 
+import is.hi.hbv501g.Hugverk1.Persistence.Entities.DonorProfile;
+import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
+import is.hi.hbv501g.Hugverk1.Persistence.Entities.RecipientProfile;
+import is.hi.hbv501g.Hugverk1.Services.DonorProfileService;
 import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
+import is.hi.hbv501g.Hugverk1.Services.RecipientProfileService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,17 +26,60 @@ public class MatchController {
     @Autowired
     private MyAppUserService myAppUserService;
 
-    //@Autowired
-    //private MatchController(MyAppUserService myAppUserService) {
-    //  this.myAppUserService = myAppUserService;
-    //}
+    @Autowired
+    private DonorProfileService donorProfileService;
 
-    @GetMapping("/matches")
-    public String matches(Model model, HttpSession session) {
+    @Autowired
+    private RecipientProfileService recipientProfileService;
+
+    @GetMapping("/donor/matches")
+    public String donorMatches(Model model, HttpSession session) {
+        MyAppUsers user = (MyAppUsers) session.getAttribute("user");
         Long donorId = (Long) session.getAttribute("donorId");
+
+        if (user == null) {
+            System.out.println("User in session is null.");
+            return "redirect:/users/login";
+        }
+
+        System.out.println("User in session: " + user);
+        System.out.println("Donor ID in session: " + donorId);
+
+        model.addAttribute("user", user);
+        model.addAttribute("userType", user.getUserType());
+
         if (donorId !=null) {
-            List<Long> matches = myAppUserService.getMatchRecipients(donorId);
-            model.addAttribute("matches", matches);
+            List<Long> matchedRecipientIds = myAppUserService.getMatchRecipients(donorId);
+            List<RecipientProfile> matchedRecipients = recipientProfileService.getProfilesByIds(matchedRecipientIds);
+            model.addAttribute("matches", matchedRecipients);
+        } else {
+            System.out.println("Donor ID is null in session");
+        }
+        return "matches";
+    }
+
+    @GetMapping("/recipient/matches")
+    public String recipientMatches(Model model, HttpSession session) {
+        MyAppUsers user = (MyAppUsers) session.getAttribute("user");
+        Long recipientId = (Long) session.getAttribute("recipientId");
+
+        if (user == null) {
+            System.out.println("User in session is null.");
+            return "redirect:/users/login";
+        }
+
+        System.out.println("User in session: " + user);
+        System.out.println("Recipient ID in session: " + recipientId);
+
+        model.addAttribute("user", user);
+        model.addAttribute("userType", user.getUserType());
+
+        if (recipientId != null) {
+            List<Long> matchedDonorIds = myAppUserService.getMatchesForRecipient(recipientId);
+            List<DonorProfile> matchedDonors = donorProfileService.getProfilesByIds(matchedDonorIds);
+            model.addAttribute("matches", matchedDonors);
+        } else {
+            System.out.println("Recipient ID is null in session");
         }
         return "matches";
     }
@@ -53,6 +101,16 @@ public class MatchController {
             return ResponseEntity.ok(matches);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    @PostMapping("/unmatch")
+    public ResponseEntity<String> unmatch(@RequestParam Long donorId, @RequestParam Long recipientId) {
+        try {
+            myAppUserService.removeMatch(donorId, recipientId);
+            return ResponseEntity.ok("Recipient removed from matches");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 }

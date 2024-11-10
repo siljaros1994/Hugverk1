@@ -13,7 +13,7 @@
             <li><a th:href="@{/recipientprofile}"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
             <li><a th:href="@{/messages/{userType}/{id}(userType=${user.userType}, id=${user.id})}"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Messages</span></a></li>
             <li><a th:href="@{/recipient/favorites}"><i class="fa fa-star fa-2x"></i><span class="nav-text">Favorite</span></a></li>
-            <li><a th:href="@{/match/matches}"><i class="fa fa-check fa-2x"></i><span class="nav-text">Match</span></a></li>
+            <li><a th:href="@{${userType == 'donor' ? '/match/donor/matches' : '/match/recipient/matches'}}"><i class="fa fa-check fa-2x"></i><span class="nav-text">Matches</span></a></li>
             <li><a th:href="@{/bookings/recipient}"><i class="fa fa-book"></i><span class="nav-text">Booking</span></a></li>
         </ul>
         <ul class="logout">

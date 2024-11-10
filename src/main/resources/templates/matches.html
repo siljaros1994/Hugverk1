@@ -2,14 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Your Matches</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/homestyle.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/match-style.css}">
 </head>
 <body>
 <div class="area">
     <nav class="main-menu">
         <ul>
-            <li><a th:href="@{/match/matches}"><i class="fa fa-check fa-2x"></i><span class="nav-text">Matches</span></a></li>
-
             <li><a th:href="@{${userType == 'donor' ? '/home/donor' : '/home/recipient'}}"><i class="fa fa-home fa-2x"></i><span class="nav-text">Home</span></a></li>
             <li th:if="${userType == 'donor'}"><a th:href="@{/donorprofile}"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
             <li th:if="${userType == 'recipient'}"><a th:href="@{/recipientprofile}"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
@@ -27,11 +25,19 @@
             </header>
 
             <div class="matched-list" th:if="${matches != null && matches.size() > 0}">
-                <ul>
-                    <li th:each="matchId : ${matches}">
-                        <p th:text="'Matched Recipient ID: ' + ${matchId}"></p>
-                    </li>
-                </ul>
+                <div class="match-cards">
+                    <div class="match-card" th:each="match : ${matches}">
+                        <img th:src="${match.imagePath != null ? match.imagePath : '/uploads/default-avatar.jpg'}" alt="Profile Image" class="match-image"/>
+                        <div class="match-info">
+                            <p><strong>ID:</strong> <span th:text="${match.donorProfileId != null ? match.donorProfileId : match.recipientProfileId}"></span></p>
+                            <p><strong>Eye Color:</strong> <span th:text="${match.eyeColor}"></span></p>
+                            <p><strong>Hair Color:</strong> <span th:text="${match.hairColor}"></span></p>
+                            <p><strong>Race:</strong> <span th:text="${match.race}"></span></p>
+                            <p><strong>Blood Type:</strong> <span th:text="${match.bloodType}"></span></p>
+                        </div>
+                        <button th:onclick="'location.href=\'/match/unmatch/' + (match.donorProfileId != null ? match.donorProfileId : match.recipientProfileId) + '\''" class="unmatch-button">Unmatch</button>
+                    </div>
+                </div>
             </div>
 
             <div th:if="${matches == null || matches.size() == 0}">

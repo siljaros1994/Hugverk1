@@ -133,6 +133,20 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
     }
 
     @Override
+    public List<Long> getMatchesForRecipient(Long recipientId) {
+        MyAppUsers recipient = userRepository.findByRecipientId(recipientId)
+                .orElseThrow(() -> new RuntimeException("Recipient not found"));
+
+        String favoriteDonors = recipient.getFavoriteDonors();
+        if (favoriteDonors == null || favoriteDonors.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return Arrays.stream(favoriteDonors.split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<Long> getMatchRecipients(Long donorId) {
         MyAppUsers donor = userRepository.findByDonorId(donorId)
                 .orElseThrow(() -> new RuntimeException("Donor not found"));
@@ -152,5 +166,19 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
             donor.setFavoriteDonors(donor.getFavoriteDonors() + "," + recipientId);
             userRepository.save(donor);
         }
+    }
+
+    @Override
+    public void removeMatch(Long donorId, Long recipientId) {
+        MyAppUsers donor = userRepository.findByDonorId(donorId)
+                .orElseThrow(() -> new RuntimeException("Donor not found"));
+        MyAppUsers recipient = userRepository.findByRecipientId(recipientId)
+                .orElseThrow(() -> new RuntimeException("Recipient not found"));
+
+        String updatedFavorites = Arrays.stream(donor.getFavoriteDonors().split(","))
+                .filter(id -> !id.equals(recipientId.toString()))
+                .collect(Collectors.joining(","));
+        donor.setFavoriteDonors(updatedFavorites);
+        userRepository.save(donor);
     }
 }
