@@ -4,31 +4,53 @@
     <title>Donor Profile</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/donorsPage.css}">
 </head>
+
 <body>
+    <div class="container">
+        <div class="area">
+            <nav class="main-menu">
+                <ul>
+                    <li><a th:href="@{/home/recipient}"><i class="fa fa-home fa-2x"></i><span class="nav-text">Home</span></a></li>
+                    <li><a th:href="@{/recipientprofile}"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
+                    <li><a th:href="@{/messages/{userType}/{id}(userType=${user.userType}, id=${user.id})}"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Messages</span></a></li>
+                    <li><a href="#"><i class="fa fa-check fa-2x"></i><span class="nav-text">Match</span></a></li>
+                    <li><a th:href="@{/bookings/recipient}"><i class="fa fa-book"></i><span class="nav-text">Booking</span></a></li>
+                </ul>
+                <ul class="logout">
+                    <li><a th:href="@{/users/logout}" th:onclick="return confirm('Are you sure you want to logout?')">
+                        <i class="fa fa-power-off fa-2x"></i><span class="nav-text">Logout</span>
+                    </a></li>
+                </ul>
+            </nav>
+        </div>
 
-<div class="profile-container">
-    <h1>Donor Profile</h1>
+        <div class="profile-container">
+            <h1>Donor Profile</h1>
 
-    <div class="profile-image">
-        <img th:src="@{${donorProfile.imagePath}}" alt="Donor Image" />
+            <div class="profile-image">
+                <img th:src="${donorProfile.imagePath != null ? donorProfile.imagePath : '/uploads/default-donor-avatar.jpg'}"
+                     alt="Donor Image"/>
+            </div>
+
+            <div class="profile-info">
+                <p><strong>Traits:</strong> <span th:text="${donorProfile.traits}">Traits</span></p>
+                <p><strong>Height:</strong> <span th:text="${donorProfile.height}">Height</span> cm</p>
+                <p><strong>Weight:</strong> <span th:text="${donorProfile.weight}">Weight</span> kg</p>
+                <p><strong>Eye Color:</strong> <span th:text="${donorProfile.eyeColor}">Eye Color</span></p>
+                <p><strong>Hair Color:</strong> <span th:text="${donorProfile.hairColor}">Hair Color</span></p>
+                <p><strong>Education Level:</strong> <span th:text="${donorProfile.educationLevel}">Education Level</span></p>
+                <p><strong>Medical History:</strong> <span th:text="${donorProfile.medicalHistory}">Medical History</span></p>
+                <p><strong>Race:</strong> <span th:text="${donorProfile.race}">Race</span></p>
+                <p><strong>Ethnicity:</strong> <span th:text="${donorProfile.ethnicity}">Ethnicity </span></p>
+                <p><strong>Blood Type:</strong> <span th:text="${donorProfile.bloodType}">Blood Type</span></p>
+                <p><strong>Donor Type:</strong> <span th:text="${donorProfile.donorType}">Donor Type</span></p>
+                <p><strong>Get to Know:</strong> <span th:text="${donorProfile.getToKnow}">Get to Know</span></p>
+            </div>
+
+            <div class="profile-actions">
+                <a th:href="@{/recipient/favorite/{donorProfileId}(donorProfileId=${donorProfile.donorProfileId})}" class="button">Favorite</a>
+            </div>
+        </div>
     </div>
-
-    <div class="profile-info">
-        <p><strong>Traits:</strong> <span th:text="${donorProfile.traits}">Traits</span></p>
-        <p><strong>Height:</strong> <span th:text="${donorProfile.height}">Height</span> cm</p>
-        <p><strong>Weight:</strong> <span th:text="${donorProfile.weight}">Weight</span> kg</p>
-        <p><strong>Eye Color:</strong> <span th:text="${donorProfile.eyeColor}">Eye Color</span></p>
-        <p><strong>Hair Color:</strong> <span th:text="${donorProfile.hairColor}">Hair Color</span></p>
-        <p><strong>Medical History:</strong> <span th:text="${donorProfile.medicalHistory}">Medical History</span></p>
-        <p><strong>Blood Type:</strong> <span th:text="${donorProfile.bloodType}">Blood Type</span></p>
-        <p><strong>Get to Know:</strong> <span th:text="${donorProfile.getToKnow}">Get to Know</span></p>
-    </div>
-
-    <div class="profile-actions">
-        <a th:href="@{/recipient/favorite/{profileId}(profileId=${donorProfile.profileId})}" class="button">Favorite</a>
-        <a th:href="@{/recipient/match/{profileId}(profileId=${donorProfile.profileId})}" class="button">Request Match</a>
-    </div>
-</div>
-
 </body>
 </html>

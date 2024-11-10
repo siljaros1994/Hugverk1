@@ -12,26 +12,35 @@ import java.util.Optional;
 
 @Service
 public class RecipientProfileService {
+
     @Autowired
     private RecipientProfileRepository recipientProfileRepository;
 
     //Save or update the recipient profile in the database
-    public void saveOrUpdateProfile(RecipientProfile profile) {
-        recipientProfileRepository.save(profile);
+    public RecipientProfile saveOrUpdateProfile(RecipientProfile profile) {
+        return recipientProfileRepository.save(profile);
     }
 
     //Finds a recipient profile by the recipient ID, unique identifier for each recipient
-    public Optional<RecipientProfile> findByUserRecipientId(String recipientId) {
+    public Optional<RecipientProfile> findByUserRecipientId(Long recipientId) {
         return recipientProfileRepository.findByUserRecipientId(recipientId);
     }
 
-    public Optional<RecipientProfile> findByProfileId(Long profileId) {
-        return recipientProfileRepository.findById(profileId);
+    public Optional<RecipientProfile> findByUserId(Long userId) {
+        return recipientProfileRepository.findByUserId(userId);
     }
 
-    //Get all the recipients by type, like single parent or couple
-    public Page<RecipientProfile> getRecipientsByType(String recipientType, Pageable pageable) {
+    public Page<RecipientProfile> getRecipientByType(String recipientType, Pageable pageable) {
         return recipientProfileRepository.findByRecipientType(recipientType, pageable);
+    }
+
+    public List<RecipientProfile> getProfilesByIds(List<Long> ids) {
+        return recipientProfileRepository.findAllById(ids);
+    }
+
+    // Finds by profile ID
+    public Optional<RecipientProfile> findByProfileId(Long recipientProfileId) {
+        return recipientProfileRepository.findById(recipientProfileId);
     }
 
     public List<RecipientProfile> getAllRecipients() {

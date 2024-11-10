@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Recipient Profile</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/recipientPage.css}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="area">
+            <nav class="main-menu">
+                <ul>
+                    <li><a th:href="@{/home/donor}"><i class="fa fa-home fa-2x"></i><span class="nav-text">Home</span></a></li>
+                    <li><a th:href="@{/donorprofile}"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
+                    <li><a th:href="@{/messages/{userType}/{id}(userType=${user.userType}, id=${user.id})}"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Messages</span></a></li>
+                    <li><a href="#"><i class="fa fa-check fa-2x"></i><span class="nav-text">Match</span></a></li>
+                    <li><a th:href="@{/bookings/donor}"><i class="fa fa-book"></i><span class="nav-text">Booking</span></a></li>
+                </ul>
+                <ul class="logout">
+                    <li><a th:href="@{/users/logout}" th:onclick="return confirm('Are you sure you want to logout?')">
+                        <i class="fa fa-power-off fa-2x"></i><span class="nav-text">Logout</span>
+                    </a></li>
+                </ul>
+            </nav>
+        </div>
+
+
+        <div class="profile-container">
+            <h1>Recipient Profile</h1>
+
+            <div class="profile-image">
+                <img th:src="${recipientProfile.imagePath != null ? recipientProfile.imagePath : '/uploads/default-recipient-avatar.jpg'}"
+                     alt="Recipient Image"/>
+            </div>
+
+            <div class="profile-info">
+                <p><strong>Traits:</strong> <span th:text="${recipientProfile.traits}">Traits</span></p>
+                <p><strong>Height:</strong> <span th:text="${recipientProfile.height}">Height</span> cm</p>
+                <p><strong>Weight:</strong> <span th:text="${recipientProfile.weight}">Weight</span> kg</p>
+                <p><strong>Eye Color:</strong> <span th:text="${recipientProfile.eyeColor}">Eye Color</span></p>
+                <p><strong>Hair Color:</strong> <span th:text="${recipientProfile.hairColor}">Hair Color</span></p>
+                <p><strong>Education Level:</strong> <span th:text="${recipientProfile.educationLevel}">Education Level</span></p>
+                <p><strong>Medical History:</strong> <span th:text="${recipientProfile.medicalHistory}">Medical History</span></p>
+                <p><strong>Race:</strong> <span th:text="${recipientProfile.race}">Race</span></p>
+                <p><strong>Ethnicity:</strong> <span th:text="${recipientProfile.ethnicity}">Ethnicity </span></p>
+                <p><strong>Blood Type:</strong> <span th:text="${recipientProfile.bloodType}">Blood Type</span></p>
+                <p><strong>Recipient Type:</strong> <span th:text="${recipientProfile.recipientType}">Recipient Type</span></p>
+                <p><strong>Get to Know:</strong> <span th:text="${recipientProfile.getToKnow}">Get to Know</span></p>
+            </div>
+
+            <div class="profile-actions">
+                <button th:onclick="'location.href=\'/donor/match/' + ${recipientProfile.user.id} + '\''">Match</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

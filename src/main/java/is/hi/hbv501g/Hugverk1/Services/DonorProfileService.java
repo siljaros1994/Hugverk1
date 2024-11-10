@@ -17,17 +17,21 @@ public class DonorProfileService {
     private DonorProfileRepository donorProfileRepository;
 
     // Save or update the donor profile in the database
-    public void saveOrUpdateProfile(DonorProfile profile) {
-        donorProfileRepository.save(profile);
+    public DonorProfile saveOrUpdateProfile(DonorProfile profile) {
+        return donorProfileRepository.save(profile);
     }
 
     // Finds a donor profile by the donor ID, unique identifier for each donor
-    public Optional<DonorProfile> findByUserDonorId(String donorId) {
+    public Optional<DonorProfile> findByUserDonorId(Long donorId) {
         return donorProfileRepository.findByUserDonorId(donorId);
     }
 
-    public Optional<DonorProfile> findByProfileId(Long profileId) {
-        return donorProfileRepository.findById(profileId);
+    public Optional<DonorProfile> findByProfileId(Long donorProfileId) {
+        return donorProfileRepository.findById(donorProfileId);
+    }
+
+    public Optional<DonorProfile> findByUserId(Long userId) {
+        return donorProfileRepository.findByUserId(userId);
     }
 
     // Our method to get all donors by type, like sperm or egg donor.
@@ -37,6 +41,10 @@ public class DonorProfileService {
 
     public List<DonorProfile> getAllDonors() {
         return donorProfileRepository.findAll();
+    }
+
+    public List<DonorProfile> getProfilesByIds(List<Long> ids) {
+        return donorProfileRepository.findAllById(ids);
     }
 
     public Page<DonorProfile> findByKeyword(String keyword, Pageable pageable) {

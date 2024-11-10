@@ -12,9 +12,11 @@ import java.util.Optional;
 
 @Repository
 public interface DonorProfileRepository extends JpaRepository<DonorProfile, Long> {
-    Optional<DonorProfile> findByUserDonorId(String donorId); // Custom query to find a donor profile by the donor id
+    Optional<DonorProfile> findByUserDonorId(Long donorId); // Custom query to find a donor profile by the donor id
+    Optional<DonorProfile> findByUserId(Long userId); // Here we find the profile by the unique user Id
     Page<DonorProfile> findByDonorType(String donorType, Pageable pageable); // For filtering by donor type
     Page<DonorProfile> findAll(Pageable pageable); // For all donors
+
     @Query("SELECT d FROM DonorProfile d WHERE " +
             "LOWER(d.eyeColor) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(d.hairColor) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +

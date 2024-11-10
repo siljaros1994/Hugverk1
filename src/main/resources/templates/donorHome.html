@@ -4,16 +4,16 @@
     <title>Donor Home Page</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/homestyle.css}">
 </head>
-
 <body>
+
 <div class="area">
     <nav class="main-menu">
         <ul>
+            <li><a th:href="@{/home/donor}"><i class="fa fa-home fa-2x"></i><span class="nav-text">Home</span></a></li>
             <li><a th:href="@{/donorprofile}"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
-            <li><a th:href="@{/dr}"><i class="fa fa-heart fa-2x"></i><span class="nav-text">Recipients</span></a></li>
-            <li><a th:href="@{/messages/donor}"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Messages</span></a></li>
+            <li><a th:href="@{/messages/{userType}/{id}(userType=${user.userType}, id=${user.id})}"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Messages</span></a></li>
             <li><a href="#"><i class="fa fa-check fa-2x"></i><span class="nav-text">Match</span></a></li>
-            <li><a th:href="@{/bookings}"><i class="fa fa-book"></i><span class="nav-text">Booking</span></a></li>
+            <li><a th:href="@{/bookings/donor}"><i class="fa fa-book"></i><span class="nav-text">Booking</span></a></li>
         </ul>
         <ul class="logout">
             <li><a th:href="@{/users/logout}" th:onclick="return confirm('Are you sure you want to logout?')">
@@ -28,6 +28,34 @@
                 <h1>Welcome Donor!</h1>
                 <p th:text="'Hello, ' + ${username} + '!'"></p>
             </header>
+
+            <section th:if="${recipientsWhoFavorited != null && recipientsWhoFavorited.size() > 0}">
+                <h2>Recipients Who Favorited You</h2>
+                <div class="recipient-cards">
+                    <div class="recipient-card" th:each="recipient : ${recipientsWhoFavorited}">
+                        <div class="profile-image">
+                            <img th:src="${recipient.recipientProfile != null && recipient.recipientProfile.imagePath != null ? recipient.recipientProfile.imagePath : '/uploads/default-recipient-avatar.jpg'}"
+                                 alt="Recipient Image" class="recipient-image"/>
+                        </div>
+                        <div class="recipient-info">
+                            <p><strong>Eye Color:</strong> <span th:text="${recipient.recipientProfile?.eyeColor ?: 'Not specified'}"></span></p>
+                            <p><strong>Hair Color:</strong> <span th:text="${recipient.recipientProfile?.hairColor ?: 'Not specified'}"></span></p>
+                            <p><strong>Race:</strong> <span th:text="${recipient.recipientProfile?.race ?: 'Not specified'}"></span></p>
+                            <p><strong>Ethnicity:</strong> <span th:text="${recipient.recipientProfile?.ethnicity ?: 'Not specified'}"></span></p>
+                            <p><strong>Age:</strong> <span th:text="${recipient.recipientProfile?.age ?: 'Not specified'}"></span></p>
+                        </div>
+                        <div class="card-buttons">
+                            <button th:onclick="'location.href=\'/donor/match/' + ${recipient.id} + '\''">Match</button>
+                            <button th:onclick="'location.href=\'/donor/view/' + ${recipient.recipientProfile?.recipientProfileId} + '\''">View</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <section th:if="${recipientsWhoFavorited == null || recipientsWhoFavorited.size() == 0}">
+                <p>No recipients have added you to favorites yet.</p>
+            </section>
         </div>
     </main>
 </div>
@@ -35,5 +63,6 @@
 <footer>
     <p>Alexandra, Guðrún, Silja og Þrándur.</p>
 </footer>
+
 </body>
 </html>

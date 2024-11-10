@@ -50,9 +50,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/users/login", "/users/register", "/css/**", "/api/authenticate").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
-                        .requestMatchers("/admin/**", "/delete/{username}").hasRole("ADMIN")
-                        .requestMatchers("/home/donor", "/home/recipient", "/recipient/view/**", "/donorprofile", "/recipientprofile", "/dr", "/favorites").authenticated() // Allow access to the home pages after login
-                        .requestMatchers("/messages/**", "/bookings/**").authenticated()
+                        .requestMatchers("/admin/**", "/home/admin", "/delete/{username}").authenticated()
+                        .requestMatchers("/home/donor", "/donorprofile", "/donor/view/**", "/bookings/donor").authenticated()
+                        .requestMatchers("/home/recipient", "/recipientprofile",  "/recipient/view/**", "/bookings/recipient", "/recipient/favorite/**").authenticated()
+                        .requestMatchers("/messages/**", "/messages/{userType}/{id}", "/dr").authenticated()
                         .anyRequest().authenticated())  // All other requests need authentication
                 .formLogin(login -> login
                         .loginPage("/users/login")
@@ -70,4 +71,3 @@ public class SecurityConfig {
                 .build();
     }
 }
-

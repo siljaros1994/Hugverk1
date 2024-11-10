@@ -3,200 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <title>Recipient Profile</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/recipientprofile.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/profile.css}">
 </head>
+
 <body>
-
-<div class="profile-container">
-    <div class="profile-edit">
-        <h2>Edit Profile</h2>
-
-        <form th:action="@{/recipientprofile/saveOrEdit}" th:object="${recipientProfile}" method="post"
-              enctype="multipart/form-data">
-
-            <div class="form__field">
-                <label for="profileImage">Profile Image:</label>
-                <input type="file" id="profileImage" name="profileImage" accept="image/*">
-            </div>
-
-            <div class="form__field">
-                <label for="eyeColor">Eye Color:</label>
-                <select th:field="*{eyeColor}" id="eyeColor" required>
-                    <option value="">--Select Eye Color--</option>
-                    <option value="blue">Blue</option>
-                    <option value="green">Green</option>
-                    <option value="brown">Brown</option>
-                    <option value="hazel">Hazel</option>
-                    <option value="heterochromia">Heterochromia</option>
-                </select>
-            </div>
-            <div class="form__field">
-                <label for="hairColor">Hair Color:</label>
-                <select th:field="*{hairColor}" id="hairColor" required>
-                    <option value="">--Select Hair Color--</option>
-                    <option value="blonde">Blonde</option>
-                    <option value="brown">Brown</option>
-                    <option value="black">Black</option>
-                    <option value="red">Red</option>
-                    <option value="strawberry-red">Strawberry Red</option>
-                    <option value="white">White</option>
-                </select>
-            </div>
-            <div class="form__field">
-                <label for="educationLevel">Education Level:</label>
-                <select th:field="*{educationLevel}" id="educationLevel" required>
-                    <option value="">--Select Education Level--</option>
-                    <option value="primary-school">Primary School</option>
-                    <option value="secondary-school">Secondary School</option>
-                    <option value="university">University</option>
-                    <option value="other">Other</option>
-                </select>
-            </div>
-            <div class="form__field">
-                <label for="race">Race:</label>
-                <select th:field="*{race}" id="race" required>
-                    <option value="">--Select Race--</option>
-                    <option value="asian">Asian</option>
-                    <option value="black">Black</option>
-                    <option value="caucasian">Caucasian</option>
-                    <option value="hispanic">Hispanic</option>
-                    <option value="native-american">Native American</option>
-                    <option value="pacific-islander">Pacific Islander</option>
-                    <option value="mixed">Mixed</option>
-                </select>
-            </div>
-            <div class="form__field">
-                <label for="ethnicity">Ethnicity:</label>
-                <select th:field="*{ethnicity}" id="ethnicity" required>
-                    <option value="">--Select Ethnicity--</option>
-                    <option value="German">German</option>
-                    <option value="African-American">African-American</option>
-                    <option value="Mexican">Mexican</option>
-                    <option value="Italian">Italian</option>
-                    <option value="American">American</option>
-                    <option value="English">English</option>
-                    <option value="Mexican">Mexican</option>
-                    <option value="Irish">Irish</option>
-                    <option value="Japanese">Japanese</option>
-                    <option value="Puerto Rican">Puerto Rican</option>
-                    <option value="Polish">Polish</option>
-                    <option value="Native American">Mexican</option>
-                    <option value="French">French</option>
-                    <option value="Scottish">Scottish</option>
-                    <option value="Chinese">Chinese</option>
-                    <option value="Norwegian">Norwegian</option>
-                    <option value="Swedish">Swedish</option>
-                    <option value="Icelandic">Icelandic</option>
-                    <option value="Danish">Danish</option>
-                    <option value="Finnish">Finnish</option>
-                </select>
-            </div>
-            <div class="form__field">
-                <label for="bloodType">Blood Type:</label>
-                <select th:field="*{bloodType}" id="bloodType" required>
-                    <option value="">--Select Blood Type--</option>
-                    <option value="A+">A+</option>
-                    <option value="A-">A-</option>
-                    <option value="B+">B+</option>
-                    <option value="B-">B-</option>
-                    <option value="AB+">AB+</option>
-                    <option value="AB-">AB-</option>
-                    <option value="O+">O+</option>
-                    <option value="O-">O-</option>
-                </select>
-            </div>
-            <div class="form__field">
-                <label for="recipientType">Recipient Type:</label>
-                <select th:field="*{recipientType}" id="recipientType" required>
-                    <option value="">--Select Recipient Type--</option>
-                    <option value="Egg">Single parent</option>
-                    <option value="Sperm">Couple</option>
-                </select>
-            </div>
-            <div class="form__field">
-                <label for="medicalHistory">Family and Donor's Medical History:</label>
-                <select th:field="*{medicalHistory}" id="medicalHistory" name="medicalHistory" multiple>
-                    <option value="cancer">Cancer</option>
-                    <option value="heart-disease">Heart Disease</option>
-                    <option value="diabetes">Diabetes</option>
-                    <option value="asthma">Asthma</option>
-                    <option value="high-blood-pressure">High Blood Pressure</option>
-                    <option value="sickle cell disease">Sickle Cell Disease</option>
-                    <option value="cystic fibrosis">Cystic Fibrosis</option>
-                    <option value="tay-sachs disease">Tay-Sachs Disease</option>
-                    <option value="spinal muscular atrophy ">Spinal Muscular Atrophy</option>
-                    <option value="fragile x syndrome">Fragile X Syndrome</option>
-                    <option value="thalassemia">Thalassemia</option>
-                    <option value="hemophilia">Hemophilia</option>
-                    <option value="muscular dystrophies">Muscular Dystrophies</option>
-                    <option value="down syndrome">Down Syndrome</option>
-                    <option value="turner syndrome">Turner Syndrome</option>
-                    <option value="alzheimer’s disease">Alzheimer’s Disease</option>
-                    <option value="parkinson’s disease">Parkinson’s Disease</option>
-                    <option value="huntington’s disease">Huntington’s Disease</option>
-                    <option value="rheumatoid arthritis">Rheumatoid Arthritis</option>
-                    <option value="galactosemia">Galactosemia</option>
-                </select>
-            </div>
-            <div class="form__field">
-                <label for="height">Height (cm):</label>
-                <input type="number" id="height" th:field="*{height}" min="50" max="250" required/>
-            </div>
-            <div class="form__field">
-                <label for="weight">Weight (kg):</label>
-                <input type="number" id="weight" th:field="*{weight}" min="20" max="200" required/>
-            </div>
-            <div class="form__field">
-                <label for="age">Age:</label>
-                <input type="number" id="age" th:field="*{age}" min="18" max="80" required/>
-            </div>
-            <div class="form__field">
-                <label for="getToKnow">Get to Know the Recipient:</label>
-                <textarea id="getToKnow" th:field="*{getToKnow}"
-                          placeholder="Tell us something about yourself..."></textarea>
-            </div>
-
-            <!--  Save/Edit Profile Button -->
-            <div class="form__field">
-                <button type="submit"
-                        th:text="${recipientProfile.profileId == null ? 'Save Profile' : 'Edit Profile'}"></button>
-            </div>
-        </form>
-    </div>
-    <div class="profile-info">
-        <h2>Profile Information</h2>
-        <div class="profile-image">
-            <img th:src="@{${recipientProfile.imagePath}}" alt="Profile Image"
-                 th:if="${recipientProfile.imagePath != null}">
+    <div class="container">
+        <div class="area">
+            <nav class="main-menu">
+                <ul>
+                    <li><a th:href="@{/home/recipient}"><i class="fa fa-home fa-2x"></i><span class="nav-text">Home</span></a></li>
+                    <li><a th:href="@{/recipientprofile}"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
+                    <li><a th:href="@{/messages/{userType}/{id}(userType=${user.userType}, id=${user.id})}"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Messages</span></a></li>
+                    <li><a href="#"><i class="fa fa-check fa-2x"></i><span class="nav-text">Match</span></a></li>
+                    <li><a th:href="@{/bookings/recipient}"><i class="fa fa-book"></i><span class="nav-text">Booking</span></a></li>
+                </ul>
+                <ul class="logout">
+                    <li><a th:href="@{/users/logout}" th:onclick="return confirm('Are you sure you want to logout?')">
+                        <i class="fa fa-power-off fa-2x"></i><span class="nav-text">Logout</span>
+                    </a></li>
+                </ul>
+            </nav>
         </div>
-        <p>Recipient ID: <span th:text="${recipientProfile.user?.donorId ?: 'No ID available'}">Recipient ID</span></p>
-        <p>Eye Color: <span th:text="${recipientProfile.eyeColor ?: 'Not specified'}">Eye Color</span></p>
-        <p>Hair Color: <span th:text="${recipientProfile.hairColor ?: 'Not specified'}">Hair Color</span></p>
-        <p>Education Level: <span th:text="${recipientProfile.educationLevel ?: 'Not specified'}">Education Level</span>
-        </p>
-        <p>Race: <span th:text="${recipientProfile.race ?: 'Not specified'}">Race</span></p>
-        <p>Ethnicity: <span th:text="${recipientProfile.ethnicity ?: 'Not specified'}">Ethnicity</span></p>
-        <p>Blood Type: <span th:text="${recipientProfile.bloodType ?: 'Not specified'}">Blood Type</span></p>
-        <p>Recipient Type: <span th:text="${recipientProfile.donorType ?: 'Not specified'}">Recipient Type</span></p>
-        <p>Family and Recipient's Medical History:
-            <span th:if="${recipientProfile.medicalHistory != null}"
-                  th:text="${#strings.arrayJoin(recipientProfile.medicalHistory.toArray(), ', ')}">Medical History</span>
-            <span th:if="${recipientProfile.medicalHistory == null}">No history specified</span>
-        </p>
-        <p>Height: <span th:text="${recipientProfile.height}">Height</span> cm</p>
-        <p>Weight: <span th:text="${recipientProfile.weight}">Weight</span> kg</p>
-        <p>Age: <span th:text="${recipientProfile.age}">Age</span></p>
-        <p>Get to Know the Recipient: <span
-                th:text="${recipientProfile.getToKnow ?: 'No information provided'}">Get to Know</span></p>
+
+        <div class="profile-container">
+            <div class="profile-edit">
+                <h2>Edit Profile</h2>
+
+                <form th:action="@{/recipientprofile/saveOrEdit}" th:object="${recipientProfile}" method="post"
+                      enctype="multipart/form-data">
+
+                    <div class="form__field">
+                        <label for="profileImage">Profile Image:</label>
+                        <input type="file" id="profileImage" name="profileImage" accept="image/*">
+                    </div>
+
+                    <div class="form__field">
+                        <label for="eyeColor">Eye Color:</label>
+                        <select th:field="*{eyeColor}" id="eyeColor" required>
+                            <option value="">--Select Eye Color--</option>
+                            <option value="blue">Blue</option>
+                            <option value="green">Green</option>
+                            <option value="brown">Brown</option>
+                            <option value="hazel">Hazel</option>
+                            <option value="grey">Grey</option>
+                            <option value="heterochromia">Heterochromia</option>
+                        </select>
+                    </div>
+                    <div class="form__field">
+                        <label for="hairColor">Hair Color:</label>
+                        <select th:field="*{hairColor}" id="hairColor" required>
+                            option value="">--Select Hair Color--</option>
+                            <option value="blonde">Blonde</option>
+                            <option value="dark blonde">Dark Blonde</option>
+                            <option value="brown">Brown</option>
+                            <option value="medium brown">Medium Brown</option>
+                            <option value="dark brown">Dark Brown</option>
+                            <option value="black">Black</option>
+                            <option value="red">Red</option>
+                            <option value="reddish brown">Reddish Brown</option>
+                            <option value="strawberry-red">Strawberry Red</option>
+                            <option value="white">White</option>
+                        </select>
+                    </div>
+                    <div class="form__field">
+                        <label for="educationLevel">Education Level:</label>
+                        <select th:field="*{educationLevel}" id="educationLevel" required>
+                            <option value="">--Select Education Level--</option>
+                            <option value="primary-school">Primary School</option>
+                            <option value="secondary-school">Secondary School</option>
+                            <option value="university">University</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form__field">
+                        <label for="race">Race:</label>
+                        <select th:field="*{race}" id="race" required>
+                            <option value="">--Select Race--</option>
+                            <option value="asian">Asian</option>
+                            <option value="black">Black</option>
+                            <option value="caucasian">Caucasian</option>
+                            <option value="hispanic">Hispanic</option>
+                            <option value="native-american">Native American</option>
+                            <option value="pacific-islander">Pacific Islander</option>
+                            <option value="mixed">Mixed</option>
+                        </select>
+                    </div>
+                    <div class="form__field">
+                        <label for="ethnicity">Ethnicity:</label>
+                        <select th:field="*{ethnicity}" id="ethnicity" required>
+                            <option value="German">German</option>
+                            <option value="African-American">African-American</option>
+                            <option value="Mexican">Mexican</option>
+                            <option value="Italian">Italian</option>
+                            <option value="American">American</option>
+                            <option value="English">English</option>
+                            <option value="Spanish">Spanish</option>
+                            <option value="Irish">Irish</option>
+                            <option value="Japanese">Japanese</option>
+                            <option value="Puerto Rican">Puerto Rican</option>
+                            <option value="Polish">Polish</option>
+                            <option value="Native American">Native American</option>
+                            <option value="French">French</option>
+                            <option value="Scottish">Scottish</option>
+                            <option value="Chinese">Chinese</option>
+                            <option value="Norwegian">Norwegian</option>
+                            <option value="Swedish">Swedish</option>
+                            <option value="Icelandic">Icelandic</option>
+                            <option value="Danish">Danish</option>
+                            <option value="Finnish">Finnish</option>
+                            <option value="Filipinos">Filipinos</option>
+                            <option value="Tibetans">Tibetans</option>
+                            <option value="Korean">Korean</option>
+                            <option value="Indian">Indian</option>
+                            <option value="Nepal">Nepal</option>
+                        </select>
+                    </div>
+                    <div class="form__field">
+                        <label for="bloodType">Blood Type:</label>
+                        <select th:field="*{bloodType}" id="bloodType" required>
+                            <option value="">--Select Blood Type--</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                    <div class="form__field">
+                        <label for="recipientType">Recipient Type:</label>
+                        <select th:field="*{recipientType}" id="recipientType" required>
+                            <option value="">--Select Recipient Type--</option>
+                            <option value="Single">Single parent</option>
+                            <option value="Couple">Couple</option>
+                        </select>
+                    </div>
+                    <div class="form__field">
+                        <label for="medicalHistory">Family and Donor's Medical History:</label>
+                        <select th:field="*{medicalHistory}" id="medicalHistory" name="medicalHistory" multiple>
+                            <option value="cancer">Cancer</option>
+                            <option value="heart-disease">Heart Disease</option>
+                            <option value="diabetes">Diabetes</option>
+                            <option value="asthma">Asthma</option>
+                            <option value="high-blood-pressure">High Blood Pressure</option>
+                            <option value="sickle cell disease">Sickle Cell Disease</option>
+                            <option value="cystic fibrosis">Cystic Fibrosis</option>
+                            <option value="tay-sachs disease">Tay-Sachs Disease</option>
+                            <option value="spinal muscular atrophy ">Spinal Muscular Atrophy</option>
+                            <option value="fragile x syndrome">Fragile X Syndrome</option>
+                            <option value="thalassemia">Thalassemia</option>
+                            <option value="hemophilia">Hemophilia</option>
+                            <option value="muscular dystrophies">Muscular Dystrophies</option>
+                            <option value="down syndrome">Down Syndrome</option>
+                            <option value="turner syndrome">Turner Syndrome</option>
+                            <option value="alzheimer’s disease">Alzheimer’s Disease</option>
+                            <option value="parkinson’s disease">Parkinson’s Disease</option>
+                            <option value="huntington’s disease">Huntington’s Disease</option>
+                            <option value="rheumatoid arthritis">Rheumatoid Arthritis</option>
+                            <option value="galactosemia">Galactosemia</option>
+                        </select>
+                    </div>
+
+                    <div class="form__field">
+                        <label for="height">Height (cm):</label>
+                        <input type="number" id="height" th:field="*{height}" min="50" max="250" required/>
+                    </div>
+                    <div class="form__field">
+                        <label for="weight">Weight (kg):</label>
+                        <input type="number" id="weight" th:field="*{weight}" min="20" max="200" required/>
+                    </div>
+                    <div class="form__field">
+                        <label for="age">Age:</label>
+                        <input type="number" id="age" th:field="*{age}" min="18" max="80" required/>
+                    </div>
+
+                    <div class="form__field">
+                        <label for="getToKnow">Get to Know the Recipient:</label>
+                        <textarea id="getToKnow" th:field="*{getToKnow}"></textarea>
+                    </div>
+
+                    <div class="form__field">
+                        <button type="submit" th:text="${recipientProfile.recipientProfileId == null ? 'Save Profile' : 'Edit Profile'}"></button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="profile-info">
+                <h2>Profile Information</h2>
+                <div class="profile-image">
+                    <img th:src="${recipientProfile.imagePath != null ? recipientProfile.imagePath : '/uploads/default-recipient-avatar.jpg'}" alt="Recipient Image"/>
+                </div>
+                <p>Recipient ID: <span th:text="${recipientProfile.user?.recipientId ?: 'No ID available'}">Recipient ID</span></p>
+                <p>Eye Color: <span th:text="${recipientProfile.eyeColor ?: 'Not specified'}">Eye Color</span></p>
+                <p>Hair Color: <span th:text="${recipientProfile.hairColor ?: 'Not specified'}">Hair Color</span></p>
+                <p>Education Level: <span th:text="${recipientProfile.educationLevel ?: 'Not specified'}">Education Level</span></p>
+                <p>Race: <span th:text="${recipientProfile.race ?: 'Not specified'}">Race</span></p>
+                <p>Ethnicity: <span th:text="${recipientProfile.ethnicity ?: 'Not specified'}">Ethnicity</span></p>
+                <p>Blood Type: <span th:text="${recipientProfile.bloodType ?: 'Not specified'}">Blood Type</span></p>
+                <p>Recipient Type: <span th:text="${recipientProfile.recipientType ?: 'Not specified'}">Recipient Type</span></p>
+                <p>Family and Recipient's Medical History:
+                    <span th:if="${recipientProfile.medicalHistory != null}"
+                          th:text="${#strings.arrayJoin(recipientProfile.medicalHistory.toArray(), ', ')}">Medical History</span>
+                    <span th:if="${recipientProfile.medicalHistory == null}">No history specified</span>
+                </p>
+                <p>Height: <span th:text="${recipientProfile.height}">Height</span> cm</p>
+                <p>Weight: <span th:text="${recipientProfile.weight}">Weight</span> kg</p>
+                <p>Age: <span th:text="${recipientProfile.age}">Age</span></p>
+                <p>Get to Know the Recipient: <span th:text="${recipientProfile.getToKnow ?: 'No information provided'}">Get to Know</span></p>
+            </div>
+        </div>
     </div>
-</div>
-
-</div>
-</form>
-</div>
-
-
-</script>
-
 </body>
 </html>

@@ -40,6 +40,7 @@ public class RecipientHomeController {
             logger.warn("LoggedInUser not found in session. Redirecting to login.");
             return "redirect:/users/login";
         }
+        model.addAttribute("user", loggedInUser);
         model.addAttribute("username", loggedInUser.getUsername());
 
         // Configure the sorting direction and it's attributes
@@ -65,15 +66,15 @@ public class RecipientHomeController {
         return "recipientHome";
     }
 
-    @GetMapping("/recipient/view/{profileId}")
-    public String viewDonorProfile(@PathVariable Long profileId, Model model) {
-        Optional<DonorProfile> donorProfile = donorProfileService.findByProfileId(profileId);
+    @GetMapping("/recipient/view/{donorProfileId}")
+    public String viewDonorProfile(@PathVariable Long donorProfileId, Model model) {
+        Optional<DonorProfile> donorProfile = donorProfileService.findByProfileId(donorProfileId);
         if (donorProfile.isPresent()) {
             model.addAttribute("donorProfile", donorProfile.get());
-            logger.info("Displaying profile for donor with profileId: {}", profileId);
+            logger.info("Displaying profile for donor with profileId: {}", donorProfileId);
             return "donorsPage";
         } else {
-            logger.warn("Donor profile with profileId {} not found. Redirecting to recipient home.", profileId);
+            logger.warn("Donor profile with profileId {} not found. Redirecting to recipient home.", donorProfileId);
             return "redirect:/home/recipient";
         }
     }

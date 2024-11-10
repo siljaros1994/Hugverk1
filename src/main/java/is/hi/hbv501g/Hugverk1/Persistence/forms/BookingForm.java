@@ -4,25 +4,25 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class BookingForm {
-    private String donorId;
-    private String recipientId;
+    private Long donorId;
+    private Long recipientId;
     private LocalDate date;
     private LocalTime time;
 
     // Getters and Setters
-    public String getDonorId() {
+    public Long getDonorId() {
         return donorId;
     }
 
-    public void setDonorId(String donorId) {
+    public void setDonorId(Long donorId) {
         this.donorId = donorId;
     }
 
-    public String getRecipientId() {
+    public Long getRecipientId() {
         return recipientId;
     }
 
-    public void setRecipientId(String recipientId) {
+    public void setRecipientId(Long recipientId) {
         this.recipientId = recipientId;
     }
 
