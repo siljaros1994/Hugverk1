@@ -22,18 +22,22 @@ public class MatchService {
     @Autowired
     private RecipientProfileRepository recipientProfileRepository;
 
+    @Autowired
+    private MyAppUserService myAppUserService;
+
     public void favoriteRecipient(Long donorId, Long recipientId) {
-        DonorProfile donorProfile = donorProfileRepository.findById(donorId).orElseThrow();
-        RecipientProfile recipientProfile = recipientProfileRepository.findById(recipientId).orElseThrow();
-        donorId.getFavoritedRecipients().add(recipientid);
-        donorProfileRepository.save(donorid);
+        DonorProfile donorProfile = donorProfileRepository.findById(donorId)
+                .orElseThrow(() -> new RuntimeException("Donor profile not found"));
+        RecipientProfile recipientProfile = recipientProfileRepository.findById(recipientId)
+                .orElseThrow(() -> new RuntimeException("Recipient profile not found"));
+        myAppUserService.addMatchRecipient(donorId, recipientId);
     }
 
-    public void favoriteDonor(long recipientId, Long donorId) {
-        recipientId recipientid = recipientProfileRepository.findById(recipientId).orElseThrow();
-        donorId donorid = donorProfileRepository.findById(donorId).orElseThrow();
-        recipientid.getFavoritedDonorsId().add(donorid);
-        recipientProfileRepository.save(recipientid);
+    //public void favoriteDonor(long recipientId, Long donorId) {
+    //  recipientId recipientid = recipientProfileRepository.findById(recipientId).orElseThrow();
+    // donorId donorid = donorProfileRepository.findById(donorId).orElseThrow();
+    //  recipientid.getFavoritedDonorsId().add(donorid);
+    //  recipientProfileRepository.save(recipientid);
     }
 //import is.hi.hbv501g.Hugverk1.Persistence.Entities.DonorProfile;
 //import is.hi.hbv501g.Hugverk1.Persistence.Repositories.DonorProfileRepository;
@@ -70,4 +74,4 @@ public class MatchService {
 //        DonorProfile donorProfile = donorProfileRepository.findById(recipientId).orElseThrow();
 //        return donorId.getFavoritedRecipientsId().contains(recipientId) && recipientId.getFavoritedDonors().contains(donorId);
 //    }
-}
+//}

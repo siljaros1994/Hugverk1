@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Your Matches</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/homestyle.css}">
+</head>
+<body>
+<div class="area">
+    <nav class="main-menu">
+        <ul>
+            <li><a th:href="@{/home/recipient}"><i class="fa fa-home fa-2x"></i><span class="nav-text">Home</span></a></li>
+            <li><a th:href="@{/match/matches}"><i class="fa fa-check fa-2x"></i><span class="nav-text">Matches</span></a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="container">
+            <header>
+                <h1>Your Matches</h1>
+            </header>
+
+            <div class="matched-list" th:if="${matches != null && matches.size() > 0}">
+                <ul>
+                    <li th:each="matchId : ${matches}">
+                        <p th:text="'Matched Recipient ID: ' + ${matchId}"></p>
+                    </li>
+                </ul>
+            </div>
+
+            <div th:if="${matches == null || matches.size() == 0}">
+                <p>No matches found.</p>
+            </div>
+        </div>
+    </main>
+</div>
+
+<footer>
+    <p>Alexandra, Guðrún, Silja og Þrándur.</p>
+</footer>
+</body>
+</html>
