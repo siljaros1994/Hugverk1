@@ -17,18 +17,20 @@ import java.util.List;
 @Controller
 @RequestMapping("/match")
 public class MatchController {
+
     @Autowired
     private MyAppUserService myAppUserService;
 
-    @Autowired
-    private MatchController(MyAppUserService myAppUserService) {
-        this.myAppUserService = myAppUserService;
-    }
+    //@Autowired
+    //private MatchController(MyAppUserService myAppUserService) {
+    //  this.myAppUserService = myAppUserService;
+    //}
+
     @GetMapping("/matches")
     public String matches(Model model, HttpSession session) {
         Long donorId = (Long) session.getAttribute("donorId");
         if (donorId !=null) {
-            List<Long> matches = MyAppUserService.getMatchRecipients(donorId);
+            List<Long> matches = myAppUserService.getMatchRecipients(donorId);
             model.addAttribute("matches", matches);
         }
         return "matches";
@@ -43,10 +45,11 @@ public class MatchController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
     @GetMapping
     public ResponseEntity<List<Long>> getMatchRecipients(@RequestParam Long donorId) {
         try {
-            List<Long> matches = MyAppUserService.getMatchRecipients(donorId);
+            List<Long> matches = myAppUserService.getMatchRecipients(donorId);
             return ResponseEntity.ok(matches);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

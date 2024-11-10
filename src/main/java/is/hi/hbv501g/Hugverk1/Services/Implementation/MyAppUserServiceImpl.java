@@ -131,4 +131,26 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
         });
         return recipients;
     }
+
+    @Override
+    public List<Long> getMatchRecipients(Long donorId) {
+        MyAppUsers donor = userRepository.findByDonorId(donorId)
+                .orElseThrow(() -> new RuntimeException("Donor not found"));
+        return Arrays.stream(donor.getFavoriteDonors().split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void addMatchRecipient(Long donorId, Long recipientId) {
+        MyAppUsers donor = userRepository.findByDonorId(donorId)
+                .orElseThrow(() -> new RuntimeException("Donor not found"));
+        MyAppUsers recipient = userRepository.findByRecipientId(recipientId)
+                .orElseThrow(() -> new RuntimeException("Recipient not found"));
+
+        if (!donor.getFavoriteDonors().contains(recipientId.toString())) {
+            donor.setFavoriteDonors(donor.getFavoriteDonors() + "," + recipientId);
+            userRepository.save(donor);
+        }
+    }
 }
