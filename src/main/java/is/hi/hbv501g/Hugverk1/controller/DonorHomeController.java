@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Controller
-public class DonorHomeController {
+public class DonorHomeController extends BaseController{
 
     private static final Logger logger = LoggerFactory.getLogger(DonorHomeController.class);
 
@@ -28,7 +28,7 @@ public class DonorHomeController {
 
     @GetMapping("/home/donor")
     public String donorHome(Model model, HttpSession session) {
-        MyAppUsers loggedInUser = (MyAppUsers) session.getAttribute("LoggedInUser");
+        MyAppUsers loggedInUser = (MyAppUsers) session.getAttribute("user");
         if (loggedInUser == null || !"donor".equalsIgnoreCase(loggedInUser.getUserType())) {
             return "redirect:/users/login";
         }
@@ -44,9 +44,17 @@ public class DonorHomeController {
     }
 
     @GetMapping("/donor/view/{recipientId}")
-    public String viewRecipientProfile(@PathVariable Long recipientId, Model model) {
+    public String viewRecipientProfile(@PathVariable Long recipientId, Model model, HttpSession session) {
+        MyAppUsers user = (MyAppUsers) session.getAttribute("user");
+
+        if (user == null) {
+            return "redirect:/users/login";
+        }
+
         Optional<RecipientProfile> recipientProfile = recipientProfileService.findByProfileId(recipientId);
+
         if (recipientProfile.isPresent()) {
+            model.addAttribute("user", user);
             model.addAttribute("recipientProfile", recipientProfile.get());
             logger.info("Displaying profile for recipient with profileId: {}", recipientId);
             return "recipientPage";

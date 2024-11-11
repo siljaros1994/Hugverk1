@@ -1,6 +1,7 @@
 package is.hi.hbv501g.Hugverk1.controller;
 
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.DonorProfile;
+import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
 import is.hi.hbv501g.Hugverk1.Services.DonorProfileService;
 import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,8 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/recipient")
-public class FavoriteController {
+@SessionAttributes("user")
+public class FavoriteController extends BaseController{
 
     @Autowired
     private MyAppUserService myAppUserService;
@@ -27,6 +29,13 @@ public class FavoriteController {
     @GetMapping("/favorites")
     public String favorites(Model model, HttpSession session) {
         Long recipientId = (Long) session.getAttribute("recipientId");
+        MyAppUsers user = (MyAppUsers) session.getAttribute("user");
+
+        if (user == null) {
+            return "redirect:/users/login";
+        }
+
+        model.addAttribute("user", user);
         List<DonorProfile> favoriteProfiles = new ArrayList<>();  // Here we initialize an empty list
 
         if (recipientId != null) {

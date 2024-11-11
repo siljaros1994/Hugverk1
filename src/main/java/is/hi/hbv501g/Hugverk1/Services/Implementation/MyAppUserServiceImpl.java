@@ -91,8 +91,10 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
     public void addFavoriteDonor(Long recipientId, Long donorId) {
         MyAppUsers recipient = userRepository.findByRecipientId(recipientId)
                 .orElseThrow(() -> new RuntimeException("Recipient not found"));
+
         String currentFavorites = recipient.getFavoriteDonors();
 
+        if (currentFavorites == null || !Arrays.asList(currentFavorites.split(",")).contains(donorId.toString())) {
         // Add the new donor ID
         if (currentFavorites == null || currentFavorites.isEmpty()) {
             currentFavorites = donorId.toString();
@@ -104,6 +106,10 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
         recipient.setFavoriteDonors(currentFavorites);
         // Save to database
         userRepository.save(recipient);
+        System.out.println("Favorite donor added successfully: " + donorId);
+        } else {
+            System.out.println("Donor ID already in favorites: " + donorId);
+        }
     }
 
     @Override
@@ -133,15 +139,44 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
     }
 
     @Override
+    public void approveFavoriteAsMatch(Long donorId, Long recipientId) {
+        System.out.println("Attempting to approve match for Donor ID: " + donorId + " with Recipient ID: " + recipientId);
+
+        MyAppUsers donor = userRepository.findByDonorId(donorId)
+                .orElseThrow(() -> new RuntimeException("Donor not found"));
+
+        MyAppUsers recipient = userRepository.findById(recipientId)
+                .filter(user -> "recipient".equalsIgnoreCase(user.getUserType()))
+                .orElseThrow(() -> new RuntimeException("Recipient not found for ID: " + recipientId));
+
+        // Check if the recipient has favorited the donor
+        String favoriteDonors = recipient.getFavoriteDonors();
+        if (favoriteDonors != null && favoriteDonors.contains(donorId.toString())) {
+            // Update matched recipients for the donor
+            List<Long> matchedRecipients = donor.getMatchRecipients() != null ? donor.getMatchRecipients() : new ArrayList<>();
+            if (!matchedRecipients.contains(recipientId)) {
+                matchedRecipients.add(recipientId);
+                donor.setMatchRecipients(matchedRecipients);
+                userRepository.save(donor);  // Persist changes
+                System.out.println("Match approved and saved for Donor ID: " + donorId + " with Recipient ID: " + recipientId);
+            } else {
+                System.out.println("Recipient already matched with donor.");
+            }
+        } else {
+            System.out.println("Recipient has not favorited the donor.");
+        }
+    }
+
+    @Override
     public List<Long> getMatchesForRecipient(Long recipientId) {
         MyAppUsers recipient = userRepository.findByRecipientId(recipientId)
                 .orElseThrow(() -> new RuntimeException("Recipient not found"));
 
-        String favoriteDonors = recipient.getFavoriteDonors();
-        if (favoriteDonors == null || favoriteDonors.isEmpty()) {
+        String matchedDonors = recipient.getMatchedDonors();
+        if (matchedDonors == null || matchedDonors.isEmpty()) {
             return new ArrayList<>();
         }
-        return Arrays.stream(favoriteDonors.split(","))
+        return Arrays.stream(matchedDonors.split(","))
                 .map(Long::parseLong)
                 .collect(Collectors.toList());
     }
@@ -150,7 +185,12 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
     public List<Long> getMatchRecipients(Long donorId) {
         MyAppUsers donor = userRepository.findByDonorId(donorId)
                 .orElseThrow(() -> new RuntimeException("Donor not found"));
-        return Arrays.stream(donor.getFavoriteDonors().split(","))
+
+        String matchedRecipients = donor.getMatchedRecipients();
+        if (matchedRecipients == null || matchedRecipients.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return Arrays.stream(matchedRecipients.split(","))
                 .map(Long::parseLong)
                 .collect(Collectors.toList());
     }

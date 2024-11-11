@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/users")
-public class UserController {
+public class UserController extends BaseController {
 
     @Autowired
     private MyAppUserService myAppUserService;
@@ -72,19 +72,23 @@ public class UserController {
         if (foundUser.isPresent()) {
             // Check if password matches
             if (myAppUserService.matchPassword(user.getPassword(), foundUser.get().getPassword())) {
-                // Store userId and userType in the session
-                session.setAttribute("userId", foundUser.get().getId());
-                session.setAttribute("userType", foundUser.get().getUserType());
+                MyAppUsers loggedInUser = foundUser.get();
 
+                // Store the full user object and its attributes in the session
+                session.setAttribute("user", loggedInUser);
+                session.setAttribute("userId", loggedInUser.getId());
+                session.setAttribute("userType", loggedInUser.getUserType());
+
+                System.out.println("User and attributes stored in session.");
                 System.out.println("Stored in session - userId: " + session.getAttribute("userId"));
                 System.out.println("Stored in session - userType: " + session.getAttribute("userType"));
 
                 // Redirect based on user type
-                if ("donor".equalsIgnoreCase(foundUser.get().getUserType())) {
+                if ("donor".equalsIgnoreCase(loggedInUser.getUserType())) {
                     return "redirect:/home/donor";
-                } else if ("recipient".equalsIgnoreCase(foundUser.get().getUserType())) {
+                } else if ("recipient".equalsIgnoreCase(loggedInUser.getUserType())) {
                     return "redirect:/home/recipient";
-                } else if ("admin".equalsIgnoreCase(foundUser.get().getUserType())) {
+                } else if ("admin".equalsIgnoreCase(loggedInUser.getUserType())) {
                     return "redirect:/home/admin";
                 } else {
                     model.addAttribute("message", "Unexpected user type.");

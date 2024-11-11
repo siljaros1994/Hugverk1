@@ -5,9 +5,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 // Here we are defining the user and maps it to a database table. It controls how user information
 // (ID, username, email, password) is stored and retrieved from the database.
@@ -41,8 +40,79 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
     @Column(nullable = false)
     private String userType; // Either donor or recipient.
 
-    @Column(name = "favorite_donors")
-    private String favoriteDonors;
+    @Column(name = "favorite_donors", nullable = true, columnDefinition = "VARCHAR(255) DEFAULT ''")
+    private String favoriteDonors = "";
+
+    @Column(name = "matched_recipients")
+    private String matchedRecipients;
+
+    @Column(name = "matched_donors")
+    private String matchedDonors;
+
+    public List<Long> getFavoriteDonorsList() {
+        if (favoriteDonors == null || favoriteDonors.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return Arrays.stream(favoriteDonors.split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+    }
+
+    public void setFavoriteDonorsList(List<Long> donorIds) {
+        if (donorIds == null || donorIds.isEmpty()) {
+            this.favoriteDonors = "";
+        } else {
+            this.favoriteDonors = donorIds.stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(","));
+        }
+    }
+
+    public List<Long> getMatchRecipients() {
+        if (matchedRecipients == null || matchedRecipients.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return Arrays.stream(matchedRecipients.split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+    }
+
+    public void setMatchRecipients(List<Long> recipientIds) {
+        if (recipientIds == null || recipientIds.isEmpty()) {
+            this.matchedRecipients = "";
+        } else {
+            this.matchedRecipients = recipientIds.stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(","));
+        }
+    }
+
+    public void addMatchedRecipient(Long recipientId) {
+        List<Long> recipients = getMatchRecipients();
+        if (!recipients.contains(recipientId)) {
+            recipients.add(recipientId);
+            setMatchRecipients(recipients);
+        }
+    }
+
+    public List<Long> getMatchedDonorsList() {
+        if (matchedDonors == null || matchedDonors.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return Arrays.stream(matchedDonors.split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+    }
+
+    public void setMatchedDonorsList(List<Long> donorIds) {
+        if (donorIds == null || donorIds.isEmpty()) {
+            this.matchedDonors = "";
+        } else {
+            this.matchedDonors = donorIds.stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(","));
+        }
+    }
 
     @Transient
     private String confirmPassword;
@@ -176,5 +246,21 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
     }
     public void setFavoriteDonors(String favoriteDonors) {
         this.favoriteDonors = favoriteDonors;
+    }
+
+    public String getMatchedRecipients() {
+        return matchedRecipients;
+    }
+
+    public void setMatchedRecipients(String matchedRecipients) {
+        this.matchedRecipients = matchedRecipients;
+    }
+
+    public String getMatchedDonors() {
+        return matchedDonors;
+    }
+
+    public void setMatchedDonors(String matchedDonors) {
+        this.matchedDonors = matchedDonors;
     }
 }

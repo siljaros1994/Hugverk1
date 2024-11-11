@@ -4,6 +4,7 @@ import is.hi.hbv501g.Hugverk1.Persistence.Entities.DonorProfile;
 import is.hi.hbv501g.Hugverk1.Persistence.Repositories.MyAppUserRepository;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
 import is.hi.hbv501g.Hugverk1.Services.DonorProfileService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -22,7 +23,7 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/donorprofile")
-public class DonorProfileController {
+public class DonorProfileController extends BaseController {
 
     @Autowired
     private DonorProfileService donorProfileService;
@@ -35,7 +36,7 @@ public class DonorProfileController {
 
     // Displays the donor profile page.
     @GetMapping
-    public String showDonorProfilePage(Model model) {
+    public String showDonorProfilePage(Model model, HttpSession session) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication(); // Here we get the logged-in user from the security context
         MyAppUsers loggedInUser = (MyAppUsers) authentication.getPrincipal();
 

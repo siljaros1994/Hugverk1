@@ -3,6 +3,7 @@ package is.hi.hbv501g.Hugverk1.controller;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
 import is.hi.hbv501g.Hugverk1.Persistence.forms.BookingForm;
 import is.hi.hbv501g.Hugverk1.Services.BookingService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,20 +13,20 @@ import org.springframework.ui.Model;
 
 @Controller
 @RequestMapping("/bookings")
-public class BookingController {
+public class BookingController extends BaseController {
 
     @Autowired
     private BookingService bookingService;
 
     @GetMapping("/recipient")
-    public String showRecipientBookingPage(Model model) {
+    public String showRecipientBookingPage(Model model, HttpSession session) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        MyAppUsers loggedInUser = (MyAppUsers) authentication.getPrincipal();
+        MyAppUsers loggedInUser = (MyAppUsers) session.getAttribute("user");
 
         if (loggedInUser == null || !"recipient".equalsIgnoreCase(loggedInUser.getUserType())) {
             return "redirect:/users/login";
         }
-
+        model.addAttribute("user", loggedInUser);
         model.addAttribute("bookingForm", new BookingForm());
         model.addAttribute("bookings", bookingService.getBookingsByRecipientId(loggedInUser.getId()));
         return "booking_recipient";
@@ -41,14 +42,13 @@ public class BookingController {
 
     // Here the donor can see pending bookings for donation
     @GetMapping("/donor")
-    public String showDonorBookingPage(Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        MyAppUsers loggedInUser = (MyAppUsers) authentication.getPrincipal();
+    public String showDonorBookingPage(Model model, HttpSession session) {
+        MyAppUsers loggedInUser = (MyAppUsers) session.getAttribute("user");
 
         if (loggedInUser == null || !"donor".equalsIgnoreCase(loggedInUser.getUserType())) {
             return "redirect:/users/login";
         }
-
+        model.addAttribute("user", loggedInUser);
         model.addAttribute("pendingBookings", bookingService.getPendingBookingsForDonor(loggedInUser.getId()));
         return "booking_donor";
     }

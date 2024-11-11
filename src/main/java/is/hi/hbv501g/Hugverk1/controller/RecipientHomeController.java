@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 
 @Controller
-public class RecipientHomeController {
+public class RecipientHomeController extends BaseController{
 
     private static final Logger logger = LoggerFactory.getLogger(RecipientHomeController.class);
 
@@ -35,7 +35,7 @@ public class RecipientHomeController {
             Model model,
             HttpSession session
     ) {
-        MyAppUsers loggedInUser = (MyAppUsers) session.getAttribute("LoggedInUser");
+        MyAppUsers loggedInUser = (MyAppUsers) session.getAttribute("user");
         if (loggedInUser == null) {
             logger.warn("LoggedInUser not found in session. Redirecting to login.");
             return "redirect:/users/login";
@@ -67,7 +67,10 @@ public class RecipientHomeController {
     }
 
     @GetMapping("/recipient/view/{donorProfileId}")
-    public String viewDonorProfile(@PathVariable Long donorProfileId, Model model) {
+    public String viewDonorProfile(@PathVariable Long donorProfileId, Model model, HttpSession session) {
+        MyAppUsers loggedInUser = (MyAppUsers) session.getAttribute("user");
+        model.addAttribute("user", loggedInUser);
+
         Optional<DonorProfile> donorProfile = donorProfileService.findByProfileId(donorProfileId);
         if (donorProfile.isPresent()) {
             model.addAttribute("donorProfile", donorProfile.get());
