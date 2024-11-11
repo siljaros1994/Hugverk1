@@ -11,7 +11,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import static is.hi.hbv501g.Hugverk1.Security.PasswordEncoderConfig.passwordEncoder;
 
@@ -58,7 +57,7 @@ public class SecurityConfig {
                         .requestMatchers("/home/donor", "/donorprofile", "/donor/view/**", "/bookings/donor").authenticated()
                         .requestMatchers("/home/recipient", "/recipientprofile",  "/recipient/view/**", "/bookings/recipient", "/recipient/favorite/**").authenticated()
                         .requestMatchers("/messages/**", "/messages/{userType}/{id}", "/dr").authenticated()
-                        .requestMatchers("/match/donor/matches", "/match/recipient/matches").authenticated()
+                        .requestMatchers("/match/donor/matches", "/match/recipient/matches", "/match/donor/approveMatch").authenticated()
                         .anyRequest().authenticated())  // All other requests need authentication
                 .formLogin(login -> login
                         .loginPage("/users/login")

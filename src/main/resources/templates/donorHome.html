@@ -45,7 +45,11 @@
                             <p><strong>Age:</strong> <span th:text="${recipient.recipientProfile?.age ?: 'Not specified'}"></span></p>
                         </div>
                         <div class="card-buttons">
-                            <button th:onclick="'location.href=\'/donor/match/' + ${recipient.id} + '\''">Match</button>
+                            <form th:action="@{/match/donor/approveMatch}" method="post">
+                                <input type="hidden" name="donorId" th:value="${user.id}" />
+                                <input type="hidden" name="recipientId" th:value="${recipient.id}" />
+                                <button type="submit">Match</button>
+                            </form>
                             <button th:onclick="'location.href=\'/match/unmatch/' + ${recipient.id} + '\''">Unmatch</button>
                             <button th:onclick="'location.href=\'/donor/view/' + ${recipient.recipientProfile?.recipientProfileId} + '\''">View</button>
                         </div>

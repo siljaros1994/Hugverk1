@@ -28,4 +28,6 @@ public interface MyAppUserService extends UserDetailsService {
     void addMatchRecipient(Long donorId, Long recipientId);
     List<Long> getMatchRecipients(Long donorId);
     List<Long> getMatchesForRecipient(Long recipientId);
+    void approveFavoriteAsMatch(Long donorId, Long recipientId);
+
 }

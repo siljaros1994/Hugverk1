@@ -9,13 +9,12 @@ import is.hi.hbv501g.Hugverk1.Services.DonorProfileService;
 import is.hi.hbv501g.Hugverk1.Services.MessageService;
 import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import is.hi.hbv501g.Hugverk1.Services.RecipientProfileService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/messages")
-public class MessageController {
+public class MessageController extends BaseController{
 
     @Autowired
     private MessageService messageService;
@@ -38,9 +37,12 @@ public class MessageController {
     private RecipientProfileService recipientProfileService;
 
     @GetMapping("/{userType}/{id}")
-    public String showMessages(@PathVariable("userType") String userType, @PathVariable("id") Long userId, Model model, Principal principal) {
-        MyAppUsers currentUser = userService.findByUsername(principal.getName())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    public String showMessages(@PathVariable("userType") String userType, @PathVariable("id") Long userId, Model model, HttpSession session) {
+        MyAppUsers currentUser = (MyAppUsers) session.getAttribute("user");
+
+        if (currentUser == null) {
+            throw new UsernameNotFoundException("User not found in session");
+        }
 
         Long senderId = "donor".equalsIgnoreCase(currentUser.getUserType()) ? currentUser.getDonorId() : currentUser.getRecipientId();
         Long receiverId = userId;
@@ -111,9 +113,12 @@ public class MessageController {
 
 
     @PostMapping("/send")
-    public String sendMessage(@ModelAttribute MessageForm messageForm, Model model, Principal principal) {
-        MyAppUsers sender = userService.findByUsername(principal.getName())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    public String sendMessage(@ModelAttribute MessageForm messageForm, Model model, HttpSession session) {
+        MyAppUsers sender = (MyAppUsers) session.getAttribute("user");
+
+        if (sender == null) {
+            throw new UsernameNotFoundException("User not found in session");
+        }
 
         Long senderId = "donor".equalsIgnoreCase(sender.getUserType()) ? sender.getDonorId() : sender.getRecipientId();
         Long receiverId = messageForm.getReceiverId();
@@ -134,9 +139,12 @@ public class MessageController {
     }
 
     @PostMapping("/report/{receiverId}")
-    public String reportUser(@PathVariable Long receiverId, Model model, Principal principal) {
-        MyAppUsers reporter = userService.findByUsername(principal.getName())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    public String reportUser(@PathVariable Long receiverId, Model model, HttpSession session) {
+        MyAppUsers reporter = (MyAppUsers) session.getAttribute("user");
+
+        if (reporter == null) {
+            throw new UsernameNotFoundException("User not found in session");
+        }
 
         messageService.reportUser(reporter.getId(), receiverId);
         model.addAttribute("message", "User reported successfully.");

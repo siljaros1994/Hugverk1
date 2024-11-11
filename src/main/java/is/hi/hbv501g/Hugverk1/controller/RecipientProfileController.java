@@ -4,6 +4,7 @@ import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.RecipientProfile;
 import is.hi.hbv501g.Hugverk1.Persistence.Repositories.MyAppUserRepository;
 import is.hi.hbv501g.Hugverk1.Services.RecipientProfileService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -20,7 +21,7 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/recipientprofile")
-public class RecipientProfileController {
+public class RecipientProfileController extends BaseController{
 
     @Autowired
     private RecipientProfileService recipientProfileService;
@@ -33,7 +34,7 @@ public class RecipientProfileController {
 
     // Displays the recipient profile page.
     @GetMapping
-    public String showRecipientProfilePage(Model model) {
+    public String showRecipientProfilePage(Model model, HttpSession session) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication(); //Here we get the logged-in user from the security context
         MyAppUsers loggedInUser = (MyAppUsers) authentication.getPrincipal();
         if (loggedInUser == null || !"recipient".equalsIgnoreCase(loggedInUser.getUserType())) { //Here we redirect to login if the user is not a recipient
