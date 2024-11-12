@@ -17,6 +17,7 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/users")
+@SessionAttributes("user")
 public class UserController extends BaseController {
 
     @Autowired
@@ -78,6 +79,8 @@ public class UserController extends BaseController {
                 session.setAttribute("user", loggedInUser);
                 session.setAttribute("userId", loggedInUser.getId());
                 session.setAttribute("userType", loggedInUser.getUserType());
+
+                model.addAttribute("userType", loggedInUser.getUserType());
 
                 System.out.println("User and attributes stored in session.");
                 System.out.println("Stored in session - userId: " + session.getAttribute("userId"));

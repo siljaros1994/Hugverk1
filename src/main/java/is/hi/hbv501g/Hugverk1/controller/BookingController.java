@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 
 @Controller
 @RequestMapping("/bookings")
+@SessionAttributes("user")
 public class BookingController extends BaseController {
 
     @Autowired

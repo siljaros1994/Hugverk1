@@ -194,7 +194,7 @@
             <div class="profile-info">
                 <h2>Profile Information</h2>
                 <div class="profile-image">
-                    <img th:src="@{${donorProfile.imagePath}}" alt="Profile Image" th:if="${donorProfile.imagePath != null}">
+                    <img th:src="${donorProfile.imagePath != null ? donorProfile.imagePath : '/uploads/default-donor-avatar.jpg'}" alt="Donor Image"/>
                 </div>
                 <p>Donor ID: <span th:text="${donorProfile.user?.donorId ?: 'No ID available'}">Donor ID</span></p>
                 <p>Eye Color: <span th:text="${donorProfile.eyeColor ?: 'Not specified'}">Eye Color</span></p>

@@ -23,6 +23,7 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/donorprofile")
+@SessionAttributes("user")
 public class DonorProfileController extends BaseController {
 
     @Autowired
@@ -36,82 +37,42 @@ public class DonorProfileController extends BaseController {
 
     // Displays the donor profile page.
     @GetMapping
-    public String showDonorProfilePage(Model model, HttpSession session) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication(); // Here we get the logged-in user from the security context
-        MyAppUsers loggedInUser = (MyAppUsers) authentication.getPrincipal();
+    public String showDonorProfilePage(Model model) {
+        MyAppUsers loggedInUser = getLoggedInUser();
 
-        if (loggedInUser == null || !"donor".equalsIgnoreCase(loggedInUser.getUserType())) { // Here we redirect to login if the user is not a donor.
+        if (loggedInUser == null || !isUserType("donor")) {
             return "redirect:/users/login";
         }
 
         model.addAttribute("user", loggedInUser);
 
-        // Retrieve profile based on the unique user ID to avoid mixing profiles
-        Optional<DonorProfile> donorProfile = donorProfileService.findByUserId(loggedInUser.getId()); // Here we find the donor profile by the user's donor id.
+        // Retrieve or create a donor profile
+        DonorProfile donorProfile = donorProfileService.findOrCreateProfile(loggedInUser);
+        model.addAttribute("donorProfile", donorProfile);
 
-        model.addAttribute("donorProfile", donorProfile.orElseGet(() -> {  // If profile exists, we use it. Otherwise we create a new profile for the donor
-            DonorProfile newProfile = new DonorProfile();
-            newProfile.setUser(loggedInUser);
-            // Assign donorId if not already set
-            if (loggedInUser.getDonorId() == null) {
-                myAppUserRepository.save(loggedInUser);
-            }
-            return newProfile;
-        }));
         return "donorprofile";
     }
 
     // Save or update the donor profile with an uploaded image of donor.
     @PostMapping("/saveOrEdit")
     public String saveOrEditProfile(@ModelAttribute("donorProfile") DonorProfile profileData,
-                                    @RequestParam("profileImage") MultipartFile profileImage) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        MyAppUsers loggedInUser = (MyAppUsers) authentication.getPrincipal();
+                                    @RequestParam("profileImage") MultipartFile profileImage) throws IOException {
+        MyAppUsers loggedInUser = getLoggedInUser();
+        profileData.setUser(loggedInUser);
 
-        // Ensure the logged-in user has a valid ID and is fully loaded from the database
-        Optional<MyAppUsers> user = myAppUserRepository.findById(loggedInUser.getId());
-        if (user.isEmpty()) {
-            throw new IllegalStateException("User not found");
-        }
+        donorProfileService.processProfileImage(profileData, profileImage, uploadPath);
 
-        MyAppUsers currentUser = user.get();
-        profileData.setUser(currentUser);
-
-        Optional<DonorProfile> existingProfile = donorProfileService.findByUserId(currentUser.getId());
-
-        if (existingProfile.isPresent()) {
-            // Update the existing profile with new data
-            DonorProfile profileToUpdate = existingProfile.get();
-            profileData.setDonorProfileId(profileToUpdate.getDonorProfileId());
-            if (profileToUpdate.getImagePath() != null && profileImage.isEmpty()) {
-                profileData.setImagePath(profileToUpdate.getImagePath()); // Retain existing image if no new image is provided
-            }
-        }
-
-        if (!profileImage.isEmpty()) { // Save uploaded image if it is included.
-            try {
-                String originalFileName = StringUtils.cleanPath(profileImage.getOriginalFilename());
-                String filePath = uploadPath + originalFileName;
-                File destinationFile = new File(filePath);
-                destinationFile.getParentFile().mkdirs();
-                profileImage.transferTo(destinationFile);
-                profileData.setImagePath("/uploads/" + originalFileName); // Here we set the image path so it displays.
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        // Here we save the profile to get the generated donorProfileId
+        // Save or update the profile
         donorProfileService.saveOrUpdateProfile(profileData);
 
-        // Assign donorId in MyAppUsers.
-        if (currentUser.getDonorId() == null) {
-            currentUser.setDonorId(profileData.getDonorProfileId());
-            myAppUserRepository.save(currentUser);
+        // Assign donorId if not already set
+        if (loggedInUser.getDonorId() == null) {
+            loggedInUser.setDonorId(profileData.getDonorProfileId());
+            myAppUserRepository.save(loggedInUser);
         }
-
         return "redirect:/donorprofile";
     }
+}
 
     //@PutMapping("/{id}/setDonationLimit")
     //public ResponseEntity<String> setDonationLimit(@PathVariable Long id, @RequestParam int limit) {
@@ -127,4 +88,3 @@ public class DonorProfileController extends BaseController {
 
         //return ResponseEntity.ok("Donation limit updated.");
     //}
-}
