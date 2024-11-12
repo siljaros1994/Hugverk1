@@ -12,10 +12,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.SessionAttributes;
+
 import java.util.List;
 import java.util.Optional;
 
 @Controller
+@SessionAttributes("user")
 public class DonorHomeController extends BaseController{
 
     private static final Logger logger = LoggerFactory.getLogger(DonorHomeController.class);
@@ -28,7 +31,7 @@ public class DonorHomeController extends BaseController{
 
     @GetMapping("/home/donor")
     public String donorHome(Model model, HttpSession session) {
-        MyAppUsers loggedInUser = (MyAppUsers) session.getAttribute("user");
+        MyAppUsers loggedInUser = getLoggedInUser();
         if (loggedInUser == null || !"donor".equalsIgnoreCase(loggedInUser.getUserType())) {
             return "redirect:/users/login";
         }
@@ -38,6 +41,7 @@ public class DonorHomeController extends BaseController{
 
         model.addAttribute("user", loggedInUser);
         model.addAttribute("username", loggedInUser.getUsername());
+        model.addAttribute("userType", loggedInUser.getUserType());
         model.addAttribute("recipientsWhoFavorited", recipientsWhoFavorited);
 
         return "donorHome";  // Returns the donor-specific homepage
@@ -56,6 +60,7 @@ public class DonorHomeController extends BaseController{
         if (recipientProfile.isPresent()) {
             model.addAttribute("user", user);
             model.addAttribute("recipientProfile", recipientProfile.get());
+            model.addAttribute("userType", user.getUserType());
             logger.info("Displaying profile for recipient with profileId: {}", recipientId);
             return "recipientPage";
         } else {

@@ -28,28 +28,29 @@ public class FavoriteController extends BaseController{
 
     @GetMapping("/favorites")
     public String favorites(Model model, HttpSession session) {
-        Long recipientId = (Long) session.getAttribute("recipientId");
         MyAppUsers user = (MyAppUsers) session.getAttribute("user");
+        Long recipientId = user != null ? user.getRecipientId() : null;
 
-        if (user == null) {
+        if (user == null || recipientId == null) {
             return "redirect:/users/login";
         }
 
         model.addAttribute("user", user);
         List<DonorProfile> favoriteProfiles = new ArrayList<>();  // Here we initialize an empty list
 
-        if (recipientId != null) {
-            List<Long> favoriteIds = myAppUserService.getFavoriteDonors(recipientId);
-            favoriteProfiles = donorProfileService.getProfilesByIds(favoriteIds);
-        }
+        // Fetch favorite donor profiles if recipientId is available
+        List<Long> favoriteIds = myAppUserService.getFavoriteDonors(recipientId);
+        favoriteProfiles = donorProfileService.getProfilesByIds(favoriteIds);
         model.addAttribute("favorites", favoriteProfiles);
         return "favorites";
     }
 
     @GetMapping("/favorite/{donorProfileId}")
     public String addFavoriteDonor(@PathVariable Long donorProfileId, HttpSession session) {
-        Long recipientId = (Long) session.getAttribute("recipientId");
-        if (recipientId != null){
+        MyAppUsers user = (MyAppUsers) session.getAttribute("user");
+        Long recipientId = user != null ? user.getRecipientId() : null;
+
+        if (recipientId != null) {
             myAppUserService.addFavoriteDonor(recipientId, donorProfileId);
         }
         return "redirect:/home/recipient";

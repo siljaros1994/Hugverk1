@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/messages")
+@SessionAttributes("user")
 public class MessageController extends BaseController{
 
     @Autowired

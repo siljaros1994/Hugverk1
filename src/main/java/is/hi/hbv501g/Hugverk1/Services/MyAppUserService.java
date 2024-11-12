@@ -11,7 +11,6 @@ import java.util.Optional;
 // Here we load the user data during the login process.
 public interface MyAppUserService extends UserDetailsService {
 
-
     void saveUser(MyAppUsers user);
     Optional<MyAppUsers> findByUsername(String username);
     Optional<MyAppUsers> findById(Long id);

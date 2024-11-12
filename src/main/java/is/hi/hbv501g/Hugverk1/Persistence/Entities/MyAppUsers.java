@@ -87,15 +87,8 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
         }
     }
 
-    public void addMatchedRecipient(Long recipientId) {
-        List<Long> recipients = getMatchRecipients();
-        if (!recipients.contains(recipientId)) {
-            recipients.add(recipientId);
-            setMatchRecipients(recipients);
-        }
-    }
-
-    public List<Long> getMatchedDonorsList() {
+    // Getter for matchedDonorsList
+    public List<Long> getMatchDonorsList() {
         if (matchedDonors == null || matchedDonors.isEmpty()) {
             return new ArrayList<>();
         }
@@ -104,13 +97,30 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
                 .collect(Collectors.toList());
     }
 
-    public void setMatchedDonorsList(List<Long> donorIds) {
+    // Setter for matchedDonorsList
+    public void setMatchDonorsList(List<Long> donorIds) {
         if (donorIds == null || donorIds.isEmpty()) {
             this.matchedDonors = "";
         } else {
             this.matchedDonors = donorIds.stream()
                     .map(String::valueOf)
                     .collect(Collectors.joining(","));
+        }
+    }
+
+    public void addMatchedRecipient(Long recipientId) {
+        List<Long> recipients = getMatchRecipients();
+        if (!recipients.contains(recipientId)) {
+            recipients.add(recipientId);
+            setMatchRecipients(recipients);
+        }
+    }
+
+    public void addMatchedDonor(Long donorId) {
+        List<Long> matchedDonors = getMatchDonorsList();
+        if (!matchedDonors.contains(donorId)) {
+            matchedDonors.add(donorId);
+            setMatchDonorsList(matchedDonors);
         }
     }
 
@@ -256,11 +266,4 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
         this.matchedRecipients = matchedRecipients;
     }
 
-    public String getMatchedDonors() {
-        return matchedDonors;
-    }
-
-    public void setMatchedDonors(String matchedDonors) {
-        this.matchedDonors = matchedDonors;
-    }
 }
