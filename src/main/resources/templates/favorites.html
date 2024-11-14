@@ -37,7 +37,7 @@
                             <p><strong>Blood Type:</strong> <span th:text="${profile.bloodType}"></span></p>
                             <p><strong>Donor Type:</strong> <span th:text="${profile.donorType}"></span></p>
                         </div>
-                        <button th:onclick="'location.href=\'/match/donor/approveMatch?donorId=' + ${user.id} + '&recipientId=' + ${profile.recipientProfileId} + '\''">Approve Match</button>
+                        <button th:onclick="'location.href=\'/match/donor/approveMatch?donorId=' + ${user.id} + '&recipientId=' + ${profile.donorProfileId} + '\''">Approve Match</button>
                     </div>
                 </div>
             </div>
