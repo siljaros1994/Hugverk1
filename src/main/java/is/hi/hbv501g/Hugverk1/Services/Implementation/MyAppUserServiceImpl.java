@@ -161,6 +161,28 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
     }
 
     @Override
+    public List<MyAppUsers> getMatchedUsers(Long userId, String userType) {
+        MyAppUsers user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Long> matchedUserIds;
+
+        if ("recipient".equalsIgnoreCase(userType)) {
+            matchedUserIds = user.getMatchDonorsList();
+            return userRepository.findAllById(matchedUserIds).stream()
+                    .filter(matchedUser -> "donor".equalsIgnoreCase(matchedUser.getUserType())) // Ensure matched users are donors
+                    .collect(Collectors.toList());
+        } else if ("donor".equalsIgnoreCase(userType)) {
+            matchedUserIds = user.getMatchRecipients();
+            return userRepository.findAllById(matchedUserIds).stream()
+                    .filter(matchedUser -> "recipient".equalsIgnoreCase(matchedUser.getUserType()))
+                    .collect(Collectors.toList());
+        } else {
+            throw new IllegalArgumentException("Invalid user type: " + userType);
+        }
+    }
+
+    @Override
     public List<Long> getMatchRecipients(Long userId) {
         MyAppUsers donor = userRepository.findByDonorId(userId)
                 .orElseThrow(() -> new RuntimeException("Donor not found"));

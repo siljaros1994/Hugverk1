@@ -5,7 +5,20 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/messagestyle.css}">
 </head>
 <body>
+
 <div class="container">
+
+    <div th:if="${showInstruction}" class="instruction-popup">
+        <div class="popup-content">
+            <p>To send a message, please click on the user ID of the matched user you want to message.</p>
+            <form th:action="@{/messages/dismissPopup}" method="post">
+                <input type="hidden" name="userType" th:value="${userType}"/>
+                <input type="hidden" name="userId" th:value="${user.id}"/>
+                <button type="submit" class="close-popup">OK</button>
+            </form>
+        </div>
+    </div>
+
     <div class="area">
         <nav class="main-menu">
             <ul>
@@ -39,7 +52,7 @@
             <div id="contacts">
                 <ul>
                     <li th:each="matchedUser : ${matchedUsers}">
-                        <a th:href="@{/messages/recipient/{id}(id=${matchedUser.id})}"th:onclick="setReceiverId(${matchedUser.id})">
+                        <a th:href="@{/messages/{userType}/{id}(userType=${user.userType}, id=${matchedUser.id})}">
                             <div class="user-details">
                                 <img th:src="${matchedUser.donorProfile != null ? matchedUser.donorProfile.imagePath : matchedUser.recipientProfile.imagePath}"
                                      alt="Profile Picture" class="user-img"/>
@@ -52,6 +65,10 @@
         </div>
 
         <div class="content">
+            <div th:if="${errorMessage}" class="error-message">
+                <p th:text="${errorMessage}"></p>
+            </div>
+
             <div class="messages">
                 <ul>
                     <li th:each="chatMessage : ${chats}" th:class="${chatMessage.senderId == senderId ? 'sent' : 'replies'}">
@@ -62,7 +79,7 @@
             </div>
 
             <div class="message-input">
-                <form th:object="${messageForm}" th:action="@{/messages/send}" method="POST" onsubmit="this.querySelector('button[type=submit]').disabled = true;">
+                <form th:object="${messageForm}" th:action="@{/messages/send}" method="POST">
                     <input type="hidden" th:field="*{receiverId}" th:value="${receiverId}" />
                     <input th:field="*{text}" type="text" placeholder="Write your message..." />
                     <button type="submit" class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i> Send</button>
