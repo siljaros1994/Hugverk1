@@ -18,15 +18,14 @@ public interface MyAppUserService extends UserDetailsService {
     List<MyAppUsers> findAllUsers();
 
     void createAdminUser();
-    void addFavoriteDonor(Long recipientId, Long donorId);
-    List<Long> getFavoriteDonors(Long recipientId);
-    List<MyAppUsers> getRecipientsWhoFavoritedTheDonor(Long donorId);
+    void addFavoriteDonor(Long userId, Long favoriteUserId);
+    List<Long> getFavoriteDonors(Long userId);
+    List<MyAppUsers> getRecipientsWhoFavoritedTheDonor(Long userId);
     UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 
-    void removeMatch(Long donorId, Long recipientId);
-    void addMatchRecipient(Long donorId, Long recipientId);
-    List<Long> getMatchRecipients(Long donorId);
-    List<Long> getMatchesForRecipient(Long recipientId);
-    void approveFavoriteAsMatch(Long donorId, Long recipientId);
-
+    void removeMatch(Long userId, Long matchedUserId);
+    void addMatchRecipient(Long userId, Long matchedUserId);
+    List<Long> getMatchRecipients(Long userId);
+    List<Long> getMatchesForRecipient(Long userId);
+    void approveFavoriteAsMatch(Long userId, Long matchedUserId);
 }

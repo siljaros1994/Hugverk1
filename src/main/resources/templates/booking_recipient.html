@@ -27,16 +27,18 @@
             <h2>Book a Donation Appointment</h2>
             <p>Choose a convenient date and time to visit the clinic or choose an alternative delivery option.</p>
             <p>We recommend booking a visit to the clinic, it offers a Comprehensive Consultations and Personalized Treatment Plans. </p>
+            <ul>
+                <li th:each="donor : ${matchedDonors}" th:text="${donor.userId}"></li>
+            </ul>
         </header>
 
         <form th:object="${bookingForm}" th:action="@{/bookings/book}" method="POST">
             <div class="input-group">
                 <label for="donorId">Donor ID:</label>
-                <input type="text" id="donorId" th:field="*{donorId}" placeholder="Enter Donor ID" required>
-            </div>
-            <div class="input-group">
-                <label for="recipientId">Recipient ID:</label>
-                <input type="text" id="recipientId" th:field="*{recipientId}" placeholder="Enter Recipient ID" required>
+                <select id="donorId" th:field="*{donorId}" required>
+                    <option value="">Select a matched donor</option>
+                    <option th:each="donor : ${matchedDonors}" th:value="${donor.userId}" th:text="${donor.userId}"></option>
+                </select>
             </div>
             <div class="input-group">
                 <label for="date">Date:</label>
@@ -52,15 +54,11 @@
         <section class="appointments">
             <h3>Current Appointments</h3>
             <ul>
-                <li th:each="booking : ${bookings}">
+                <li th:each="booking : ${currentAppointments}">
                     <p>
                         <strong>Donor ID:</strong> <span th:text="${booking.donorId}"></span> |
-                        <strong>Recipient ID:</strong> <span th:text="${booking.recipientId}"></span> |
                         <strong>Date:</strong> <span th:text="${booking.date}"></span> |
                         <strong>Time:</strong> <span th:text="${booking.time}"></span>
-                    <form th:action="@{/bookings/cancel/{id}(id=${booking.id})}" method="post" style="display: inline;">
-                        <button type="submit" class="btn-cancel">Cancel</button>
-                    </form>
                     </p>
                 </li>
             </ul>
