@@ -15,8 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+
 
 @Controller
 @RequestMapping("/match")
@@ -32,7 +31,7 @@ public class MatchController extends BaseController {
     @Autowired
     private RecipientProfileService recipientProfileService;
 
-    @Autowired  // Inject MyAppUserRepository
+    @Autowired
     private MyAppUserRepository userRepository;
 
 
@@ -46,27 +45,14 @@ public class MatchController extends BaseController {
         model.addAttribute("user", user);
         model.addAttribute("userType", user.getUserType());
 
-        // Get list of user IDs that are matched with the donor
         List<Long> matchedUserIds = user.getMatchRecipients();
-
-        // Retrieve recipient profiles by the recipient_profile_id instead of user_id
-        List<Long> matchedRecipientProfileIds = matchedUserIds.stream()
-                .map(id -> userRepository.findById(id)
-                        .map(MyAppUsers::getRecipientProfile)
-                        .map(RecipientProfile::getRecipientProfileId)
-                        .orElse(null))
-                .filter(Objects::nonNull)  // Remove nulls if any IDs were not found
-                .collect(Collectors.toList());
-
-        // Fetch profiles using the corrected recipient_profile_ids
-        List<RecipientProfile> matchedRecipients = recipientProfileService.getProfilesByIds(matchedRecipientProfileIds);
+        List<RecipientProfile> matchedRecipients = recipientProfileService.getProfilesByUserIds(matchedUserIds);
 
         System.out.println("User in session: " + user);
-        System.out.println("Matched Recipient Profile IDs: " + matchedRecipientProfileIds);
+        System.out.println("Matched Recipient Profile IDs: " + matchedUserIds);
         System.out.println("Matched Recipients: " + matchedRecipients);
 
         model.addAttribute("matches", matchedRecipients);
-        model.addAttribute("user", user);
         return "donorMatchesPage";
     }
 
@@ -81,14 +67,11 @@ public class MatchController extends BaseController {
         model.addAttribute("userType", user.getUserType());
         System.out.println("User in session: " + user);
 
-        // Retrieve the donor IDs from donors who have the recipient's ID in their matchedRecipients
-        List<Long> matchedDonorIds = userRepository.findAll().stream()
-                .filter(donor -> donor.getMatchRecipients().contains(user.getId()))
-                .map(MyAppUsers::getDonorId)
-                .collect(Collectors.toList());
+        // Retrieve matched donor user IDs for this recipient
+        List<Long> matchedUserIds = user.getMatchDonorsList();
 
-        // Fetch Donor Profiles based on the matched donor IDs
-        List<DonorProfile> matchedDonors = donorProfileService.getProfilesByIds(matchedDonorIds);
+        // Fetch Donor Profiles based on user_id
+        List<DonorProfile> matchedDonors = donorProfileService.getProfilesByUserIds(matchedUserIds);
 
         model.addAttribute("matches", matchedDonors);
         return "recipientMatchesPage";
@@ -105,13 +88,13 @@ public class MatchController extends BaseController {
     }
 
     @PostMapping("/approveMatch")
-    public String approveMatch(@RequestParam Long recipientId, HttpSession session) {
+    public String approveMatch(@RequestParam("userId") Long userId, HttpSession session) {
         MyAppUsers user = getLoggedInUser();
-        if (user == null || user.getDonorId() == null) {
+        if (user == null || !"donor".equalsIgnoreCase(user.getUserType())) {
             return "redirect:/users/login";
         }
 
-        myAppUserService.approveFavoriteAsMatch(user.getDonorId(), recipientId);
+        myAppUserService.approveFavoriteAsMatch(user.getId(), userId); // Using userId for both
         System.out.println("Match approved successfully.");
         return "redirect:/match/donor/matches";
     }

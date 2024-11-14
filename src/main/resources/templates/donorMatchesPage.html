@@ -35,7 +35,7 @@
                         <img th:src="${recipient.imagePath != null ? recipient.imagePath : '/uploads/default-recipient-avatar.jpg'}"
                              alt="Recipient Image" class="match-image"/>
                         <div class="match-info">
-                            <p><strong>ID:</strong> <span th:text="${recipient.recipientProfileId}"></span></p>
+                            <p><strong>ID:</strong> <span th:text="${recipient.user.id}"></span></p>
                             <p><strong>Height:</strong> <span th:text="${recipient.height}">Height</span> cm</p>
                             <p><strong>Weight:</strong> <span th:text="${recipient.weight}">Weight</span> kg</p>
                             <p><strong>Eye Color:</strong> <span th:text="${recipient.eyeColor}"></span></p>
@@ -47,8 +47,8 @@
                         </div>
                         <div class="card-buttons">
                             <form th:action="@{/match/unmatch}" method="post">
-                                <input type="hidden" name="donorId" th:value="${user.donorId}" />
-                                <input type="hidden" name="recipientId" th:value="${recipient.recipientProfileId}" />
+                                <input type="hidden" name="donorId" th:value="${user.Id}" />
+                                <input type="hidden" name="userId" th:value="${recipient.user.Id}" />
                                 <button type="submit">Unmatch</button>
                             </form>
                         </div>

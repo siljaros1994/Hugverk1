@@ -35,12 +35,14 @@
             <ul>
                 <li th:each="booking : ${pendingBookings}">
                     <p>
-                        <strong>Donor ID:</strong> <span th:text="${booking.donorId}"></span> |
                         <strong>Recipient ID:</strong> <span th:text="${booking.recipientId}"></span> |
                         <strong>Date:</strong> <span th:text="${booking.date}"></span> |
                         <strong>Time:</strong> <span th:text="${booking.time}"></span>
                     <form th:action="@{/bookings/confirm/{id}(id=${booking.id})}" method="post" style="display: inline;">
-                        <button type="submit" class="btn-submit">Confirm</button>
+                        <button type="submit" class="btn-confirm">Confirm</button>
+                    </form>
+                    <form th:action="@{/bookings/cancel/{id}(id=${booking.id})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn-cancel">Cancel</button>
                     </form>
                     </p>
                 </li>

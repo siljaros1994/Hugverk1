@@ -29,9 +29,9 @@ public class FavoriteController extends BaseController{
     @GetMapping("/favorites")
     public String favorites(Model model, HttpSession session) {
         MyAppUsers user = (MyAppUsers) session.getAttribute("user");
-        Long recipientId = user != null ? user.getRecipientId() : null;
+        Long userId = user != null ? user.getRecipientId() : null;
 
-        if (user == null || recipientId == null) {
+        if (user == null || userId == null) {
             return "redirect:/users/login";
         }
 
@@ -39,27 +39,27 @@ public class FavoriteController extends BaseController{
         List<DonorProfile> favoriteProfiles = new ArrayList<>();  // Here we initialize an empty list
 
         // Fetch favorite donor profiles if recipientId is available
-        List<Long> favoriteIds = myAppUserService.getFavoriteDonors(recipientId);
+        List<Long> favoriteIds = myAppUserService.getFavoriteDonors(userId);
         favoriteProfiles = donorProfileService.getProfilesByIds(favoriteIds);
         model.addAttribute("favorites", favoriteProfiles);
         return "favorites";
     }
 
     @GetMapping("/favorite/{donorProfileId}")
-    public String addFavoriteDonor(@PathVariable Long donorProfileId, HttpSession session) {
+    public String addFavoriteDonor(@PathVariable Long favoriteUserId, HttpSession session) {
         MyAppUsers user = (MyAppUsers) session.getAttribute("user");
-        Long recipientId = user != null ? user.getRecipientId() : null;
+        Long userId = user != null ? user.getRecipientId() : null;
 
-        if (recipientId != null) {
-            myAppUserService.addFavoriteDonor(recipientId, donorProfileId);
+        if (userId != null) {
+            myAppUserService.addFavoriteDonor(userId, favoriteUserId);
         }
         return "redirect:/home/recipient";
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<Long>> getFavoriteDonors(@RequestParam Long recipientId) {
+    public ResponseEntity<List<Long>> getFavoriteDonors(@RequestParam Long userId) {
         try {
-            List<Long> favorites = myAppUserService.getFavoriteDonors(recipientId);
+            List<Long> favorites = myAppUserService.getFavoriteDonors(userId);
             return ResponseEntity.ok(favorites);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

@@ -48,13 +48,16 @@ public class BookingService {
         return bookingRepository.findByDonorIdAndConfirmedFalse(donorId);
     }
 
+    public List<Booking> getConfirmedBookingsForRecipient(Long recipientId) {
+        return bookingRepository.findByRecipientIdAndConfirmedTrue(recipientId);
+    }
+
     public void confirmBooking(Long id) {
-        Optional<Booking> bookingOpt = bookingRepository.findById(id);
-        if (bookingOpt.isPresent()) {
-            Booking booking = bookingOpt.get();
-            booking.setConfirmed(true);
-            bookingRepository.save(booking);
-        }
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+        booking.setConfirmed(true);
+        booking.setStatus("Confirmed");
+        bookingRepository.save(booking);
     }
 
     public void cancelBooking(Long id) {
