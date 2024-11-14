@@ -27,9 +27,6 @@
             <h2>Book a Donation Appointment</h2>
             <p>Choose a convenient date and time to visit the clinic or choose an alternative delivery option.</p>
             <p>We recommend booking a visit to the clinic, it offers a Comprehensive Consultations and Personalized Treatment Plans. </p>
-            <ul>
-                <li th:each="donor : ${matchedDonors}" th:text="${donor.userId}"></li>
-            </ul>
         </header>
 
         <form th:object="${bookingForm}" th:action="@{/bookings/book}" method="POST">
@@ -37,7 +34,7 @@
                 <label for="donorId">Donor ID:</label>
                 <select id="donorId" th:field="*{donorId}" required>
                     <option value="">Select a matched donor</option>
-                    <option th:each="donor : ${matchedDonors}" th:value="${donor.userId}" th:text="${donor.userId}"></option>
+                    <option th:each="donor : ${matchedDonors}" th:value="${donor.user.Id}" th:text="${donor.user.Id}"></option>
                 </select>
             </div>
             <div class="input-group">
@@ -60,6 +57,9 @@
                         <strong>Date:</strong> <span th:text="${booking.date}"></span> |
                         <strong>Time:</strong> <span th:text="${booking.time}"></span>
                     </p>
+                    <form th:action="@{/bookings/cancel/{id}(id=${booking.id})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn-cancel">Cancel Appointment</button>
+                    </form>
                 </li>
             </ul>
         </section>

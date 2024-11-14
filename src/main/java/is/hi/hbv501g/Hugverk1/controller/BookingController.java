@@ -8,15 +8,11 @@ import is.hi.hbv501g.Hugverk1.Services.BookingService;
 import is.hi.hbv501g.Hugverk1.Services.DonorProfileService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
-
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+
 
 @Controller
 @RequestMapping("/bookings")
@@ -47,8 +43,8 @@ public class BookingController extends BaseController {
         // Log the donor profiles
         System.out.println("Matched Donor Profiles: " + matchedDonors);
 
-        model.addAttribute("matchedDonors", matchedDonors); // Pass matched donors to the model
-        model.addAttribute("bookingForm", new BookingForm()); // Create a new booking form
+        model.addAttribute("matchedDonors", matchedDonors);
+        model.addAttribute("bookingForm", new BookingForm()); // This create's a new booking form
         model.addAttribute("currentAppointments", bookingService.getConfirmedBookingsForRecipient(loggedInUser.getId()));
 
         return "booking_recipient"; // Render the recipient booking page
@@ -77,7 +73,8 @@ public class BookingController extends BaseController {
         model.addAttribute("user", loggedInUser);
 
         // Shows all pending bookings for the donor.
-        List<Booking> pendingBookings = bookingService.getPendingBookingsForDonor(loggedInUser.getDonorId());
+        List<Booking> pendingBookings = bookingService.getPendingBookingsForDonor(loggedInUser.getId());
+        System.out.println("Pending bookings for donor " + loggedInUser.getId() + ": " + pendingBookings);
 
         model.addAttribute("pendingBookings", pendingBookings);
         return "booking_donor";
@@ -90,10 +87,21 @@ public class BookingController extends BaseController {
         return "redirect:/bookings/donor";
     }
 
-    // Recipient can cancel a booking.
     @PostMapping("/cancel/{id}")
-    public String cancelBooking(@PathVariable Long id) {
+    public String cancelBooking(@PathVariable Long id, HttpSession session) {
+        MyAppUsers loggedInUser = getLoggedInUser();
+        if (loggedInUser == null) {
+            return "redirect:/users/login";
+        }
+
         bookingService.cancelBooking(id);
-        return "redirect:/bookings/recipient";
+
+        if ("recipient".equalsIgnoreCase(loggedInUser.getUserType())) {
+            return "redirect:/bookings/recipient";
+        } else if ("donor".equalsIgnoreCase(loggedInUser.getUserType())) {
+            return "redirect:/bookings/donor";
+        }
+
+        return "redirect:/users/login";
     }
 }

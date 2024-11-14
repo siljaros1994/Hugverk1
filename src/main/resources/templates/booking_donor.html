@@ -38,6 +38,7 @@
                         <strong>Recipient ID:</strong> <span th:text="${booking.recipientId}"></span> |
                         <strong>Date:</strong> <span th:text="${booking.date}"></span> |
                         <strong>Time:</strong> <span th:text="${booking.time}"></span>
+                    </p>
                     <form th:action="@{/bookings/confirm/{id}(id=${booking.id})}" method="post" style="display: inline;">
                         <button type="submit" class="btn-confirm">Confirm</button>
                     </form>
