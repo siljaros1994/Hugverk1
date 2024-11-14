@@ -133,13 +133,13 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
     public void approveFavoriteAsMatch(Long userId, Long matchedUserId) {
         System.out.println("Attempting to approve match for Donor User ID: " + userId + " with Recipient User ID: " + matchedUserId);
 
-        // Find the donor and recipient by their respective user IDs
+        // Here we find the donor and recipient by their respective user IDs
         MyAppUsers donor = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Donor not found"));
         MyAppUsers recipient = userRepository.findById(matchedUserId)
                 .orElseThrow(() -> new RuntimeException("Recipient not found"));
 
-        // Update donor's matched recipients list
+        // this update´s the donor's matched recipients list
         List<Long> matchedRecipients = donor.getMatchRecipients();
         if (!matchedRecipients.contains(matchedUserId)) {
             matchedRecipients.add(matchedUserId);
@@ -150,7 +150,7 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
             System.out.println("Recipient User ID " + matchedUserId + " is already matched with Donor User ID " + userId);
         }
 
-        // Update recipient's matched donors list
+        // this update´s the recipient's matched donors list
         List<Long> matchedDonors = recipient.getMatchDonorsList();
         if (!matchedDonors.contains(userId)) {
             matchedDonors.add(userId);

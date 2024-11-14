@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BookingService {
@@ -45,7 +44,9 @@ public class BookingService {
     }
 
     public List<Booking> getPendingBookingsForDonor(Long donorId) {
-        return bookingRepository.findByDonorIdAndConfirmedFalse(donorId);
+        List<Booking> pendingBookings = bookingRepository.findByDonorIdAndConfirmedFalse(donorId);
+        System.out.println("Pending bookings for Donor ID " + donorId + ": " + pendingBookings);
+        return pendingBookings;
     }
 
     public List<Booking> getConfirmedBookingsForRecipient(Long recipientId) {
@@ -56,7 +57,7 @@ public class BookingService {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
         booking.setConfirmed(true);
-        booking.setStatus("Confirmed");
+        booking.setStatus("Booked");
         bookingRepository.save(booking);
     }
 
