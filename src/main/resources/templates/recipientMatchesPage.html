@@ -31,7 +31,14 @@
                         <img th:src="${match.imagePath != null ? match.imagePath : '/uploads/default-avatar.jpg'}" alt="Profile Image" class="match-image"/>
                         <div class="match-info">
                             <p><strong>ID:</strong> <span th:text="${match.donorProfileId}"></span></p>
+                            <p><strong>Height:</strong> <span th:text="${match.height}">Height</span> cm</p>
+                            <p><strong>Weight:</strong> <span th:text="${match.weight}">Weight</span> kg</p>
                             <p><strong>Eye Color:</strong> <span th:text="${match.eyeColor}"></span></p>
+                            <p><strong>Hair Color:</strong> <span th:text="${match.hairColor}"></span></p>
+                            <p><strong>Race:</strong> <span th:text="${match.race}"></span></p>
+                            <p><strong>Ethnicity:</strong> <span th:text="${match.ethnicity}"></span></p>
+                            <p><strong>Blood Type:</strong> <span th:text="${match.bloodType}"></span></p>
+                            <p><strong>Donor Type:</strong> <span th:text="${match.donorType}"></span></p>
                         </div>
                         <div class="card-buttons">
                             <form th:action="@{/match/unmatch}" method="post">
