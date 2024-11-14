@@ -18,17 +18,8 @@ public class MessageService {
         return messageRepository.save(message);
     }
 
-    public List<Message> getConversationBetween(Long userId1, Long userId2) {
-        List<Message> conversation = messageRepository.findBySenderIdAndReceiverIdOrReceiverIdAndSenderId(userId1, userId2);
-        System.out.println("Number of messages in conversation: " + conversation.size());
-
-        for (Message message : conversation) {
-            String direction = (message.getSenderId().equals(userId1)) ? "Sent" : "Received";
-            System.out.println(direction + " Message: " + message.getContent() + " (Sender ID: " + message.getSenderId() + ", Receiver ID: " + message.getReceiverId() + ")");
-        }
-
-        conversation.sort(Comparator.comparing(Message::getTimestamp));
-        return conversation;
+    public List<Message> getConversationBetween(Long senderId, Long receiverId) {
+        return messageRepository.findBySenderIdAndReceiverIdOrReceiverIdAndSenderId(senderId, receiverId);
     }
 
     public void reportUser(Long reporterId, Long reportedId) {
