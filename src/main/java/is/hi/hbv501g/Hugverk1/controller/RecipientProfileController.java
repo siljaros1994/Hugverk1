@@ -4,6 +4,7 @@ import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.RecipientProfile;
 import is.hi.hbv501g.Hugverk1.Persistence.Repositories.MyAppUserRepository;
 import is.hi.hbv501g.Hugverk1.Services.RecipientProfileService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -20,7 +21,8 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/recipientprofile")
-public class RecipientProfileController {
+@SessionAttributes("user")
+public class RecipientProfileController extends BaseController{
 
     @Autowired
     private RecipientProfileService recipientProfileService;
@@ -34,78 +36,40 @@ public class RecipientProfileController {
     // Displays the recipient profile page.
     @GetMapping
     public String showRecipientProfilePage(Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication(); //Here we get the logged-in user from the security context
-        MyAppUsers loggedInUser = (MyAppUsers) authentication.getPrincipal();
-        if (loggedInUser == null || !"recipient".equalsIgnoreCase(loggedInUser.getUserType())) { //Here we redirect to login if the user is not a recipient
+        MyAppUsers loggedInUser = getLoggedInUser();
+
+        if (loggedInUser == null || !isUserType("recipient")) {
             return "redirect:/users/login";
         }
 
         model.addAttribute("user", loggedInUser);
 
-        // Retrieve profile based on the unique user ID
-        Optional<RecipientProfile> recipientProfile = recipientProfileService.findByUserId(loggedInUser.getId()); //Here we find the recipient profile by the user's recipient id
+        // Find or create a new profile
+        RecipientProfile recipientProfile = recipientProfileService.findOrCreateProfile(loggedInUser);
+        model.addAttribute("recipientProfile", recipientProfile);
 
-        model.addAttribute("recipientProfile", recipientProfile.orElseGet(() -> { //If the profile exists, we use it. Otherwise, we create a new profile for the recipient
-            RecipientProfile newProfile = new RecipientProfile();
-            newProfile.setUser(loggedInUser);
-
-            if (loggedInUser.getRecipientId() == null) {
-                RecipientProfile savedProfile = recipientProfileService.saveOrUpdateProfile(newProfile);
-                loggedInUser.setRecipientId(savedProfile.getRecipientProfileId());
-                myAppUserRepository.save(loggedInUser);
-            }
-            return newProfile;
-        }));
         return "recipientprofile";
     }
 
     //Save or update the recipient profile with an uploaded image of recipient
     @PostMapping("/saveOrEdit")
     public String saveOrEditProfile(@ModelAttribute("recipientProfile") RecipientProfile profileData,
-                                  @RequestParam("profileImage") MultipartFile profileImage) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        MyAppUsers loggedInUser = (MyAppUsers) authentication.getPrincipal();
+                                  @RequestParam("profileImage") MultipartFile profileImage) throws IOException {
 
-        Optional<MyAppUsers> user = myAppUserRepository.findById(loggedInUser.getId());
-        if (user.isEmpty()) {
-            throw new IllegalStateException("User not found");
-        }
+        MyAppUsers loggedInUser = getLoggedInUser();
+        profileData.setUser(loggedInUser);
 
-        MyAppUsers currentUser = user.get();
-        profileData.setUser(currentUser);
+        recipientProfileService.processProfileImage(profileData, profileImage, uploadPath);
 
-        Optional<RecipientProfile> existingProfile = recipientProfileService.findByUserId(currentUser.getId());
-
-        if (existingProfile.isPresent()) {
-            RecipientProfile profileToUpdate = existingProfile.get();
-            profileData.setRecipientProfileId(profileToUpdate.getRecipientProfileId());
-
-            if (profileToUpdate.getImagePath() != null && profileImage.isEmpty()) {
-                profileData.setImagePath(profileToUpdate.getImagePath());
-            }
-        }
-      
-        if (!profileImage.isEmpty()) { //Save uploaded image if it's included
-            try {
-                String originalFileName = StringUtils.cleanPath(profileImage.getOriginalFilename());
-                String filePath = uploadPath + originalFileName;
-                File destinationFile = new File(filePath);
-                destinationFile.getParentFile().mkdirs();
-                profileImage.transferTo(destinationFile);
-                profileData.setImagePath("/uploads/" + originalFileName); //Here is the image path (so it displays)
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } 
         // Save or update the profile
         recipientProfileService.saveOrUpdateProfile(profileData);
 
-        // Assign recipientId in MyAppUsers if not already set
-        if (currentUser.getRecipientId() == null) {
-            currentUser.setRecipientId(profileData.getRecipientProfileId());
-            myAppUserRepository.save(currentUser);
+        // Assign recipientId if not already set
+        if (loggedInUser.getRecipientId() == null) {
+            loggedInUser.setRecipientId(profileData.getRecipientProfileId());
+            myAppUserRepository.save(loggedInUser);
         }
+
         return "redirect:/recipientprofile";
     }
 }

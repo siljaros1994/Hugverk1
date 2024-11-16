@@ -12,7 +12,7 @@
             <li><a th:href="@{/home/donor}"><i class="fa fa-home fa-2x"></i><span class="nav-text">Home</span></a></li>
             <li><a th:href="@{/donorprofile}"><i class="fa fa-user"></i><span class="nav-text">Profile</span></a></li>
             <li><a th:href="@{/messages/{userType}/{id}(userType=${user.userType}, id=${user.id})}"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Messages</span></a></li>
-            <li><a href="#"><i class="fa fa-check"></i><span class="nav-text">Match</span></a></li>
+            <li><a th:href="@{${userType == 'donor' ? '/match/donor/matches' : '/match/recipient/matches'}}"><i class="fa fa-check fa-2x"></i><span class="nav-text">Matches</span></a></li>
             <li><a th:href="@{/bookings/donor}"><i class="fa fa-book"></i><span class="nav-text">Booking</span></a></li>
         </ul>
         <ul class="logout">
@@ -35,12 +35,15 @@
             <ul>
                 <li th:each="booking : ${pendingBookings}">
                     <p>
-                        <strong>Donor ID:</strong> <span th:text="${booking.donorId}"></span> |
                         <strong>Recipient ID:</strong> <span th:text="${booking.recipientId}"></span> |
                         <strong>Date:</strong> <span th:text="${booking.date}"></span> |
                         <strong>Time:</strong> <span th:text="${booking.time}"></span>
+                    </p>
                     <form th:action="@{/bookings/confirm/{id}(id=${booking.id})}" method="post" style="display: inline;">
-                        <button type="submit" class="btn-submit">Confirm</button>
+                        <button type="submit" class="btn-confirm">Confirm</button>
+                    </form>
+                    <form th:action="@{/bookings/cancel/{id}(id=${booking.id})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn-cancel">Cancel</button>
                     </form>
                     </p>
                 </li>

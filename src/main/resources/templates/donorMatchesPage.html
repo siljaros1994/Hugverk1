@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Donor Matches</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/match-style.css}">
+</head>
+<body>
+<div class="area">
+    <nav class="main-menu">
+        <ul>
+            <li><a th:href="@{/home/donor}"><i class="fa fa-home fa-2x"></i><span class="nav-text">Home</span></a></li>
+            <li><a th:href="@{/donorprofile}"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
+            <li><a th:href="@{/messages/{userType}/{id}(userType=${user.userType}, id=${user.id})}"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Messages</span></a></li>
+            <li><a th:href="@{/match/donor/matches}"><i class="fa fa-check fa-2x"></i><span class="nav-text">Matches</span></a></li>
+            <li><a th:href="@{/bookings/donor}"><i class="fa fa-book"></i><span class="nav-text">Booking</span></a></li>
+        </ul>
+        <ul class="logout">
+            <li><a th:href="@{/users/logout}" th:onclick="return confirm('Are you sure you want to logout?')">
+                <i class="fa fa-power-off fa-2x"></i><span class="nav-text">Logout</span>
+            </a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="container">
+            <header>
+                <h1>Your Matches</h1>
+            </header>
+
+            <div th:text="'Matches size: ' + ${matches.size()}"></div>
+
+            <div class="matched-list" th:if="${matches != null && matches.size() > 0}">
+                <div class="match-cards">
+                    <div class="match-card" th:each="recipient : ${matches}">
+                        <img th:src="${recipient.imagePath != null ? recipient.imagePath : '/uploads/default-recipient-avatar.jpg'}"
+                             alt="Recipient Image" class="match-image"/>
+                        <div class="match-info">
+                            <p><strong>ID:</strong> <span th:text="${recipient.user.id}"></span></p>
+                            <p><strong>Height:</strong> <span th:text="${recipient.height}">Height</span> cm</p>
+                            <p><strong>Weight:</strong> <span th:text="${recipient.weight}">Weight</span> kg</p>
+                            <p><strong>Eye Color:</strong> <span th:text="${recipient.eyeColor}"></span></p>
+                            <p><strong>Hair Color:</strong> <span th:text="${recipient.hairColor}"></span></p>
+                            <p><strong>Race:</strong> <span th:text="${recipient.race}"></span></p>
+                            <p><strong>Ethnicity:</strong> <span th:text="${recipient.ethnicity}"></span></p>
+                            <p><strong>Blood Type:</strong> <span th:text="${recipient.bloodType}"></span></p>
+                            <p><strong>Donor Type:</strong> <span th:text="${recipient.recipientType}"></span></p>
+                        </div>
+                        <div class="card-buttons">
+                            <form th:action="@{/match/unmatch}" method="post">
+                                <input type="hidden" name="donorId" th:value="${user.Id}" />
+                                <input type="hidden" name="userId" th:value="${recipient.user.Id}" />
+                                <button type="submit">Unmatch</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${matches == null || matches.size() == 0}">
+                <p>No matches found.</p>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

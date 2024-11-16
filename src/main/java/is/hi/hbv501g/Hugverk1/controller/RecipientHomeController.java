@@ -17,9 +17,11 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 @Controller
-public class RecipientHomeController {
+@SessionAttributes("user")
+public class RecipientHomeController extends BaseController{
 
     private static final Logger logger = LoggerFactory.getLogger(RecipientHomeController.class);
 
@@ -35,9 +37,9 @@ public class RecipientHomeController {
             Model model,
             HttpSession session
     ) {
-        MyAppUsers loggedInUser = (MyAppUsers) session.getAttribute("LoggedInUser");
+        MyAppUsers loggedInUser = getLoggedInUser();
         if (loggedInUser == null) {
-            logger.warn("LoggedInUser not found in session. Redirecting to login.");
+            logger.warn("LoggedInUser not found in session.");
             return "redirect:/users/login";
         }
         model.addAttribute("user", loggedInUser);
@@ -67,15 +69,20 @@ public class RecipientHomeController {
     }
 
     @GetMapping("/recipient/view/{donorProfileId}")
-    public String viewDonorProfile(@PathVariable Long donorProfileId, Model model) {
+    public String viewDonorProfile(@PathVariable Long donorProfileId, Model model, HttpSession session) {
+        MyAppUsers loggedInUser = (MyAppUsers) session.getAttribute("user");
+        model.addAttribute("user", loggedInUser);
+
         Optional<DonorProfile> donorProfile = donorProfileService.findByProfileId(donorProfileId);
-        if (donorProfile.isPresent()) {
-            model.addAttribute("donorProfile", donorProfile.get());
-            logger.info("Displaying profile for donor with profileId: {}", donorProfileId);
-            return "donorsPage";
-        } else {
-            logger.warn("Donor profile with profileId {} not found. Redirecting to recipient home.", donorProfileId);
-            return "redirect:/home/recipient";
-        }
+        donorProfile.ifPresentOrElse(
+                profile -> {
+                    model.addAttribute("donorProfile", profile);
+                    logger.info("Displaying profile for donor with profileId: {}", donorProfileId);
+                },
+                () -> {
+                    logger.warn("Donor profile with profileId {} not found. Redirecting to recipient home.", donorProfileId);
+                }
+        );
+        return donorProfile.isPresent() ? "donorsPage" : "redirect:/home/recipient";
     }
 }

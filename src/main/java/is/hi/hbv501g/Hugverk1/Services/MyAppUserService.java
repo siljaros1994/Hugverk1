@@ -10,7 +10,6 @@ import java.util.Optional;
 
 // Here we load the user data during the login process.
 public interface MyAppUserService extends UserDetailsService {
-    List<Long> getMatchRecipients(Long donorId);
 
     void saveUser(MyAppUsers user);
     Optional<MyAppUsers> findByUsername(String username);
@@ -19,10 +18,15 @@ public interface MyAppUserService extends UserDetailsService {
     List<MyAppUsers> findAllUsers();
 
     void createAdminUser();
-    void addFavoriteDonor(Long recipientId, Long donorId);
-    List<Long> getFavoriteDonors(Long recipientId);
-    List<MyAppUsers> getRecipientsWhoFavoritedTheDonor(Long donorId);
+    void addFavoriteDonor(Long userId, Long favoriteUserId);
+    List<Long> getFavoriteDonors(Long userId);
+    List<MyAppUsers> getRecipientsWhoFavoritedTheDonor(Long userId);
     UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 
-    void addMatchRecipient(Long donorId, Long recipientId);
+    void removeMatch(Long userId, Long matchedUserId);
+    void addMatchRecipient(Long userId, Long matchedUserId);
+    List<Long> getMatchRecipients(Long userId);
+    List<Long> getMatchesForRecipient(Long userId);
+    void approveFavoriteAsMatch(Long userId, Long matchedUserId);
+    List<MyAppUsers> getMatchedUsers(Long userId, String userType);
 }

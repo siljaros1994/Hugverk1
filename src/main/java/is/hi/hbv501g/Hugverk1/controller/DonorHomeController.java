@@ -12,11 +12,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.SessionAttributes;
+
 import java.util.List;
 import java.util.Optional;
 
 @Controller
-public class DonorHomeController {
+@SessionAttributes("user")
+public class DonorHomeController extends BaseController{
 
     private static final Logger logger = LoggerFactory.getLogger(DonorHomeController.class);
 
@@ -28,7 +31,7 @@ public class DonorHomeController {
 
     @GetMapping("/home/donor")
     public String donorHome(Model model, HttpSession session) {
-        MyAppUsers loggedInUser = (MyAppUsers) session.getAttribute("LoggedInUser");
+        MyAppUsers loggedInUser = getLoggedInUser();
         if (loggedInUser == null || !"donor".equalsIgnoreCase(loggedInUser.getUserType())) {
             return "redirect:/users/login";
         }
@@ -38,16 +41,26 @@ public class DonorHomeController {
 
         model.addAttribute("user", loggedInUser);
         model.addAttribute("username", loggedInUser.getUsername());
+        model.addAttribute("userType", loggedInUser.getUserType());
         model.addAttribute("recipientsWhoFavorited", recipientsWhoFavorited);
 
         return "donorHome";  // Returns the donor-specific homepage
     }
 
     @GetMapping("/donor/view/{recipientId}")
-    public String viewRecipientProfile(@PathVariable Long recipientId, Model model) {
+    public String viewRecipientProfile(@PathVariable Long recipientId, Model model, HttpSession session) {
+        MyAppUsers user = (MyAppUsers) session.getAttribute("user");
+
+        if (user == null) {
+            return "redirect:/users/login";
+        }
+
         Optional<RecipientProfile> recipientProfile = recipientProfileService.findByProfileId(recipientId);
+
         if (recipientProfile.isPresent()) {
+            model.addAttribute("user", user);
             model.addAttribute("recipientProfile", recipientProfile.get());
+            model.addAttribute("userType", user.getUserType());
             logger.info("Displaying profile for recipient with profileId: {}", recipientId);
             return "recipientPage";
         } else {

@@ -26,6 +26,6 @@ public class AdminHomeController {
 
         model.addAttribute("username", loggedInUser.getUsername());
         model.addAttribute("recipientsWhoFavorited", recipientsWhoFavorited);
-        return "adminHome";  // Returns the donor-specific homepage
+        return "adminHome";
     }
 }
