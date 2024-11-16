@@ -55,7 +55,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/users/login", "/users/register", "/css/**", "/api/authenticate").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
-                        .requestMatchers("/admin/**", "/home/admin", "/delete/{username}", "/reports").authenticated()
+                        .requestMatchers("/admin/**", "/home/admin", "/donorlimits", "/delete/{username}", "/reports").authenticated()
                         .requestMatchers("/home/donor", "/donorprofile", "/donor/view/**", "/bookings/donor").authenticated()
                         .requestMatchers("/home/recipient", "/recipientprofile",  "/recipient/view/**", "/bookings/recipient", "/recipient/favorite/**").authenticated()
                         .requestMatchers("/messages/**", "/messages/{userType}/{id}", "/dr").authenticated()

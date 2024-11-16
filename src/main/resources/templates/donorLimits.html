@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Donor Limits</title>
+  <link rel="stylesheet" type="text/css" th:href="@{/css/homestyle.css}">
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Donor Limits</h1>
+  </header>
+
+  <section>
+    <table class="table table-bordered">
+      <thead>
+      <tr>
+        <th>Donor ID</th>
+        <th>Completed Donations</th>
+        <th>Donation Limit</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="donor : ${allDonors}">
+        <td th:text="${donor.donorProfileId}"></td>
+        <td th:text="${donor.donationsCompleted}"></td>
+        <td th:text="${donor.donationLimit}"></td>
+      </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+
+<footer>
+  <p>Alexandra, Guðrún, Silja og Þrándur.</p>
+</footer>
+
+</body>
+</html>
