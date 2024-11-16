@@ -58,8 +58,30 @@ body {
 }
 
 .nav-text {
-    font-size: 1em;
-    color: #ECF0F1;
+    font-size: 1.3em;
+    color: #ffffff;
+    text-align: center;
+    font-weight: bold;
+}
+
+.logout {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+.logout button {
+    background: none;
+    font-size: 1.3em;
+    display: flex;
+    justify-content: center;
+    padding: 10px 20px;
+    width: 100%;
+}
+
+.logout i {
+    font-size: 1.5em;
+    color: #ffffff;
 }
 
 .profile-container {
@@ -150,25 +172,6 @@ textarea {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     margin: 0 auto;
     display: block;
-}
-
-.logout {
-    margin-bottom: 20px;
-}
-
-.logout a {
-    color: #E74C3C;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px;
-    transition: background-color 0.3s;
-}
-
-.logout a:hover {
-    background-color: #C0392B;
-    border-radius: 5px;
 }
 
 @media (max-width: 768px) {
