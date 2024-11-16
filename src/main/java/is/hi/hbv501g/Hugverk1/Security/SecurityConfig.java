@@ -12,6 +12,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
 import static is.hi.hbv501g.Hugverk1.Security.PasswordEncoderConfig.passwordEncoder;
 
 // security configuration for the application, It handles login, user registration, password encoding, and more.
@@ -66,11 +68,12 @@ public class SecurityConfig {
                 .httpBasic(httpBasic -> httpBasic
                         .authenticationEntryPoint(authenticationEntryPoint))
                 .logout(logout -> logout
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/users/logout", "POST"))
                         .logoutUrl("/users/logout")
                         .logoutSuccessUrl("/users/login?logout=true")
-                        .invalidateHttpSession(true)
-                        .clearAuthentication(true)
-                        .permitAll())
+                        .invalidateHttpSession(true) //This will invalidate session on logout
+                        .clearAuthentication(true) // This will clear authentication on logout
+                        .permitAll()) // Allow all users to access logout
                 .addFilterBefore(new CustomFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
