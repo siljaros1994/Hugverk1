@@ -5,7 +5,8 @@
 }
 
 body {
-  background-color: #2c3338;
+  background: url('https://isohelix.com/wp-content/uploads/2023/06/DNA-tubes-wide.png') no-repeat center center fixed;
+  background-size: cover;
   color: var(--baseColor);
   font-family: "Open Sans", sans-serif;
   font-size: 0.875rem;
@@ -24,8 +25,9 @@ body {
   max-width: 400px;
   width: 100%;
   padding: 1rem;
-  background-color: #3b4148;
+  background-color: rgba(59, 65, 72, 0.9);
   border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
 }
 
 h1 {

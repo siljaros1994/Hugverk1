@@ -46,12 +46,12 @@ public class FavoriteController extends BaseController{
     }
 
     @GetMapping("/favorite/{donorProfileId}")
-    public String addFavoriteDonor(@PathVariable Long favoriteUserId, HttpSession session) {
+    public String addFavoriteDonor(@PathVariable Long donorProfileId, HttpSession session) {
         MyAppUsers user = (MyAppUsers) session.getAttribute("user");
         Long userId = user != null ? user.getRecipientId() : null;
 
         if (userId != null) {
-            myAppUserService.addFavoriteDonor(userId, favoriteUserId);
+            myAppUserService.addFavoriteDonor(userId, donorProfileId);
         }
         return "redirect:/home/recipient";
     }
