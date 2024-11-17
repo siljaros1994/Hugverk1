@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Donor Home Page</title>
+    <title>Admin Home Page</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/homestyle.css}">
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -27,10 +27,10 @@
 <div class="area">
     <nav class="main-menu">
         <ul>
-            <li><a th:href="@{/dr}"><i class="fa fa-user"></i><span class="nav-text">User list</span></a></li>
+            <li><a th:href="@{/dr}"><i class="fa fa-user"></i><span class="nav-text">Users</span></a></li>
             <li><a th:href="@{/reports}"><i class="fa fa-flag"></i><span class="nav-text">Reports</span></a></li>
-            <li><a th:href="@{/donationhistory}"><i class="fa fa-history"></i><span class="nav-text">Donation history</span></a></li>
-            <li><a th:href="@{/donorlimits}"><i class="fa fa-sliders-h"></i><span class="nav-text">Donor Limits</span></a></li>
+            <li><a th:href="@{/donationhistory}"><i class="fa fa-history"></i><span class="nav-text">History</span></a></li>
+            <li><a th:href="@{/donorlimits}"><i class="fa fa-sliders-h"></i><span class="nav-text">Limits</span></a></li>
         </ul>
         <ul class="logout">
             <li><a th:href="@{/users/logout}" th:onclick="return confirm('Are you sure you want to logout?')">
