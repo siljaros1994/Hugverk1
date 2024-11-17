@@ -65,4 +65,15 @@ public class FavoriteController extends BaseController{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
+    @PostMapping("/unfavorite/{donorProfileId}")
+    public String unfavoriteDonor(@PathVariable Long donorProfileId, HttpSession session) {
+        MyAppUsers user = (MyAppUsers) session.getAttribute("user");
+        Long userId = user != null ? user.getRecipientId() : null;
+
+        if (userId != null) {
+            myAppUserService.removeFavoriteDonor(userId, donorProfileId);
+        }
+
+        return "redirect:/recipient/favorites";
+    }
 }
