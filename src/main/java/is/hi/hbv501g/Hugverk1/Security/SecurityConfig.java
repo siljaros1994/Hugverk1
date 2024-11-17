@@ -49,13 +49,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)  // Here we always create a session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)  // Here we always create a session
                         .sessionFixation().migrateSession()  // Migrate the session to prevent session fixation attacks
                         .maximumSessions(1).maxSessionsPreventsLogin(false))  // at last we allow only one session per user
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/users/login", "/users/register", "/css/**", "/api/authenticate").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
-                        .requestMatchers("/admin/**", "/home/admin", "/delete/{username}", "/reports").authenticated()
+                        .requestMatchers("/admin/**", "/home/admin", "/donorlimits", "/delete/{username}", "/reports").authenticated()
                         .requestMatchers("/home/donor", "/donorprofile", "/donor/view/**", "/bookings/donor").authenticated()
                         .requestMatchers("/home/recipient", "/recipientprofile",  "/recipient/view/**", "/bookings/recipient", "/recipient/favorite/**").authenticated()
                         .requestMatchers("/messages/**", "/messages/{userType}/{id}", "/dr").authenticated()
