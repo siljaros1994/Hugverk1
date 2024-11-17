@@ -6,15 +6,32 @@
   <meta charset="utf-8">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+  <link rel="stylesheet"
+        href="https://use.fontawesome.com/releases/v5.4.1/css/all.css"
+        integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz"
+        crossorigin="anonymous">
+  <style>
+    table {
+      border-collapse: collapse; /* Ensures that borders do not double up */
+      width: 100%; /* Optional: Makes the table stretch the width of its container */
+  }
+  th, td {
+      border: 1px solid black; /* Adds a border around table cells */
+      padding: 8px; /* Adds spacing within cells */
+      text-align: left; /* Aligns text to the left */
+  }
+  th {
+      background-color: #f2f2f2; /* Optional: Adds a light gray background to headers */
+  }
+  </style>
 </head>
 <body>
-<div class="container">
-  <header>
-    <h1>Donor Limits</h1>
-  </header>
-
-  <section>
-    <table class="table table-bordered">
+<h1>Donor Limits</h1>
+    <table>
       <thead>
       <tr>
         <th>Donor ID</th>
@@ -30,12 +47,6 @@
       </tr>
       </tbody>
     </table>
-  </section>
-</div>
-
-<footer>
-  <p>Alexandra, Guðrún, Silja og Þrándur.</p>
-</footer>
 
 </body>
 </html>
