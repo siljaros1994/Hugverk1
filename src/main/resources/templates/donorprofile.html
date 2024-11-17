@@ -216,6 +216,11 @@
                 <p>Weight: <span th:text="${donorProfile.weight}">Weight</span> kg</p>
                 <p>Age: <span th:text="${donorProfile.age}">Age</span></p>
                 <p>Get to Know the Donor: <span th:text="${donorProfile.getToKnow ?: 'No information provided'}">Get to Know</span></p>
+
+                <form th:action="@{/recipient/unfavorite/{donorProfileId}(donorProfileId=${donorProfile.user.donorId})}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" class="unfavorite-button">Unfavorite</button>
+                </form>
             </div>
         </div>
     </div>
