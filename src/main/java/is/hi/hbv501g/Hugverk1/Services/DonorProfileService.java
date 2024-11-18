@@ -26,6 +26,8 @@ public class DonorProfileService {
                 .orElseGet(() -> {
                     DonorProfile newProfile = new DonorProfile();
                     newProfile.setUser(user);
+                    newProfile.setDonationLimit(5);
+                    newProfile.setDonationsCompleted(0);
                     return newProfile;
                 });
     }
