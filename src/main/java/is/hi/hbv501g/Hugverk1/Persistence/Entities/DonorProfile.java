@@ -68,7 +68,7 @@ public class DonorProfile {
     @Column(name = "donations_completed", nullable = false)
     private int donationsCompleted = 0;
 
-    // Getters and Setters
+    // Getters and Setters.
 
     public Long getDonorProfileId() {
         return donorProfileId;
