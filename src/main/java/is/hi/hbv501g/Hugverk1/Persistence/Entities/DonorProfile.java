@@ -62,10 +62,10 @@ public class DonorProfile {
     @Column(name = "image_path")
     private String imagePath;
 
-    @Column(name = "donation_limit")
+    @Column(name = "donation_limit", nullable = false)
     private int donationLimit = 5;
 
-    @Column(name = "donations_completed")
+    @Column(name = "donations_completed", nullable = false)
     private int donationsCompleted = 0;
 
     // Getters and Setters
