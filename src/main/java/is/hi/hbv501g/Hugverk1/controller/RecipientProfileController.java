@@ -68,18 +68,17 @@ public class RecipientProfileController extends BaseController{
             BeanUtils.copyProperties(profileData, profileToUpdate, "recipientProfileId", "user");
             recipientProfileService.processProfileImage(profileToUpdate, profileImage, uploadPath);
             recipientProfileService.saveOrUpdateProfile(profileToUpdate);
+
+            loggedInUser.setRecipientId(profileToUpdate.getRecipientProfileId());
         } else {
             // Create a new profile if none exists
             profileData.setUser(loggedInUser);
             recipientProfileService.processProfileImage(profileData, profileImage, uploadPath);
             recipientProfileService.saveOrUpdateProfile(profileData); // Save or update the profile
-
-            // Assign recipientId if not already set
-            if (loggedInUser.getRecipientId() == null) {
-                loggedInUser.setRecipientId(profileData.getRecipientProfileId());
-                myAppUserRepository.save(loggedInUser);
-            }
+            loggedInUser.setRecipientId(profileData.getRecipientProfileId());
         }
+        myAppUserRepository.save(loggedInUser);
+        System.out.println("Recipient ID set for user: " + loggedInUser.getRecipientId());
 
         return "redirect:/recipientprofile";
     }
