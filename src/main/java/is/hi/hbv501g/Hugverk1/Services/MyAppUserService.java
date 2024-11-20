@@ -29,4 +29,7 @@ public interface MyAppUserService extends UserDetailsService {
     List<Long> getMatchesForRecipient(Long userId);
     void approveFavoriteAsMatch(Long userId, Long matchedUserId);
     List<MyAppUsers> getMatchedUsers(Long userId, String userType);
+    void removeFavoriteDonor(Long userId, Long donorId);
+
 }
+

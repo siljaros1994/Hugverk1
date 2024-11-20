@@ -37,18 +37,18 @@ public class MatchController extends BaseController {
 
     @GetMapping("/donor/matches")
     public String donorMatches(Model model) {
-        MyAppUsers user = getLoggedInUser();
-        if (user == null || !"donor".equalsIgnoreCase(user.getUserType())) {
+        MyAppUsers loggedInUser = getLoggedInUser();
+        if (loggedInUser == null || !"donor".equalsIgnoreCase(loggedInUser.getUserType())) {
             return "redirect:/users/login";
         }
 
-        model.addAttribute("user", user);
-        model.addAttribute("userType", user.getUserType());
+        model.addAttribute("user", loggedInUser);
+        model.addAttribute("userType", loggedInUser.getUserType());
 
-        List<Long> matchedUserIds = user.getMatchRecipients();
+        List<Long> matchedUserIds = loggedInUser.getMatchRecipients();
         List<RecipientProfile> matchedRecipients = recipientProfileService.getProfilesByUserIds(matchedUserIds);
 
-        System.out.println("User in session: " + user);
+        System.out.println("User in session: " + loggedInUser);
         System.out.println("Matched Recipient Profile IDs: " + matchedUserIds);
         System.out.println("Matched Recipients: " + matchedRecipients);
 
