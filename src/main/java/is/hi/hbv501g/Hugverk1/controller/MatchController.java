@@ -45,11 +45,12 @@ public class MatchController extends BaseController {
         model.addAttribute("user", loggedInUser);
         model.addAttribute("userType", loggedInUser.getUserType());
 
-        List<Long> matchedUserIds = loggedInUser.getMatchRecipients();
-        List<RecipientProfile> matchedRecipients = recipientProfileService.getProfilesByUserIds(matchedUserIds);
+        // Here we use the loggedInUser to get the matched recipient IDs
+        List<Long> matchedRecipientIds = loggedInUser.getMatchRecipients();
+        List<RecipientProfile> matchedRecipients = recipientProfileService.getProfilesByUserIds(matchedRecipientIds);
 
         System.out.println("User in session: " + loggedInUser);
-        System.out.println("Matched Recipient Profile IDs: " + matchedUserIds);
+        System.out.println("Matched Recipient Profile IDs: " + matchedRecipientIds);
         System.out.println("Matched Recipients: " + matchedRecipients);
 
         model.addAttribute("matches", matchedRecipients);
@@ -67,11 +68,9 @@ public class MatchController extends BaseController {
         model.addAttribute("userType", user.getUserType());
         System.out.println("User in session: " + user);
 
-        // Retrieve matched donor user IDs for this recipient
-        List<Long> matchedUserIds = user.getMatchDonorsList();
-
-        // Fetch Donor Profiles based on user_id
-        List<DonorProfile> matchedDonors = donorProfileService.getProfilesByUserIds(matchedUserIds);
+        // Here we also use user to get the matched donor IDs
+        List<Long> matchedDonorIds = user.getMatchDonorsList();
+        List<DonorProfile> matchedDonors = donorProfileService.getProfilesByUserIds(matchedDonorIds);
 
         model.addAttribute("matches", matchedDonors);
         return "recipientMatchesPage";
@@ -88,14 +87,14 @@ public class MatchController extends BaseController {
     }
 
     @PostMapping("/approveMatch")
-    public String approveMatch(@RequestParam("userId") Long userId, HttpSession session) {
-        MyAppUsers user = getLoggedInUser();
-        if (user == null || !"donor".equalsIgnoreCase(user.getUserType())) {
+    public String approveMatch(@RequestParam("recipientId") Long recipientId, HttpSession session) {
+        MyAppUsers donor = getLoggedInUser();
+        if (donor == null || !"donor".equalsIgnoreCase(donor.getUserType())) {
             return "redirect:/users/login";
         }
 
-        myAppUserService.approveFavoriteAsMatch(user.getId(), userId); // Using userId for both
-        System.out.println("Match approved successfully.");
+        myAppUserService.approveFavoriteAsMatch(donor.getId(), recipientId);
+        System.out.println("Match approved: Donor ID " + donor.getId() + " with Recipient ID " + recipientId);
         return "redirect:/match/donor/matches";
     }
 
