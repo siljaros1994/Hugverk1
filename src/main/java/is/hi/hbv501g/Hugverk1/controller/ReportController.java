@@ -2,25 +2,17 @@ package is.hi.hbv501g.Hugverk1.controller;
 
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.DonorProfile;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
-import is.hi.hbv501g.Hugverk1.Persistence.Entities.Report;
-import is.hi.hbv501g.Hugverk1.Persistence.forms.BookingForm;
 import is.hi.hbv501g.Hugverk1.Persistence.forms.ReportForm;
 import is.hi.hbv501g.Hugverk1.Services.DonorProfileService;
 import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import is.hi.hbv501g.Hugverk1.Services.RecipientProfileService;
 import is.hi.hbv501g.Hugverk1.Services.ReportService;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
 
@@ -57,6 +49,10 @@ public class ReportController extends BaseController {
     Long reporterId = currentUser.getId();
     Long reportedId = userId;
 
+
+
+
+
         // Log the recipient's matched donor IDs
         List<Long> matchedUserIds = currentUser.getMatchDonorsList();
         System.out.println("Matched Donor User IDs for Recipient ID " + currentUser.getId() + ": " + matchedUserIds);
@@ -69,10 +65,11 @@ public class ReportController extends BaseController {
 
         model.addAttribute("matchedDonors", matchedDonors);
         model.addAttribute("reportForm", new ReportForm()); // This creates a new report form
-        model.addAttribute("currentreports", reportservice.createReport(currentUser.getId()));
+        model.addAttribute("currentreports", reportservice.createReport(currentUser.getId(), recipientId, reporterId));
 
         return "report"; //Render the report page
     }
+
 
 
     //Users can create a report

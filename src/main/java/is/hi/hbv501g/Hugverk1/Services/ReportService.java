@@ -24,7 +24,7 @@ public class ReportService {
     private RecipientProfileRepository recipientProfileRepository;
 
 
-    public Report createReport(Long donorId) {
+    public Report createReport(Long donorId, Long recipientId, Long reporterId, Long reportedId) {
         Report report = new Report();
         report.setDonorId(donorId);
         report.setRecipientId(recipientId);
