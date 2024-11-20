@@ -1,17 +1,18 @@
 <!DOCTYPE html>
+<!--This is the report from the recipient's end (i.e. reporting a donor) --->
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <title>Report User</title>
   <link rel="stylesheet" type="text/css" th:href="@{/css/reportstyle.css}">
 </head>
 <body>
-<h1>
-  Report User
-</h1>
+<!--<h1>-->
+<!--  Report User-->
+<!--</h1>-->
 <div class="area">
-  <nav class="main-menu">
+  <nav class="side-panel">
     <ul>
-      <li><a th:href="@{${userType == 'donor' ? '/home/donor' : '/home/recipient'}}"><i class="fa fa-home fa-2x"></i><span class="nav-text">Home</span></a></li>
+      <li><a th:href="@{${userType == 'recipient' ? '/home/recipient' : '/home/recipient'}}"><i class="fa fa-home fa-2x"></i><span class="nav-text">Home</span></a></li>
       <li th:if="${userType == 'recipient'}"><a th:href="@{/recipientprofile}"><i class="fa fa-user fa-2x"></i><span class="nav-text">Profile</span></a></li>
       <li><a th:href="@{/messages/{userType}/{id}(userType=${user.userType}, id=${user.id})}"><i class="fa fa-envelope fa-2x"></i><span class="nav-text">Messages</span></a></li>
       <li><a th:href="@{/recipient/favorites}"><i class="fa fa-star fa-2x"></i><span class="nav-text">Favorite</span></a></li>
@@ -27,10 +28,36 @@
       </form>
     </ul>
   </nav>
+  <main class="main-content">
+    <header class="page-header">
+      <p>Please fill in your id, the id of the user and the description of the incident</p>
+    </header>
+    <form th:object="$ {reportForm}" th:action="@{/messages/report}" method="POST">
+      <div class="input-group">
+      <label for="accused_user">Accused User</label>
+      <select id="accused_user" th:field="*{accused_user}" required>
+        <option value=""> Select a matched user</option>
+        <option th:each="donor : ${matchedDonors}" th:value="${donor.user.Id}" th:text="${donor.user.Id}"></option>
+      </select>
+      </div>
+      <div class="input-group">
+        <label for="report_name">Your Id</label>
+        <select id="report_name" th:field="*{report_name}" required>
+          <option value="">Fill in your id</option>
+          <option th:this="recipient : ${recipient_id}" th:value="${recipient.user.Id}" th:text="${recipient.user.Id}"></option>
+        </select>
+
+
+      </div>
+      <button type="submit" class="btn-submit">Submit Report</button>
+    </form>
+  </main>
+
+
 </div>
 
 
-
+<!--
 <form action="/submit-report" method="post">
   <label for="report_name">Your Id</label>
   <input type="text" id="report_name" name="report_name" required>
@@ -42,5 +69,11 @@
 
   <button type="submit">Submit Report</button>
 </form>
+-->
+
+<footer>
+  <p>Alexandra, Guðrún, Silja og Þrándur</p>
+</footer>
+
 </body>
 </html>

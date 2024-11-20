@@ -10,37 +10,10 @@ import java.util.Optional;
 
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Long> {
-    /**
-     * Find all reports submitted by a specific reporter (report_name)
-     *
-     * @param reportName The ID of the reporter
-     * @return List of reports submitted by the reporter.
-     */
-    List<Report> findByReportName(Long reportName);
-
-    /**
-     * Find all reports involving a specific donor
-     */
+    List<Report> findByReporterId(Long reporterId);
     List<Report> findByDonorId(Long donorId);
-
-    /**
-     * Find all reports involving a specific recipient
-     */
     List<Report> findByRecipientId(Long recipientId);
-
-    /**
-     * Find reports by both reporter and accused user
-     */
-    //List<Report> findByReportNameAndAccusedUser(Long reportName, Long accusedUser);
-
-    /**
-     * Find all reports against a specific accused user
-     *
-     * @param accusedUser The ID of the accused user
-     * @return List of reports against the accused user.
-     */
-    List<Report> findByAccusedUser(Long accusedUser);
-
+    List<Report> findByReported(Long reportedId);
 }
 
 
