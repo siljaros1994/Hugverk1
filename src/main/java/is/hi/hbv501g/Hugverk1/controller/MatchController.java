@@ -15,6 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -47,7 +49,10 @@ public class MatchController extends BaseController {
 
         // Here we use the loggedInUser to get the matched recipient IDs
         List<Long> matchedRecipientIds = loggedInUser.getMatchRecipients();
-        List<RecipientProfile> matchedRecipients = recipientProfileService.getProfilesByUserIds(matchedRecipientIds);
+        List<RecipientProfile> matchedRecipients = recipientProfileService.getProfilesByUserIds(matchedRecipientIds).stream()
+                .filter(Objects::nonNull)
+                .filter(recipient -> recipient.getUser() != null)
+                .collect(Collectors.toList());
 
         System.out.println("User in session: " + loggedInUser);
         System.out.println("Matched Recipient Profile IDs: " + matchedRecipientIds);
@@ -99,8 +104,24 @@ public class MatchController extends BaseController {
     }
 
     @PostMapping("/unmatch")
-    public String unmatch(@RequestParam Long donorId, @RequestParam Long recipientId) {
-        myAppUserService.removeMatch(donorId, recipientId);
-        return "redirect:/match/donor/matches";
+    public String unmatch(@RequestParam Long donorId, @RequestParam Long recipientId, HttpSession session) {
+        MyAppUsers loggedInUser = getLoggedInUser();
+
+        if (loggedInUser == null) {
+            return "redirect:/users/login";
+        }
+
+        // Here we unmatch based on the user type
+        if ("recipient".equalsIgnoreCase(loggedInUser.getUserType())) {
+            myAppUserService.removeMatch(donorId, loggedInUser.getId());
+            System.out.println("Recipient (ID: " + loggedInUser.getId() + ") unmatched with Donor ID: " + donorId);
+            return "redirect:/match/recipient/matches";
+        } else if ("donor".equalsIgnoreCase(loggedInUser.getUserType())) {
+            myAppUserService.removeMatch(loggedInUser.getId(), recipientId);
+            System.out.println("Donor (ID: " + loggedInUser.getId() + ") unmatched with Recipient ID: " + recipientId);
+            return "redirect:/match/donor/matches";
+        } else {
+            return "redirect:/users/login";
+        }
     }
 }

@@ -213,16 +213,28 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
     }
 
     @Override
-    public void removeMatch(Long userId, Long matchedUserId) {
-        MyAppUsers donor = userRepository.findByDonorId(userId)
+    public void removeMatch(Long donorId, Long recipientId) {
+        MyAppUsers donor = userRepository.findById(donorId)
                 .orElseThrow(() -> new RuntimeException("Donor not found"));
-        List<Long> updatedMatches = donor.getMatchRecipients().stream()
-                .filter(id -> !id.equals(matchedUserId))
+
+        List<Long> updatedDonorMatches = donor.getMatchRecipients().stream()
+                .filter(id -> !id.equals(recipientId))
                 .collect(Collectors.toList());
-        donor.setMatchRecipients(updatedMatches);
+        donor.setMatchRecipients(updatedDonorMatches.isEmpty() ? null : updatedDonorMatches);
         userRepository.save(donor);
-        System.out.println("Removed match: Donor ID " + userId + " with Recipient ID " + matchedUserId);
+
+        MyAppUsers recipient = userRepository.findById(recipientId)
+                .orElseThrow(() -> new RuntimeException("Recipient not found"));
+
+        List<Long> updatedRecipientMatches = recipient.getMatchDonorsList().stream()
+                .filter(id -> !id.equals(donorId))
+                .collect(Collectors.toList());
+        recipient.setMatchDonorsList(updatedRecipientMatches.isEmpty() ? null : updatedRecipientMatches);
+        userRepository.save(recipient);
+
+        System.out.println("Removed match: Donor ID " + donorId + " with Recipient ID " + recipientId);
     }
+
 
     @Override
     public List<Long> getMatchesForRecipient(Long userId) {
