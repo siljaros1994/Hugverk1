@@ -47,7 +47,7 @@ public class BookingController extends BaseController {
         model.addAttribute("bookingForm", new BookingForm()); // This creates a new booking form
         model.addAttribute("currentAppointments", bookingService.getConfirmedBookingsForRecipient(loggedInUser.getId()));
 
-        return "booking_recipient"; // Render the recipient booking page
+        return "booking_recipient";
     }
 
     // Recipient can create booking time.

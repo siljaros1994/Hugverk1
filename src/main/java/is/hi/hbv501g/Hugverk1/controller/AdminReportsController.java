@@ -28,6 +28,4 @@ public class AdminReportsController {
         return "adminReports";
     }
 
-
-
 }

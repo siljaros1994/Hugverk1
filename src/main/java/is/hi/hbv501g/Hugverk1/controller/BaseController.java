@@ -8,6 +8,9 @@ public abstract class BaseController {
 
     protected MyAppUsers getLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof MyAppUsers)) {
+            return null;
+        }
         return (MyAppUsers) authentication.getPrincipal();
     }
 

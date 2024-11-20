@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Reports</title>
+  <title>Donor Limits</title>
+  <link rel="stylesheet" type="text/css" th:href="@{/css/homestyle.css}">
   <meta charset="utf-8">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -29,26 +30,23 @@
   </style>
 </head>
 <body>
-<h1>
-  Reports
-</h1>
-<table>
-  <thead>
-  <tr>
-    <th>ID</th>
-    <th>Username</th>
-    <th>Email</th>
-    <th>Reported by</th>
-    <th>Reason of report</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr th:each="user : ${users}">
-    <td th:text="${user.id}"></td>
-    <td th:text="${user.username}"></td>
-    <td th:text="${user.email}"></td>
-  </tr>
-  </tbody>
-</table>
+<h1>Donor Limits</h1>
+    <table>
+      <thead>
+      <tr>
+        <th>Donor ID</th>
+        <th>Completed Donations</th>
+        <th>Donation Limit</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="donor : ${allDonors}">
+        <td th:text="${donor.donorProfileId}"></td>
+        <td th:text="${donor.donationsCompleted}"></td>
+        <td th:text="${donor.donationLimit}"></td>
+      </tr>
+      </tbody>
+    </table>
+
 </body>
 </html>

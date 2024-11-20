@@ -130,6 +130,33 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
     }
 
     @Override
+    public void removeFavoriteDonor(Long userId, Long donorId) {
+        MyAppUsers recipient = userRepository.findByRecipientId(userId)
+                .orElseThrow(() -> new RuntimeException("Recipient not found"));
+
+        String currentFavorites = recipient.getFavoriteDonors();
+
+        if (currentFavorites != null && !currentFavorites.isEmpty()) {
+            List<String> favoriteList = new ArrayList<>(Arrays.asList(currentFavorites.split(",")));
+
+            if (favoriteList.contains(donorId.toString())) {
+                favoriteList.remove(donorId.toString());
+                String updatedFavorites = String.join(",", favoriteList);
+
+                // Here we update recipient entity
+                recipient.setFavoriteDonors(updatedFavorites);
+                userRepository.save(recipient);
+                System.out.println("Favorite donor removed successfully: " + donorId);
+            } else {
+                System.out.println("Donor ID not found in favorites: " + donorId);
+            }
+        } else {
+            System.out.println("No favorites to remove.");
+        }
+    }
+
+
+    @Override
     public void approveFavoriteAsMatch(Long userId, Long matchedUserId) {
         System.out.println("Attempting to approve match for Donor User ID: " + userId + " with Recipient User ID: " + matchedUserId);
 
@@ -170,7 +197,7 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
         if ("recipient".equalsIgnoreCase(userType)) {
             matchedUserIds = user.getMatchDonorsList();
             return userRepository.findAllById(matchedUserIds).stream()
-                    .filter(matchedUser -> "donor".equalsIgnoreCase(matchedUser.getUserType())) // Ensure matched users are donors
+                    .filter(matchedUser -> "donor".equalsIgnoreCase(matchedUser.getUserType()))
                     .collect(Collectors.toList());
         } else if ("donor".equalsIgnoreCase(userType)) {
             matchedUserIds = user.getMatchRecipients();
