@@ -35,24 +35,21 @@
 
             <div class="matched-list" th:if="${matches != null && matches.size() > 0}">
                 <div class="match-cards">
-                    <div class="match-card" th:each="match : ${matches}">
-                        <img th:src="${match.imagePath != null ? match.imagePath : '/uploads/default-avatar.jpg'}" alt="Profile Image" class="match-image"/>
+                    <div class="match-card" th:each="recipient : ${matches}">
+                        <img th:src="${recipient.imagePath != null ? recipient.imagePath : '/uploads/default-recipient-avatar.jpg'}"
+                             alt="Recipient Image" class="match-image"/>
                         <div class="match-info">
-                            <p><strong>ID:</strong> <span th:text="${match.user.id}"></span></p>
-                            <p><strong>Height:</strong> <span th:text="${match.height}">Height</span> cm</p>
-                            <p><strong>Weight:</strong> <span th:text="${match.weight}">Weight</span> kg</p>
-                            <p><strong>Eye Color:</strong> <span th:text="${match.eyeColor}"></span></p>
-                            <p><strong>Hair Color:</strong> <span th:text="${match.hairColor}"></span></p>
-                            <p><strong>Race:</strong> <span th:text="${match.race}"></span></p>
-                            <p><strong>Ethnicity:</strong> <span th:text="${match.ethnicity}"></span></p>
-                            <p><strong>Blood Type:</strong> <span th:text="${match.bloodType}"></span></p>
-                            <p><strong>Donor Type:</strong> <span th:text="${match.donorType}"></span></p>
+                            <p><strong>ID:</strong> <span th:text="${recipient?.user?.id ?: 'N/A'}"></span></p>
+                            <p><strong>Height:</strong> <span th:text="${recipient?.height ?: 'Not specified'}">Height</span> cm</p>
+                            <p><strong>Weight:</strong> <span th:text="${recipient?.weight ?: 'Not specified'}">Weight</span> kg</p>
+                            <p><strong>Eye Color:</strong> <span th:text="${recipient?.eyeColor ?: 'Not specified'}"></span></p>
+                            <p><strong>Hair Color:</strong> <span th:text="${recipient?.hairColor ?: 'Not specified'}"></span></p>
                         </div>
                         <div class="card-buttons">
                             <form th:action="@{/match/unmatch}" method="post">
-                                <input type="hidden" name="recipientId" th:value="${user.id}" />
-                                <input type="hidden" name="donorId" th:value="${match.user.Id}" />
-                                <button type="submit">Unmatch</button>
+                                <input type="hidden" name="donorId" th:value="${user.id}" />
+                                <input type="hidden" name="recipientId" th:value="${recipient?.user?.id}" />
+                                <button type="submit" th:disabled="${recipient?.user == null}">Unmatch</button>
                             </form>
                         </div>
                     </div>
