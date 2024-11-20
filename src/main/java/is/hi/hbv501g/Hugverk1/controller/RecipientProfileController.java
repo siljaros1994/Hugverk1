@@ -5,6 +5,7 @@ import is.hi.hbv501g.Hugverk1.Persistence.Entities.RecipientProfile;
 import is.hi.hbv501g.Hugverk1.Persistence.Repositories.MyAppUserRepository;
 import is.hi.hbv501g.Hugverk1.Services.RecipientProfileService;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -59,16 +60,25 @@ public class RecipientProfileController extends BaseController{
         MyAppUsers loggedInUser = getLoggedInUser();
         profileData.setUser(loggedInUser);
 
-        recipientProfileService.processProfileImage(profileData, profileImage, uploadPath);
+        // Here we check if the profile already exists
+        Optional<RecipientProfile> existingProfile = recipientProfileService.findByUserId(loggedInUser.getId());
 
-        // Save or update the profile
-        recipientProfileService.saveOrUpdateProfile(profileData);
+        if (existingProfile.isPresent()) { // Update the existing profile
+            RecipientProfile profileToUpdate = existingProfile.get();
+            BeanUtils.copyProperties(profileData, profileToUpdate, "recipientProfileId", "user");
+            recipientProfileService.processProfileImage(profileToUpdate, profileImage, uploadPath);
+            recipientProfileService.saveOrUpdateProfile(profileToUpdate);
 
-        // Assign recipientId if not already set
-        if (loggedInUser.getRecipientId() == null) {
+            loggedInUser.setRecipientId(profileToUpdate.getRecipientProfileId());
+        } else {
+            // Create a new profile if none exists
+            profileData.setUser(loggedInUser);
+            recipientProfileService.processProfileImage(profileData, profileImage, uploadPath);
+            recipientProfileService.saveOrUpdateProfile(profileData); // Save or update the profile
             loggedInUser.setRecipientId(profileData.getRecipientProfileId());
-            myAppUserRepository.save(loggedInUser);
         }
+        myAppUserRepository.save(loggedInUser);
+        System.out.println("Recipient ID set for user: " + loggedInUser.getRecipientId());
 
         return "redirect:/recipientprofile";
     }

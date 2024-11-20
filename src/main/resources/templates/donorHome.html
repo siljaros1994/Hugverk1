@@ -49,7 +49,7 @@
                         </div>
                         <div class="card-buttons">
                             <form th:action="@{/match/approveMatch}" method="post">
-                                <input type="hidden" name="userId" th:value="${recipient.id}" />
+                                <input type="hidden" name="recipientId" th:value="${recipient.id}" />
                                 <button type="submit">Match</button>
                             </form>
                             <form th:action="@{/match/unmatch}" method="post">

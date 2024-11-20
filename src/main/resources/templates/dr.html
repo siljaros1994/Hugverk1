@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>DR</title>
+  <title>User list</title>
   <meta charset="utf-8">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,17 +14,26 @@
         integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz"
         crossorigin="anonymous">
   <style>
-    #loading {
-        display: none;
-        margin-left: 10px;
-        vertical-align: middle;
-    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+  }
+  th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: left;
+  }
+  th {
+      background-color: #f2f2f2;
+  }
   </style>
 </head>
 <body>
+<a href="/home/admin" class="btn">
+  <i class="fas fa-home" style="color: black;"></i> Home
+</a>
 <h1>
   User List
-  <i id="loading" class="fa fa-spinner fa-spin" style="display: none;"></i>
 </h1>
 <table>
   <thead>
@@ -41,27 +50,9 @@
     <td th:text="${user.username}"></td>
     <td th:text="${user.email}"></td>
     <td><a th:href="@{/delete/{username}(username=${user.username})}"
-           class="btn btn-primary"><i class="fa fa-trash" style="color: white;"></i></a></td>
+           class="btn btn-danger"><i class="fa fa-trash" style="color: white;"></i></a></td>
   </tr>
   </tbody>
 </table>
-<div class="pagination" th:if="${totalPages > 1}">
-  <a th:if="${currentPage > 0}"
-     th:href="@{/dr(page=${currentPage - 1}, size=10)}"
-     onclick="showLoading()">&laquo; Previous</a>
-  <span>Page <span th:text="${currentPage + 1}"></span> of <span th:text="${totalPages}"></span></span>
-  <a th:if="${currentPage < totalPages - 1}"
-     th:href="@{/dr(page=${currentPage + 1}, size=10)}"
-     onclick="showLoading()">Next &raquo;</a>
-</div>
-<script>
-  function showLoading() {
-      document.getElementById('loading').style.display = 'inline-block';
-  }
-
-  window.onload = function() {
-      document.getElementById('loading').style.display = 'none';
-  }
-</script>
 </body>
 </html>
