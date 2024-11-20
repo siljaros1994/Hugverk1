@@ -32,8 +32,8 @@ public class DonorProfileController extends BaseController {
     @Autowired
     private MyAppUserRepository myAppUserRepository;
 
-    @Value("${upload.path}") // the Path to where uploaded images are stored
-    private String uploadPath;
+    //@Value("${upload.path}") // the Path to where uploaded images are stored
+    //private String uploadPath;
 
     // Displays the donor profile page.
     @GetMapping
@@ -60,7 +60,7 @@ public class DonorProfileController extends BaseController {
         MyAppUsers loggedInUser = getLoggedInUser();
         profileData.setUser(loggedInUser);
 
-        donorProfileService.processProfileImage(profileData, profileImage, uploadPath);
+        //donorProfileService.processProfileImage(profileData, profileImage, uploadPath);
 
         // Save or update the profile
         donorProfileService.saveOrUpdateProfile(profileData);

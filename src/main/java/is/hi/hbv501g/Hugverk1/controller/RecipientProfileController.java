@@ -30,8 +30,8 @@ public class RecipientProfileController extends BaseController{
     @Autowired
     private MyAppUserRepository myAppUserRepository;
 
-    @Value("${upload.path}") //Path to where uploaded images are stored
-    private String uploadPath;
+    //@Value("${upload.path}") //Path to where uploaded images are stored
+    //private String uploadPath;
 
     // Displays the recipient profile page.
     @GetMapping
@@ -59,7 +59,7 @@ public class RecipientProfileController extends BaseController{
         MyAppUsers loggedInUser = getLoggedInUser();
         profileData.setUser(loggedInUser);
 
-        recipientProfileService.processProfileImage(profileData, profileImage, uploadPath);
+       // recipientProfileService.processProfileImage(profileData, profileImage, uploadPath);
 
         // Save or update the profile
         recipientProfileService.saveOrUpdateProfile(profileData);
