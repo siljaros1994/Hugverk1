@@ -1,7 +1,5 @@
 package is.hi.hbv501g.Hugverk1.Services;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.RecipientProfile;
 import is.hi.hbv501g.Hugverk1.Persistence.Repositories.RecipientProfileRepository;
@@ -18,7 +16,6 @@ import org.springframework.util.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,9 +27,6 @@ public class RecipientProfileService {
 
     @Value("${upload.path}")
     private String uploadPath;
-
-    @Autowired
-    private Cloudinary cloudinary;
 
     @Autowired
     public RecipientProfileService(RecipientProfileRepository recipientProfileRepository, @Value("${upload.path}") String uploadPath) {
@@ -53,10 +47,20 @@ public class RecipientProfileService {
 
     public void processProfileImage(RecipientProfile profile, MultipartFile profileImage) throws IOException {
         if (!profileImage.isEmpty()) {
-            Map uploadResult = cloudinary.uploader().upload(profileImage.getBytes(), ObjectUtils.emptyMap());
-            String imageUrl = (String) uploadResult.get("url");
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                boolean created = uploadDir.mkdirs();
+                System.out.println(created ? "Upload directory created" : "Failed to create upload directory");
+            }
 
-            profile.setImagePath(imageUrl);
+            String originalFilename = profileImage.getOriginalFilename();
+            String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
+            File destinationFile = new File(uploadDir, uniqueFilename);
+            System.out.println("Saving file to: " + destinationFile.getAbsolutePath());
+            profileImage.transferTo(destinationFile);
+
+            profile.setImagePath("/uploads/" + uniqueFilename);
+            System.out.println("Image path set: " + profile.getImagePath());
         }
     }
 
