@@ -17,6 +17,9 @@ FROM eclipse-temurin:17-jdk-alpine
 # Sets the working directory inside the runtime container
 WORKDIR /app
 
+# Create the uploads directory for user-uploaded images
+RUN mkdir -p /app/uploads && chmod -R 755 /app/uploads
+
 # Copy the JAR file from the builder stage (correcting the stage name)
 COPY --from=builder /app/target/Hugverk1-0.0.1-SNAPSHOT.jar app.jar
 
