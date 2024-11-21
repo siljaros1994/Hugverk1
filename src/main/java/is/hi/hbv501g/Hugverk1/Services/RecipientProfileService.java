@@ -6,6 +6,7 @@ import is.hi.hbv501g.Hugverk1.Persistence.Repositories.RecipientProfileRepositor
 import org.hibernate.Hibernate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,9 @@ public class RecipientProfileService {
     @Autowired
     private RecipientProfileRepository recipientProfileRepository;
 
+    @Value("${upload.path}")
+    private String uploadPath;
+
     @Autowired
     public RecipientProfileService(RecipientProfileRepository recipientProfileRepository) {
         this.recipientProfileRepository = recipientProfileRepository;
@@ -38,17 +42,14 @@ public class RecipientProfileService {
                 });
     }
 
-    public void processProfileImage(RecipientProfile profile, MultipartFile profileImage, String uploadPath) throws IOException {
+    public void processProfileImage(RecipientProfile profile, MultipartFile profileImage) throws IOException {
         if (!profileImage.isEmpty()) {
+            ensureUploadDirectoryExists();
+
             String originalFilename = profileImage.getOriginalFilename();
             String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
 
-            File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
-
-            File destinationFile = new File(uploadDir, uniqueFilename);
+            File destinationFile = new File(uploadPath, uniqueFilename);
             profileImage.transferTo(destinationFile);
 
             profile.setImagePath("/uploads/" + uniqueFilename);
@@ -96,13 +97,13 @@ public class RecipientProfileService {
     }
 
     public void ensureUploadDirectoryExists() {
-        File uploadDir = new File("/app/uploads/");
+        File uploadDir = new File(uploadPath);
         if (!uploadDir.exists()) {
             boolean created = uploadDir.mkdirs();
             if (created) {
-                System.out.println("Upload directory created: /app/uploads/");
+                System.out.println("Upload directory created: " + uploadPath);
             } else {
-                System.err.println("Failed to create upload directory: /app/uploads/");
+                System.err.println("Failed to create upload directory: " + uploadPath);
             }
         }
     }

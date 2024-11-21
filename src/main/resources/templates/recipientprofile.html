@@ -33,9 +33,7 @@
             <div class="profile-edit">
                 <h2>Edit Profile</h2>
 
-                <form th:action="@{/recipientprofile/saveOrEdit}" th:object="${recipientProfile}" method="post"
-                      enctype="multipart/form-data">
-
+                <form th:action="@{/recipientprofile/saveOrEdit}" th:object="${recipientProfile}" method="post" enctype="multipart/form-data">
                     <div class="form__field">
                         <label for="profileImage">Profile Image:</label>
                         <input type="file" id="profileImage" name="profileImage" accept="image/*">

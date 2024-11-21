@@ -60,13 +60,13 @@ public class RecipientProfileController extends BaseController{
         if (existingProfile.isPresent()) { // Update the existing profile
             RecipientProfile profileToUpdate = existingProfile.get();
             BeanUtils.copyProperties(profileData, profileToUpdate, "recipientProfileId", "user");
-            recipientProfileService.processProfileImage(profileToUpdate, profileImage, uploadPath);
+            recipientProfileService.processProfileImage(profileToUpdate, profileImage);
             recipientProfileService.saveOrUpdateProfile(profileToUpdate);
             loggedInUser.setRecipientId(profileToUpdate.getRecipientProfileId());
         } else {
             // Create a new profile if none exists
             profileData.setUser(loggedInUser);
-            recipientProfileService.processProfileImage(profileData, profileImage, uploadPath);
+            recipientProfileService.processProfileImage(profileData, profileImage);
             recipientProfileService.saveOrUpdateProfile(profileData);
             loggedInUser.setRecipientId(profileData.getRecipientProfileId());
         }
