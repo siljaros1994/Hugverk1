@@ -49,7 +49,7 @@ public class RecipientProfileController extends BaseController{
     //Save or update the recipient profile with an uploaded image of recipient
     @PostMapping("/saveOrEdit")
     public String saveOrEditProfile(@ModelAttribute("recipientProfile") RecipientProfile profileData,
-                                  @RequestParam("profileImage") MultipartFile profileImage) throws IOException {
+                                    @RequestParam("profileImage") MultipartFile profileImage) throws IOException {
 
         MyAppUsers loggedInUser = getLoggedInUser();
         profileData.setUser(loggedInUser);
