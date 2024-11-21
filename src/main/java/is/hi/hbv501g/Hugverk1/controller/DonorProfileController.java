@@ -73,18 +73,3 @@ public class DonorProfileController extends BaseController {
         return "redirect:/donorprofile";
     }
 }
-
-    //@PutMapping("/{id}/setDonationLimit")
-    //public ResponseEntity<String> setDonationLimit(@PathVariable Long id, @RequestParam int limit) {
-      //  Optional<DonorProfile> donorProfileOpt = donorProfileService.findByProfileId(id);
-
-        //if (donorProfileOpt.isEmpty()) {
-          //  return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Donor profile not found");
-        //}
-
-        //DonorProfile donorProfile = donorProfileOpt.get();
-        //donorProfile.setDonationLimit(limit);
-        //donorProfileService.saveOrUpdateProfile(donorProfile);
-
-        //return ResponseEntity.ok("Donation limit updated.");
-    //}

@@ -3,6 +3,7 @@ package is.hi.hbv501g.Hugverk1.Services;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.RecipientProfile;
 import is.hi.hbv501g.Hugverk1.Persistence.Repositories.RecipientProfileRepository;
+import org.hibernate.Hibernate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -48,6 +49,7 @@ public class RecipientProfileService {
     }
 
     //Save or update the recipient profile in the database
+
     public RecipientProfile saveOrUpdateProfile(RecipientProfile profile) {
         // Retrieve the existing profile, if present
         Optional<RecipientProfile> existingProfile = recipientProfileRepository.findByUserId(profile.getUser().getId());
@@ -77,7 +79,9 @@ public class RecipientProfileService {
     }
 
     public List<RecipientProfile> getProfilesByUserIds(List<Long> userIds) {
-        return recipientProfileRepository.findByUserIdIn(userIds);
+        List<RecipientProfile> profiles = recipientProfileRepository.findByUserIdIn(userIds);
+        profiles.forEach(profile -> Hibernate.initialize(profile.getUser())); // Initialize the user field
+        return profiles;
     }
 
     // Finds by profile ID

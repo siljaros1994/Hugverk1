@@ -88,37 +88,27 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
     }
 
     @Override
-    public void addFavoriteDonor(Long userId, Long favoriteUserId) {
-        MyAppUsers recipient = userRepository.findByRecipientId(userId)
+    public void addFavoriteDonor(Long recipientId, Long donorId) {
+        MyAppUsers recipient = userRepository.findByRecipientId(recipientId)
                 .orElseThrow(() -> new RuntimeException("Recipient not found"));
 
-        String currentFavorites = recipient.getFavoriteDonors();
-
-        if (currentFavorites == null || !Arrays.asList(currentFavorites.split(",")).contains(favoriteUserId.toString())) {
-        // Add the new donor ID
-        if (currentFavorites == null || currentFavorites.isEmpty()) {
-            currentFavorites = favoriteUserId.toString();
+        List<Long> favoriteDonors = recipient.getFavoriteDonorsList();
+        if (!favoriteDonors.contains(donorId)) {
+            favoriteDonors.add(donorId);
+            recipient.setFavoriteDonorsList(favoriteDonors);
+            userRepository.save(recipient);
+            System.out.println("Donor ID " + donorId + " added to recipient ID " + recipientId + "'s favorites.");
         } else {
-            currentFavorites += "," + favoriteUserId;
-        }
-        // Update recipient entity
-        System.out.println("Updated Favorite Donors: " + currentFavorites);
-        recipient.setFavoriteDonors(currentFavorites);
-        // Save to database
-        userRepository.save(recipient);
-        System.out.println("Favorite donor added successfully: " + favoriteUserId);
-        } else {
-            System.out.println("Donor ID already in favorites: " + favoriteUserId);
+            System.out.println("Donor ID " + donorId + " is already in recipient ID " + recipientId + "'s favorites.");
         }
     }
 
     @Override
-    public List<Long> getFavoriteDonors(Long userId) {
-        MyAppUsers recipient = userRepository.findByRecipientId(userId)
+    public List<Long> getFavoriteDonors(Long recipientId) {
+        MyAppUsers recipient = userRepository.findByRecipientId(recipientId)
                 .orElseThrow(() -> new RuntimeException("Recipient not found"));
-        String favoriteDonors = recipient.getFavoriteDonors();
-        return (favoriteDonors == null || favoriteDonors.isEmpty()) ? new ArrayList<>() :
-                Arrays.stream(favoriteDonors.split(",")).map(Long::parseLong).collect(Collectors.toList());
+
+        return recipient.getFavoriteDonorsList();
     }
 
     // Here we fetch all recipients who have this donor's ID in their favorites list
@@ -157,33 +147,31 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
 
 
     @Override
-    public void approveFavoriteAsMatch(Long userId, Long matchedUserId) {
-        System.out.println("Attempting to approve match for Donor User ID: " + userId + " with Recipient User ID: " + matchedUserId);
+    public void approveFavoriteAsMatch(Long donorId, Long recipientId) {
+        System.out.println("Approving match: Donor ID " + donorId + " with Recipient ID " + recipientId);
 
-        // Here we find the donor and recipient by their respective user IDs
-        MyAppUsers donor = userRepository.findById(userId)
+        // Fetch the donor and recipient
+        MyAppUsers donor = userRepository.findById(donorId)
                 .orElseThrow(() -> new RuntimeException("Donor not found"));
-        MyAppUsers recipient = userRepository.findById(matchedUserId)
+        MyAppUsers recipient = userRepository.findById(recipientId)
                 .orElseThrow(() -> new RuntimeException("Recipient not found"));
 
-        // this update´s the donor's matched recipients list
+        // Update donor's matchedRecipients (recipient IDs)
         List<Long> matchedRecipients = donor.getMatchRecipients();
-        if (!matchedRecipients.contains(matchedUserId)) {
-            matchedRecipients.add(matchedUserId);
+        if (!matchedRecipients.contains(recipientId)) {
+            matchedRecipients.add(recipientId);
             donor.setMatchRecipients(matchedRecipients);
             userRepository.save(donor);
-            System.out.println("Match approved: Donor User ID " + userId + " with Recipient User ID " + matchedUserId);
-        } else {
-            System.out.println("Recipient User ID " + matchedUserId + " is already matched with Donor User ID " + userId);
+            System.out.println("Donor's matched recipients updated: " + matchedRecipients);
         }
 
-        // this update´s the recipient's matched donors list
+        // Update recipient's matchedDonors (donor IDs)
         List<Long> matchedDonors = recipient.getMatchDonorsList();
-        if (!matchedDonors.contains(userId)) {
-            matchedDonors.add(userId);
+        if (!matchedDonors.contains(donorId)) {
+            matchedDonors.add(donorId);
             recipient.setMatchDonorsList(matchedDonors);
             userRepository.save(recipient);
-            System.out.println("Match updated for Recipient User ID " + matchedUserId + " with Donor User ID " + userId);
+            System.out.println("Recipient's matched donors updated: " + matchedDonors);
         }
     }
 
@@ -225,16 +213,28 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
     }
 
     @Override
-    public void removeMatch(Long userId, Long matchedUserId) {
-        MyAppUsers donor = userRepository.findByDonorId(userId)
+    public void removeMatch(Long donorId, Long recipientId) {
+        MyAppUsers donor = userRepository.findById(donorId)
                 .orElseThrow(() -> new RuntimeException("Donor not found"));
-        List<Long> updatedMatches = donor.getMatchRecipients().stream()
-                .filter(id -> !id.equals(matchedUserId))
+
+        List<Long> updatedDonorMatches = donor.getMatchRecipients().stream()
+                .filter(id -> !id.equals(recipientId))
                 .collect(Collectors.toList());
-        donor.setMatchRecipients(updatedMatches);
+        donor.setMatchRecipients(updatedDonorMatches.isEmpty() ? null : updatedDonorMatches);
         userRepository.save(donor);
-        System.out.println("Removed match: Donor ID " + userId + " with Recipient ID " + matchedUserId);
+
+        MyAppUsers recipient = userRepository.findById(recipientId)
+                .orElseThrow(() -> new RuntimeException("Recipient not found"));
+
+        List<Long> updatedRecipientMatches = recipient.getMatchDonorsList().stream()
+                .filter(id -> !id.equals(donorId))
+                .collect(Collectors.toList());
+        recipient.setMatchDonorsList(updatedRecipientMatches.isEmpty() ? null : updatedRecipientMatches);
+        userRepository.save(recipient);
+
+        System.out.println("Removed match: Donor ID " + donorId + " with Recipient ID " + recipientId);
     }
+
 
     @Override
     public List<Long> getMatchesForRecipient(Long userId) {
