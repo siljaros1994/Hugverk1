@@ -9,7 +9,7 @@ public class MvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/uploads/**") // This is the URL path
-                .addResourceLocations("file:/app/uploads/");
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:C:/Users/silja/Desktop/Hugverk1/Hugverk1/src/main/resources/static/uploads/");
     }
 }
