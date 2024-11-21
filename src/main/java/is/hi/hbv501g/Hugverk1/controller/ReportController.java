@@ -32,7 +32,6 @@ public class ReportController extends BaseController {
     @Autowired
     private MyAppUserService userService;
 
-
     @Autowired
     private RecipientProfileService recipientProfileService;
 
@@ -46,47 +45,101 @@ public class ReportController extends BaseController {
     private ReportForm reportForm;
 
     @GetMapping("/{userType}/{id}")
-    public String showUserIdReportPage(@PathVariable("userType") String userType, @PathVariable("id")Long userId, Model model, HttpSession session) {
+    public String showUserIdReportPage(@PathVariable("userType") String userType, @PathVariable("id") String id, Model model, HttpSession session) {
         MyAppUsers currentUser = (MyAppUsers) session.getAttribute("user");
 
         if (currentUser == null) {
             throw new UsernameNotFoundException("User not found in session");
 
         }
-        model.addAttribute("user", currentUser);
-        model.addAttribute("userType", userType);
-        //model.addAttribute("reporterId", reporterId);
-        //model.addAttribute("reportedId", reportedId);
-        //model.addAttribute("matchedUsers", userService.getMatchedUsers(currentUser.getId(), currentUser.getUserType()));
-        model.addAttribute("reportForm", new ReportForm()); // This creates a new report form
-        return "report";
 
+        Long userId;
+        try {
+            //Convert the id to a numeric value
+            userId = Long.parseLong(id);
+        } catch (NumberFormatException e) {
+            //Handle invalid numeric input gracefully
+            model.addAttribute("error", "Invalid Id format. Please use a numeric value");
+            return "redirect";
+        }
+
+        //Fetch all reports using the injected reportService
+        List<Report> allReports = reportService.getAllReports();
+        model.addAttribute("reports", allReports);
+        model.addAttribute("user", currentUser);
+        model.addAttribute("matchedUsers", userService.getMatchedUsers(currentUser.getId(), currentUser.getUserType()));
+        model.addAttribute("reportForm", new ReportForm()); //This creates a new report form
+        return "report";
     }
+
     @PostMapping("/report")
     public String createReport(@ModelAttribute ReportForm reportForm, HttpSession session) {
-    MyAppUsers currentUser = (MyAppUsers) session.getAttribute("user");
-    if (currentUser == null) {
-        throw new UsernameNotFoundException("User not found in session");
-    }
-    if (reportForm.getReportedId() == null || reportForm.getReportedId().equals(currentUser.getId())) {
-        throw new IllegalArgumentException("Cannot report yourself or invalid user ID.");
-    }
-    //Call the service method to create a report
+        MyAppUsers currentUser = (MyAppUsers) session.getAttribute("user");
+        if (currentUser == null) {
+            throw new UsernameNotFoundException("User not found in session");
+        }
+        if (reportForm.getReportedId() == null || reportForm.getReporterId().equals(currentUser.getId())) {
+            throw new IllegalArgumentException("Cannot report yourself or invalid user ID.");
+        }
+        //Call the service method to create a report
         reportService.createReport(
                 reportForm.getDonorId(),
                 reportForm.getRecipientId(),
                 currentUser.getId(),
                 reportForm.getReportedId()
         );
-    return "redirect:/users/login";
+        return "redirect:/user/login";
     }
 
     @PostMapping("/submit/{id}")
-    public String submitReport(@PathVariable Long id){
+    public String submitReport(@PathVariable Long id) {
         reportService.submitReport(id);
-        return "redirect:/meesages";
+        return "redirect:/messages";
+    }
+
+
+    @GetMapping("/all")
+    public String getAllReports(Model model) {
+        List<Report> allReports = reportService.getAllReports();
+        model.addAttribute("reports", allReports);
+        return "reportsView"; //Replace with your actual view name
     }
 }
+
+        //model.addAttribute("user", currentUser);
+        //model.addAttribute("userType", userType);
+        //model.addAttribute("reporterId", reporterId);
+        //model.addAttribute("reportedId", reportedId);
+        //model.addAttribute("matchedUsers", userService.getMatchedUsers(currentUser.getId(), currentUser.getUserType()));
+        //model.addAttribute("reportForm", new ReportForm()); // This creates a new report form
+        //return "report";
+
+    //}
+    //@PostMapping("/report")
+    //public String createReport(@ModelAttribute ReportForm reportForm, HttpSession session) {
+    //MyAppUsers currentUser = (MyAppUsers) session.getAttribute("user");
+    //if (currentUser == null) {
+    //    throw new UsernameNotFoundException("User not found in session");
+    //}
+    //if (reportForm.getReportedId() == null || reportForm.getReportedId().equals(currentUser.getId())) {
+    //    throw new IllegalArgumentException("Cannot report yourself or invalid user ID.");
+    //}
+    //Call the service method to create a report
+    //    reportService.createReport(
+    //            reportForm.getDonorId(),
+    //            reportForm.getRecipientId(),
+    //            currentUser.getId(),
+    //            reportForm.getReportedId()
+    //    );
+    //return "redirect:/users/login";
+    //}
+
+    //@PostMapping("/submit/{id}")
+    //public String submitReport(@PathVariable Long id){
+    //    reportService.submitReport(id);
+    //    return "redirect:/messages";
+    //}
+//}
 
 
 

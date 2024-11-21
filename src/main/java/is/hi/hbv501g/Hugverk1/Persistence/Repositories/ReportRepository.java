@@ -10,10 +10,12 @@ import java.util.Optional;
 
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Long> {
-    List<Report> findByReporterId(Long reporterId);
-    List<Report> findByDonorId(Long donorId);
-    List<Report> findByRecipientId(Long recipientId);
-    List<Report> findByReportedId(Long reportedId);
+
+    //List<Report> findAllReports(Long reportId);
+    //List<Report> findByReporterId(Long reporterId);
+    //List<Report> findByDonorId(Long donorId);
+    //List<Report> findByRecipientId(Long recipientId);
+    //List<Report> findByReportedId(Long reportedId);
 }
 
 

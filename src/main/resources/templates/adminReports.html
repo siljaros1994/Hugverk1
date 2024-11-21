@@ -42,10 +42,10 @@
   </tr>
   </thead>
   <tbody>
-  <tr th:each="user : ${users}">
-    <td th:text="${user.id}"></td>
-    <td th:text="${user.reporter_id}"></td>
-    <td th:text="${user.reported_id}"></td>
+  <tr th:each="report : ${allReports}">
+    <td th:text="${report.id}"></td>
+    <td th:text="${report.reporterId}"></td>
+    <td th:text="${report.reportedId}"></td>
     <td th:text="${incident_description} "></td>
   </tr>
   </tbody>

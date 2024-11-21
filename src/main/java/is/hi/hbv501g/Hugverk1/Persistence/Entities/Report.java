@@ -52,6 +52,10 @@ public class Report {
 
     //Getters and Setters
 
+    //public Long getReportId() {return reportId;}
+
+    //public void setReportId(Long reportId) {this.reportId = reportId;}
+
     public Long getId() { return id; }
 
     public void setId(Long id) {this.id = id;}
