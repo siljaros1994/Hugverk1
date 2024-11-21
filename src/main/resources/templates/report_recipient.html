@@ -6,9 +6,9 @@
   <link rel="stylesheet" type="text/css" th:href="@{/css/reportstyle.css}">
 </head>
 <body>
-<!--<h1>-->
-<!--  Report User-->
-<!--</h1>-->
+<h1>
+  Report User
+</h1>
 <div class="area">
   <nav class="side-panel">
     <ul>
@@ -34,8 +34,8 @@
     </header>
     <form th:object="$ {reportForm}" th:action="@{/messages/report}" method="POST">
       <div class="input-group">
-      <label for="accused_user">Accused User</label>
-      <select id="accused_user" th:field="*{accused_user}" required>
+      <label for="reported_id">Reported Id</label>
+      <select id="reported_id" th:field="*{reported_id}" required>
         <option value=""> Select a matched user</option>
         <option th:each="donor : ${matchedDonors}" th:value="${donor.user.Id}" th:text="${donor.user.Id}"></option>
       </select>
@@ -48,6 +48,10 @@
         </select>
 
 
+      </div>
+      <div>
+        <label for="incident-description">Description of Incident</label>
+        <textarea id="incident-description" name="incident_description" rows="6" placeholder="Describe the behavior and any details about the incident." required></textarea>
       </div>
       <button type="submit" class="btn-submit">Submit Report</button>
     </form>

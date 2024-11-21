@@ -34,8 +34,8 @@
         </header>
         <form th:object="$ {reportForm}" th:action="@{/messages/report}" method="POST">
             <div class="input-group">
-                <label for="accused_user">Accused User</label>
-                <select id="accused_user" th:field="*{accused_user}" required>
+                <label for="reported_id">Reported Id</label>
+                <select id="reported_id" th:field="*{reported_id}" required>
                     <option value=""> Select a matched user</option>
                     <option th:each="recipient : ${matchedRecipients}" th:value="${recipient.user.Id}" th:text="${recipient.user.Id}"></option>
                 </select>
@@ -46,8 +46,10 @@
                     <option value="">Fill in your id</option>
                     <option th:this="donor : ${donor_id}" th:value="${donor.user.Id}" th:text="${donor.user.Id}"></option>
                 </select>
-
-
+            </div>
+            <div>
+                <label for="incident-description">Description of Incident</label>
+                <textarea id="incident-description" name="incident_description" rows="6" placeholder="Describe the behavior and any details about the incident." required></textarea>
             </div>
             <button type="submit" class="btn-submit">Submit Report</button>
         </form>
@@ -55,7 +57,8 @@
 
 
 
-<!--</div>
+</div>
+<!--
 <form action="/submit-report" method="post">
 <label for="report-name">Your Name</label>
 <input type="text" id="report-name" name="report_name" required>
