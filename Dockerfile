@@ -20,8 +20,6 @@ WORKDIR /app
 # Copy the JAR file from the builder stage (correcting the stage name)
 COPY --from=builder /app/target/Hugverk1-0.0.1-SNAPSHOT.jar app.jar
 
-upload.path=/app/uploads/
-
 # Exposes the port that the application listens on.
 EXPOSE 8080
 
