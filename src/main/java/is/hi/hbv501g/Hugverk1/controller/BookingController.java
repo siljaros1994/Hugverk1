@@ -44,7 +44,7 @@ public class BookingController extends BaseController {
         System.out.println("Matched Donor Profiles: " + matchedDonors);
 
         model.addAttribute("matchedDonors", matchedDonors);
-        model.addAttribute("bookingForm", new BookingForm()); // This create's a new booking form
+        model.addAttribute("bookingForm", new BookingForm()); // This creates a new booking form
         model.addAttribute("currentAppointments", bookingService.getConfirmedBookingsForRecipient(loggedInUser.getId()));
 
         return "booking_recipient";
