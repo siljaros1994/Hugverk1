@@ -33,7 +33,7 @@ public class Report {
     private Long recipientId; //Optional: Recipient involved in the report
 
 
-    @Column( nullable = false, length = 1000)
+    @Column(name ="incident_description" ,nullable = false, length = 1000)
     private String incidentDescription; //Description of the incident
 
     @Column(name = "submitted", nullable=false)
@@ -66,9 +66,9 @@ public class Report {
     public void setReportedId(Long reportedId) { this.reportedId = reportedId;}
 
 
-    public String getIncidentDescription() { return incidentDescription; }
+    public String getincidentDescription() { return incidentDescription; }
 
-    public void setIncidentDescription(String incidentDescription) {this.incidentDescription = incidentDescription;}
+    public void setincidentDescription(String incidentDescription) {this.incidentDescription = incidentDescription;}
 
     public Long getDonorId() {return donorId;}
 

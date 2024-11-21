@@ -31,8 +31,8 @@ public class RecipientProfileController extends BaseController{
     @Autowired
     private MyAppUserRepository myAppUserRepository;
 
-    //@Value("${upload.path}") //Path to where uploaded images are stored
-    //private String uploadPath;
+    @Value("${upload.path}") //Path to where uploaded images are stored
+    private String uploadPath;
 
     // Displays the recipient profile page.
     @GetMapping
@@ -55,21 +55,10 @@ public class RecipientProfileController extends BaseController{
     //Save or update the recipient profile with an uploaded image of recipient
     @PostMapping("/saveOrEdit")
     public String saveOrEditProfile(@ModelAttribute("recipientProfile") RecipientProfile profileData,
-                                  @RequestParam("profileImage") MultipartFile profileImage) throws IOException {
+                                    @RequestParam("profileImage") MultipartFile profileImage) throws IOException {
 
         MyAppUsers loggedInUser = getLoggedInUser();
         profileData.setUser(loggedInUser);
-
-
-       // recipientProfileService.processProfileImage(profileData, profileImage, uploadPath);
-
-        // Save or update the profile
-        recipientProfileService.saveOrUpdateProfile(profileData);
-
-        // Assign recipientId if not already set
-        if (loggedInUser.getRecipientId() == null) {
-            loggedInUser.setRecipientId(profileData.getRecipientProfileId());
-            myAppUserRepository.save(loggedInUser);
 
         // Here we check if the profile already exists
         Optional<RecipientProfile> existingProfile = recipientProfileService.findByUserId(loggedInUser.getId());
@@ -79,19 +68,17 @@ public class RecipientProfileController extends BaseController{
             BeanUtils.copyProperties(profileData, profileToUpdate, "recipientProfileId", "user");
             recipientProfileService.processProfileImage(profileToUpdate, profileImage, uploadPath);
             recipientProfileService.saveOrUpdateProfile(profileToUpdate);
+
+            loggedInUser.setRecipientId(profileToUpdate.getRecipientProfileId());
         } else {
             // Create a new profile if none exists
             profileData.setUser(loggedInUser);
             recipientProfileService.processProfileImage(profileData, profileImage, uploadPath);
             recipientProfileService.saveOrUpdateProfile(profileData); // Save or update the profile
-
-            // Assign recipientId if not already set
-            if (loggedInUser.getRecipientId() == null) {
-                loggedInUser.setRecipientId(profileData.getRecipientProfileId());
-                myAppUserRepository.save(loggedInUser);
-            }
-
+            loggedInUser.setRecipientId(profileData.getRecipientProfileId());
         }
+        myAppUserRepository.save(loggedInUser);
+        System.out.println("Recipient ID set for user: " + loggedInUser.getRecipientId());
 
         return "redirect:/recipientprofile";
     }
