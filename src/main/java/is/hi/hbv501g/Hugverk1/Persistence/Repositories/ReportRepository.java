@@ -13,8 +13,9 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     List<Report> findByReporterId(Long reporterId);
     List<Report> findByDonorId(Long donorId);
     List<Report> findByRecipientId(Long recipientId);
-    List<Report> findByReported(Long reportedId);
+    List<Report> findByReportedId(Long reportedId);
 }
+
 
 
 

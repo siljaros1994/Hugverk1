@@ -33,6 +33,11 @@ public class ReportService {
         report.setSubmitted(false);
         return reportRepository.save(report);
     }
+    public void submitReport(Long reportId) {
+        Report report = reportRepository.findById(reportId).orElseThrow(() -> new IllegalArgumentException("Report not found"));
+        report.setSubmitted(true);
+        reportRepository.save(report);
+    }
 }
 
 
