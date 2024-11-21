@@ -44,14 +44,22 @@ public class RecipientProfileService {
 
     public void processProfileImage(RecipientProfile profile, MultipartFile profileImage) throws IOException {
         if (!profileImage.isEmpty()) {
-            ensureUploadDirectoryExists();
+            // Ensure the upload directory exists
+            File uploadDir = new File("/app/uploads/");
+            if (!uploadDir.exists()) {
+                boolean created = uploadDir.mkdirs();
+                if (!created) {
+                    throw new IOException("Failed to create upload directory: /app/uploads/");
+                }
+            }
 
+            // Save the image to the /app/uploads/ directory
             String originalFilename = profileImage.getOriginalFilename();
             String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
-
-            File destinationFile = new File(uploadPath, uniqueFilename);
+            File destinationFile = new File(uploadDir, uniqueFilename);
             profileImage.transferTo(destinationFile);
 
+            // Update the image path in the profile
             profile.setImagePath("/uploads/" + uniqueFilename);
         }
     }
