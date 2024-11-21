@@ -53,6 +53,7 @@ public class DonorProfileService {
             System.out.println("Saving file to: " + destinationFile.getAbsolutePath());
             profileImage.transferTo(destinationFile); // Save the file
 
+
             // Update the profile image path
             profileData.setImagePath("/uploads/" + originalFileName);
             System.out.println("Image path set: " + profileData.getImagePath());

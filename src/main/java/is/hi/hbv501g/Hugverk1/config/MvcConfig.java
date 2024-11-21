@@ -1,4 +1,4 @@
-package is.hi.hbv501g.Hugverk1.Security;
+package is.hi.hbv501g.Hugverk1.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
