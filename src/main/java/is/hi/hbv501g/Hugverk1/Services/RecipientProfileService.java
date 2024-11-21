@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class RecipientProfileService {
@@ -37,19 +38,24 @@ public class RecipientProfileService {
                 });
     }
 
-    public void processProfileImage(RecipientProfile profileData, MultipartFile profileImage, String uploadPath) throws IOException {
+    public void processProfileImage(RecipientProfile profile, MultipartFile profileImage, String uploadPath) throws IOException {
         if (!profileImage.isEmpty()) {
-            String originalFileName = StringUtils.cleanPath(profileImage.getOriginalFilename());
-            String filePath = uploadPath + originalFileName;
-            File destinationFile = new File(filePath);
-            destinationFile.getParentFile().mkdirs();
+            String originalFilename = profileImage.getOriginalFilename();
+            String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
+
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
+
+            File destinationFile = new File(uploadDir, uniqueFilename);
             profileImage.transferTo(destinationFile);
-            profileData.setImagePath("/uploads/" + originalFileName);
+
+            profile.setImagePath("/uploads/" + uniqueFilename);
         }
     }
 
     //Save or update the recipient profile in the database
-
     public RecipientProfile saveOrUpdateProfile(RecipientProfile profile) {
         // Retrieve the existing profile, if present
         Optional<RecipientProfile> existingProfile = recipientProfileRepository.findByUserId(profile.getUser().getId());
@@ -87,5 +93,17 @@ public class RecipientProfileService {
     // Finds by profile ID
     public Optional<RecipientProfile> findByProfileId(Long recipientProfileId) {
         return recipientProfileRepository.findById(recipientProfileId);
+    }
+
+    public void ensureUploadDirectoryExists() {
+        File uploadDir = new File("/app/uploads/");
+        if (!uploadDir.exists()) {
+            boolean created = uploadDir.mkdirs();
+            if (created) {
+                System.out.println("Upload directory created: /app/uploads/");
+            } else {
+                System.err.println("Failed to create upload directory: /app/uploads/");
+            }
+        }
     }
 }

@@ -4,19 +4,13 @@ import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.RecipientProfile;
 import is.hi.hbv501g.Hugverk1.Persistence.Repositories.MyAppUserRepository;
 import is.hi.hbv501g.Hugverk1.Services.RecipientProfileService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -68,13 +62,12 @@ public class RecipientProfileController extends BaseController{
             BeanUtils.copyProperties(profileData, profileToUpdate, "recipientProfileId", "user");
             recipientProfileService.processProfileImage(profileToUpdate, profileImage, uploadPath);
             recipientProfileService.saveOrUpdateProfile(profileToUpdate);
-
             loggedInUser.setRecipientId(profileToUpdate.getRecipientProfileId());
         } else {
             // Create a new profile if none exists
             profileData.setUser(loggedInUser);
             recipientProfileService.processProfileImage(profileData, profileImage, uploadPath);
-            recipientProfileService.saveOrUpdateProfile(profileData); // Save or update the profile
+            recipientProfileService.saveOrUpdateProfile(profileData);
             loggedInUser.setRecipientId(profileData.getRecipientProfileId());
         }
         myAppUserRepository.save(loggedInUser);
