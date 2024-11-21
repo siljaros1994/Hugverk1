@@ -23,9 +23,12 @@ RUN mkdir -p /app/uploads && chmod -R 755 /app/uploads
 # Copy the JAR file from the builder stage (correcting the stage name)
 COPY --from=builder /app/target/Hugverk1-0.0.1-SNAPSHOT.jar app.jar
 
-# Copy default images to the uploads directory
-COPY src/main/resources/static/uploads/default-donor-avatar.jpg /app/uploads/
-COPY src/main/resources/static/uploads/default-recipient-avatar.jpg /app/uploads/
+# Copy's the entire uploads directory
+COPY src/main/resources/static/uploads /app/uploads/
+
+COPY src/main/resources/static/uploads/default-donor-avatar.png /app/uploads/
+COPY src/main/resources/static/uploads/default-recipient-avatar.png /app/uploads/
+
 
 # Exposes the port that the application listens on.
 EXPOSE 8080

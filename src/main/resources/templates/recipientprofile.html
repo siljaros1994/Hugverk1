@@ -195,7 +195,7 @@
             <div class="profile-info">
                 <h2>Profile Information</h2>
                 <div class="profile-image">
-                    <img th:src="${recipientProfile.imagePath != null ? recipientProfile.imagePath : '/uploads/default-recipient-avatar.jpg'}" alt="Recipient Image"/>
+                    <img th:src="${recipientProfile.imagePath != null ? recipientProfile.imagePath : '/uploads/default-recipient-avatar.png'}" alt="Recipient Image"/>
                 </div>
                 <p>Recipient ID: <span th:text="${recipientProfile.user?.recipientId ?: 'No ID available'}">Recipient ID</span></p>
                 <p>Eye Color: <span th:text="${recipientProfile.eyeColor ?: 'Not specified'}">Eye Color</span></p>
