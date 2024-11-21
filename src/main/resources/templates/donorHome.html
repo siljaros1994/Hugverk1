@@ -37,7 +37,7 @@
                 <div class="recipient-cards">
                     <div class="recipient-card" th:each="recipient : ${recipientsWhoFavorited}">
                         <div class="profile-image">
-                            <img th:src="${recipient.recipientProfile != null && recipient.recipientProfile.imagePath != null ? recipient.recipientProfile.imagePath : '/uploads/default-recipient-avatar.jpg'}"
+                            <img th:src="${recipient.recipientProfile != null && recipient.recipientProfile.imagePath != null ? recipient.recipientProfile.imagePath : '/uploads/default-recipient-avatar.png'}"
                                  alt="Recipient Image" class="recipient-image"/>
                         </div>
                         <div class="recipient-info">

@@ -10,4 +10,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByRecipientId(Long recipientId);
     List<Booking> findByRecipientIdAndConfirmedTrue(Long recipientId);
     List<Booking> findByDonorIdAndConfirmedFalse(Long donorId);
+    List<Booking> findByDonorIdAndConfirmedTrue(Long donorId);
 }

@@ -13,7 +13,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class DonorProfileService {
@@ -34,12 +36,27 @@ public class DonorProfileService {
 
     public void processProfileImage(DonorProfile profileData, MultipartFile profileImage, String uploadPath) throws IOException {
         if (!profileImage.isEmpty()) {
-            String originalFileName = StringUtils.cleanPath(profileImage.getOriginalFilename());
-            String filePath = uploadPath + originalFileName;
-            File destinationFile = new File(filePath);
-            destinationFile.getParentFile().mkdirs();
-            profileImage.transferTo(destinationFile);
+            // Ensure the original file name is not null or empty
+            String originalFileName = StringUtils.cleanPath(
+                    Optional.ofNullable(profileImage.getOriginalFilename()).orElse("default-file-" + UUID.randomUUID() + ".jpg")
+            );
+
+            // Ensure the upload directory exists
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                boolean created = uploadDir.mkdirs();
+                System.out.println(created ? "Upload directory created: " + uploadDir.getAbsolutePath() : "Failed to create upload directory");
+            }
+
+            // Create the destination file
+            File destinationFile = new File(uploadDir, originalFileName);
+            System.out.println("Saving file to: " + destinationFile.getAbsolutePath());
+            profileImage.transferTo(destinationFile); // Save the file
+
+
+            // Update the profile image path
             profileData.setImagePath("/uploads/" + originalFileName);
+            System.out.println("Image path set: " + profileData.getImagePath());
         }
     }
 

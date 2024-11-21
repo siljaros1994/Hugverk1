@@ -35,7 +35,7 @@
             <div class="matched-list" th:if="${matches != null && matches.size() > 0}">
                 <div class="match-cards">
                     <div class="match-card" th:each="recipient : ${matches}">
-                        <img th:src="${recipient?.imagePath != null ? recipient.imagePath : '/uploads/default-recipient-avatar.jpg'}"
+                        <img th:src="${recipient?.imagePath != null ? recipient.imagePath : '/uploads/default-recipient-avatar.png'}"
                              alt="Recipient Image" class="match-image"/>
                         <div class="match-info">
                             <p><strong>ID:</strong> <span th:text="${recipient?.user?.id ?: 'N/A'}"></span></p>

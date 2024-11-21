@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/match")
 @SessionAttributes("user")
-public class MatchController extends BaseController {
+public class  MatchController extends BaseController {
 
     @Autowired
     private MyAppUserService myAppUserService;
@@ -44,17 +44,21 @@ public class MatchController extends BaseController {
             return "redirect:/users/login";
         }
 
-        model.addAttribute("user", loggedInUser);
-        model.addAttribute("userType", loggedInUser.getUserType());
+        // Here we fetch the latest user data
+        MyAppUsers refreshedUser = myAppUserService.findById(loggedInUser.getId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        model.addAttribute("user", refreshedUser);
+        model.addAttribute("userType", refreshedUser.getUserType());
 
         // Here we use the loggedInUser to get the matched recipient IDs
-        List<Long> matchedRecipientIds = loggedInUser.getMatchRecipients();
+        List<Long> matchedRecipientIds = refreshedUser.getMatchRecipients();
         List<RecipientProfile> matchedRecipients = recipientProfileService.getProfilesByUserIds(matchedRecipientIds).stream()
                 .filter(Objects::nonNull)
                 .filter(recipient -> recipient.getUser() != null)
                 .collect(Collectors.toList());
 
-        System.out.println("User in session: " + loggedInUser);
+        System.out.println("User in session: " + refreshedUser);
         System.out.println("Matched Recipient Profile IDs: " + matchedRecipientIds);
         System.out.println("Matched Recipients: " + matchedRecipients);
 
@@ -98,7 +102,14 @@ public class MatchController extends BaseController {
             return "redirect:/users/login";
         }
 
+        // Here we approve the match
         myAppUserService.approveFavoriteAsMatch(donor.getId(), recipientId);
+
+        // Here we refresh the session with updated user data so we dont have to logout and login again to update.
+        MyAppUsers updatedDonor = myAppUserService.findById(donor.getId())
+                .orElseThrow(() -> new RuntimeException("Donor not found"));
+        session.setAttribute("user", updatedDonor);
+
         System.out.println("Match approved: Donor ID " + donor.getId() + " with Recipient ID " + recipientId);
         return "redirect:/match/donor/matches";
     }
