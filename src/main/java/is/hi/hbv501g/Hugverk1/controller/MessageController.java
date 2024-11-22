@@ -50,11 +50,10 @@ public class MessageController extends BaseController{
         Long receiverId = userId;
 
         Boolean showInstruction = (Boolean) session.getAttribute("showInstruction");
+        model.addAttribute("showInstruction", showInstruction != null && showInstruction);
+
         if (showInstruction == null || showInstruction) {
             session.setAttribute("showInstruction", true);
-            model.addAttribute("showInstruction", true);
-        } else {
-            model.addAttribute("showInstruction", false);
         }
 
         if (receiverId == null || receiverId.equals(senderId)) {
@@ -74,7 +73,7 @@ public class MessageController extends BaseController{
         model.addAttribute("userType", userType);
         model.addAttribute("senderId", senderId);
         model.addAttribute("receiverId", receiverId);
-        model.addAttribute("matchedUsers", userService.getMatchedUsers(currentUser.getId(), currentUser.getUserType()));
+        model.addAttribute("matchedUsers", matchedUsers);
         model.addAttribute("senderImagePath", getSenderImagePath(currentUser));
         model.addAttribute("messageForm", new MessageForm(receiverId));
 

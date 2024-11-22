@@ -180,21 +180,29 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
         MyAppUsers user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<Long> matchedUserIds;
+        // Determine matched user IDs based on userType
+        List<Long> matchedUserIds = "recipient".equalsIgnoreCase(userType)
+                ? user.getMatchDonorsList()
+                : user.getMatchRecipients();
 
-        if ("recipient".equalsIgnoreCase(userType)) {
-            matchedUserIds = user.getMatchDonorsList();
-            return userRepository.findAllById(matchedUserIds).stream()
-                    .filter(matchedUser -> "donor".equalsIgnoreCase(matchedUser.getUserType()))
-                    .collect(Collectors.toList());
-        } else if ("donor".equalsIgnoreCase(userType)) {
-            matchedUserIds = user.getMatchRecipients();
-            return userRepository.findAllById(matchedUserIds).stream()
-                    .filter(matchedUser -> "recipient".equalsIgnoreCase(matchedUser.getUserType()))
-                    .collect(Collectors.toList());
-        } else {
-            throw new IllegalArgumentException("Invalid user type: " + userType);
+        if (matchedUserIds == null || matchedUserIds.isEmpty()) {
+            System.out.println("No matches found for user ID: " + userId);
+            return Collections.emptyList();
         }
+
+        // Fetch users for matched IDs and filter by user type
+        return userRepository.findAllById(matchedUserIds).stream()
+                .filter(java.util.Objects::nonNull) // Exclude null matches
+                .filter(matchedUser -> {
+                    if ("recipient".equalsIgnoreCase(userType)) {
+                        return "donor".equalsIgnoreCase(matchedUser.getUserType());
+                    } else if ("donor".equalsIgnoreCase(userType)) {
+                        return "recipient".equalsIgnoreCase(matchedUser.getUserType());
+                    }
+                    return false;
+                })
+                .peek(matchedUser -> System.out.println("Matched user: " + matchedUser.getId() + ", Type: " + matchedUser.getUserType()))
+                .collect(Collectors.toList());
     }
 
     @Override

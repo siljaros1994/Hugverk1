@@ -49,6 +49,15 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
     @Column(name = "matched_donors")
     private String matchedDonors;
 
+    public List<Long> getMatchedDonorsList() {
+        if (matchedDonors == null || matchedDonors.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(matchedDonors.split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+    }
+
     public List<Long> getFavoriteDonorsList() {
         if (favoriteDonors == null || favoriteDonors.isEmpty()) {
             return new ArrayList<>();
