@@ -58,7 +58,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**", "/home/admin", "/donorlimits", "/delete/{username}", "/reports", "/history").hasRole("ADMIN")
                         .requestMatchers("/home/donor", "/donorprofile", "/donor/view/**", "/bookings/donor").authenticated()
                         .requestMatchers("/home/recipient", "/recipientprofile",  "/recipient/view/**", "/bookings/recipient", "/recipient/favorite/**").authenticated()
-                        .requestMatchers("/messages/**", "/messages/{userType}/{id}", "/dr").authenticated()
+                        .requestMatchers("/messages/**", "/messages/{userType}/{id:[0-9]+}", "/dr").authenticated()
                         .requestMatchers("/match/donor/matches", "/match/recipient/matches", "/match/approveMatch", "/match/unmatch").authenticated()
                         .anyRequest().authenticated())  // All other requests need authentication
                 .formLogin(login -> login

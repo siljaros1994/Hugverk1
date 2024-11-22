@@ -28,6 +28,11 @@ public class ReportService {
 
 
     public Report createReport(Long donorId, Long recipientId, Long reporterId, Long reportedId) {
+
+        if (reporterId == null || reportedId == null) {
+            throw new IllegalArgumentException("Reporter and Reported IDs must not be null.");
+        }
+
         Report report = new Report();
         report.setDonorId(donorId);
         report.setRecipientId(recipientId);

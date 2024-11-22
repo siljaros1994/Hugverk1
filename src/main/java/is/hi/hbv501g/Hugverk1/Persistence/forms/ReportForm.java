@@ -1,16 +1,18 @@
 package is.hi.hbv501g.Hugverk1.Persistence.forms;
 
-import org.springframework.stereotype.Component;
-
 //This file is where a data transfer object (DTO) captures input data for creating a report
 //this includes report_name, accused_user and incident_description
 
-@Component
 public class ReportForm {
+
     private Long reporterId;
+
     private Long reportedId;
+
     private Long donorId;
+
     private Long recipientId;
+
     private String incidentDescription;
 
     public ReportForm() {
@@ -23,12 +25,17 @@ public class ReportForm {
     }
 
     //Getters and Setters
+
     public Long getReporterId() {
         return reporterId;
     }
 
     public void setReporterId(Long reporterId) {
         this.reporterId = reporterId;
+    }
+
+    public void setReportedId(Long reportedId) {
+        this.reportedId = reportedId;
     }
 
     public Long getReportedId() {
