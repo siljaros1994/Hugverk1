@@ -31,10 +31,10 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
     private String password;
 
     // Fields for donorId and recipientId
-    @Column(name = "donor_id", unique = true, nullable = true)
+    @Column(name = "donor_id", nullable = true)
     private Long donorId;
 
-    @Column(name = "recipient_id", unique = true, nullable = true)
+    @Column(name = "recipient_id", nullable = true)
     private Long recipientId;
 
     @Column(nullable = false)
