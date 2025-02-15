@@ -40,7 +40,7 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
     @Column(nullable = false)
     private String userType; // Either donor or recipient.
 
-    @Column(name = "favorite_donors", nullable = true, columnDefinition = "VARCHAR(255) DEFAULT ''")
+    @Column(name = "favorite_donors", nullable = true)
     private String favoriteDonors = "";
 
     @Column(name = "matched_recipients")
