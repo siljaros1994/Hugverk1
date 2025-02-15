@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -34,29 +33,22 @@ public class DonorProfileService {
                 });
     }
 
-    public void processProfileImage(DonorProfile profileData, MultipartFile profileImage, String uploadPath) throws IOException {
+    public void processProfileImage(DonorProfile profile, MultipartFile profileImage, String uploadPath) throws IOException {
         if (!profileImage.isEmpty()) {
-            // Ensure the original file name is not null or empty
-            String originalFileName = StringUtils.cleanPath(
-                    Optional.ofNullable(profileImage.getOriginalFilename()).orElse("default-file-" + UUID.randomUUID() + ".jpg")
-            );
-
-            // Ensure the upload directory exists
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) {
                 boolean created = uploadDir.mkdirs();
-                System.out.println(created ? "Upload directory created: " + uploadDir.getAbsolutePath() : "Failed to create upload directory");
+                System.out.println(created ? "Upload directory created" : "Failed to create upload directory");
             }
 
-            // Create the destination file
-            File destinationFile = new File(uploadDir, originalFileName);
+            String originalFilename = profileImage.getOriginalFilename();
+            String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
+            File destinationFile = new File(uploadDir, uniqueFilename);
             System.out.println("Saving file to: " + destinationFile.getAbsolutePath());
-            profileImage.transferTo(destinationFile); // Save the file
+            profileImage.transferTo(destinationFile);
 
-
-            // Update the profile image path
-            profileData.setImagePath("/uploads/" + originalFileName);
-            System.out.println("Image path set: " + profileData.getImagePath());
+            profile.setImagePath("/uploads/" + uniqueFilename);
+            System.out.println("Image path set: " + profile.getImagePath());
         }
     }
 
