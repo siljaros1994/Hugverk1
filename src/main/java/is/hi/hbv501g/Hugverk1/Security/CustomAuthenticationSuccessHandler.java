@@ -54,17 +54,6 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         System.out.println("Session donorId: " + session.getAttribute("donorId"));
         System.out.println("Session recipientId: " + session.getAttribute("recipientId"));
 
-        // Redirect based on user type
-        //if ("donor".equalsIgnoreCase(user.getUserType())) {
-        //  response.sendRedirect("/home/donor");
-        //} else if ("recipient".equalsIgnoreCase(user.getUserType())) {
-        //  response.sendRedirect("/home/recipient");
-        //} else if ("admin".equalsIgnoreCase(user.getUserType())) {
-        //  response.sendRedirect("/home/admin");
-        //} else {
-        //  response.sendRedirect("/users/login?error=true");
-        //}
-
         String redirectUrl = switch (user.getUserType().toLowerCase()) {
             case "donor" -> "/home/donor";
             case "recipient" -> "/home/recipient";
