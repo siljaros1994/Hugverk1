@@ -57,7 +57,7 @@
             <div class="donor-cards" th:if="${donorsPage != null && donorsPage.content.size() > 0}">
                 <div class="card-grid">
                     <div class="donor-card" th:each="donor : ${donorsPage.content}">
-                        <img th:src="${donor.imagePath != null ? donor.imagePath : '/uploads/default-donor-avatar.jpg'}"
+                        <img th:src="${donor.imagePath != null ? donor.imagePath : '/uploads/default-donor-avatar.png'}"
                              alt="Donor Image" class="donor-image"/>
                         <div class="donor-info">
                             <p><strong>Eye Color:</strong> <span th:text="${donor.eyeColor}">Eye Color</span></p>

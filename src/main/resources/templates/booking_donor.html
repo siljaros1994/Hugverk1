@@ -34,7 +34,7 @@
         </header>
 
         <section class="appointments">
-            <h2>Confirm Appointments</h2>
+            <h2>Confirm your appointments: </h2>
             <ul>
                 <li th:each="booking : ${pendingBookings}">
                     <p>
@@ -49,6 +49,22 @@
                         <button type="submit" class="btn-cancel">Cancel</button>
                     </form>
                     </p>
+                </li>
+            </ul>
+        </section>
+
+        <section class="appointments">
+            <h2>Appointments that are booked: </h2>
+            <ul>
+                <li th:each="booking : ${confirmedBookings}">
+                    <p>
+                        <strong>Recipient ID:</strong> <span th:text="${booking.recipientId}"></span> |
+                        <strong>Date:</strong> <span th:text="${booking.date}"></span> |
+                        <strong>Time:</strong> <span th:text="${booking.time}"></span>
+                    </p>
+                    <form th:action="@{/bookings/cancel/{id}(id=${booking.id})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn-cancel">Cancel</button>
+                    </form>
                 </li>
             </ul>
         </section>

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 import java.util.List;
 
-
 @Controller
 @RequestMapping("/bookings")
 @SessionAttributes("user")
@@ -44,7 +43,7 @@ public class BookingController extends BaseController {
         System.out.println("Matched Donor Profiles: " + matchedDonors);
 
         model.addAttribute("matchedDonors", matchedDonors);
-        model.addAttribute("bookingForm", new BookingForm()); // This create's a new booking form
+        model.addAttribute("bookingForm", new BookingForm()); // This creates a new booking form
         model.addAttribute("currentAppointments", bookingService.getConfirmedBookingsForRecipient(loggedInUser.getId()));
 
         return "booking_recipient";
@@ -75,8 +74,13 @@ public class BookingController extends BaseController {
         // Shows all pending bookings for the donor.
         List<Booking> pendingBookings = bookingService.getPendingBookingsForDonor(loggedInUser.getId());
         System.out.println("Pending bookings for donor " + loggedInUser.getId() + ": " + pendingBookings);
-
         model.addAttribute("pendingBookings", pendingBookings);
+
+        // Shows all confirmed bookings for the donor
+        List<Booking> confirmedBookings = bookingService.getConfirmedBookingsForDonor(loggedInUser.getId());
+        System.out.println("Confirmed bookings for donor " + loggedInUser.getId() + ": " + confirmedBookings);
+        model.addAttribute("confirmedBookings", confirmedBookings);
+
         return "booking_donor";
     }
 

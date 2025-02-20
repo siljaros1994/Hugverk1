@@ -46,6 +46,10 @@ public class BookingService {
         return pendingBookings;
     }
 
+    public List<Booking> getConfirmedBookingsForDonor(Long donorId) {
+        return bookingRepository.findByDonorIdAndConfirmedTrue(donorId);
+    }
+
     public List<Booking> getConfirmedBookingsForRecipient(Long recipientId) {
         return bookingRepository.findByRecipientIdAndConfirmedTrue(recipientId);
     }
@@ -53,7 +57,7 @@ public class BookingService {
     public void confirmBooking(Long id) {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
-        DonorProfile donorProfile = donorProfileRepository.findByUserDonorId(booking.getDonorId())
+        DonorProfile donorProfile = donorProfileRepository.findByUserId(booking.getDonorId())
                 .orElseThrow(() -> new RuntimeException("Donor profile not found"));
         if (donorProfile.getDonationsCompleted() >= donorProfile.getDonationLimit()) {
             throw new IllegalStateException("Donor has reached their donation limit.");

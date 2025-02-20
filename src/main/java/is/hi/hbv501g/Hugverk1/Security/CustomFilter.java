@@ -13,6 +13,6 @@ public class CustomFilter extends GenericFilterBean {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         // Custom filter logic
-        chain.doFilter(request, response);  // Pass control to the next filter in the chain
+        chain.doFilter(request, response);
     }
 }

@@ -13,7 +13,7 @@ public class DonorProfile {
     @Column(name = "donor_profile_id", nullable = false, unique = true)
     private Long donorProfileId;
 
-    // Links each profile to a unique donor
+    // Links each profile to a unique donor, (The user_id in the DonorProfile table should always match the donorId in MyAppUsers table for that user.)
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true)
     private MyAppUsers user;

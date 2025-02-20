@@ -55,7 +55,11 @@
 
             <div id="contacts">
                 <ul>
-                    <li th:each="matchedUser : ${matchedUsers}">
+                    <li th:if="${matchedUsers == null || matchedUsers.isEmpty()}">
+                        <p>No matched users available. Please wait for a match to start a conversation.</p>
+                    </li>
+
+                    <li th:each="matchedUser : ${matchedUsers}" th:if="${matchedUser != null}">
                         <a th:href="@{/messages/{userType}/{id}(userType=${user.userType}, id=${matchedUser.id})}">
                             <div class="user-details">
                                 <img th:src="${matchedUser.donorProfile != null ? matchedUser.donorProfile.imagePath : matchedUser.recipientProfile.imagePath}"
@@ -88,10 +92,11 @@
                     <input th:field="*{text}" type="text" placeholder="Write your message..." />
                     <button type="submit" class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i> Send</button>
                 </form>
-                <form th:action="@{/messages/report/{receiverId}(receiverId=${receiverId})}" method="POST">
+                <form th:if="${receiverId != null}" th:action="@{/messages/report/{receiverId}(receiverId=${receiverId})}" method="POST">
                     <button type="submit" class="report-button"><i class="fa fa-flag"></i> Report</button>
                 </form>
             </div>
+
         </div>
     </div>
 </div>

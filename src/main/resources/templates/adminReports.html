@@ -35,17 +35,18 @@
 <table>
   <thead>
   <tr>
-    <th>ID</th>
-    <th>Username</th>
-    <th>Email</th>
-    <th>Reported by</th>
+    <th>ID of Report</th>
+    <th>Reporter Id</th>
+    <th>Reported Id</th>
+    <th>Incident Description</th>
   </tr>
   </thead>
   <tbody>
-  <tr th:each="user : ${users}">
-    <td th:text="${user.id}"></td>
-    <td th:text="${user.username}"></td>
-    <td th:text="${user.email}"></td>
+  <tr th:each="report : ${allReports}">
+    <td th:text="${report.id}"></td>
+    <td th:text="${report.reporterId}"></td>
+    <td th:text="${report.reportedId}"></td>
+    <td th:text="${incident_description} "></td>
   </tr>
   </tbody>
 </table>

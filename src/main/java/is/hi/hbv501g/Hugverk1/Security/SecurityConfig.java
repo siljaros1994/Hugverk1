@@ -48,17 +48,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/api/**") // Disable CSRF for API endpoints
+                )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)  // Here we always create a session
                         .sessionFixation().migrateSession()  // Migrate the session to prevent session fixation attacks
                         .maximumSessions(1).maxSessionsPreventsLogin(false))  // at last we allow only one session per user
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/**").permitAll() // Allow all API endpoints
                         .requestMatchers("/users/login", "/users/register", "/css/**", "/api/authenticate").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/admin/**", "/home/admin", "/donorlimits", "/delete/{username}", "/reports", "/history").hasRole("ADMIN")
                         .requestMatchers("/home/donor", "/donorprofile", "/donor/view/**", "/bookings/donor").authenticated()
                         .requestMatchers("/home/recipient", "/recipientprofile",  "/recipient/view/**", "/bookings/recipient", "/recipient/favorite/**").authenticated()
-                        .requestMatchers("/messages/**", "/messages/{userType}/{id}", "/dr").authenticated()
+                        .requestMatchers("/messages/**", "/messages/{userType}/{id:[0-9]+}", "/dr").authenticated()
                         .requestMatchers("/match/donor/matches", "/match/recipient/matches", "/match/approveMatch", "/match/unmatch").authenticated()
                         .anyRequest().authenticated())  // All other requests need authentication
                 .formLogin(login -> login

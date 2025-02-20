@@ -7,13 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class DonorProfileService {
@@ -32,14 +33,22 @@ public class DonorProfileService {
                 });
     }
 
-    public void processProfileImage(DonorProfile profileData, MultipartFile profileImage, String uploadPath) throws IOException {
+    public void processProfileImage(DonorProfile profile, MultipartFile profileImage, String uploadPath) throws IOException {
         if (!profileImage.isEmpty()) {
-            String originalFileName = StringUtils.cleanPath(profileImage.getOriginalFilename());
-            String filePath = uploadPath + originalFileName;
-            File destinationFile = new File(filePath);
-            destinationFile.getParentFile().mkdirs();
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                boolean created = uploadDir.mkdirs();
+                System.out.println(created ? "Upload directory created" : "Failed to create upload directory");
+            }
+
+            String originalFilename = profileImage.getOriginalFilename();
+            String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
+            File destinationFile = new File(uploadDir, uniqueFilename);
+            System.out.println("Saving file to: " + destinationFile.getAbsolutePath());
             profileImage.transferTo(destinationFile);
-            profileData.setImagePath("/uploads/" + originalFileName);
+
+            profile.setImagePath("/uploads/" + uniqueFilename);
+            System.out.println("Image path set: " + profile.getImagePath());
         }
     }
 

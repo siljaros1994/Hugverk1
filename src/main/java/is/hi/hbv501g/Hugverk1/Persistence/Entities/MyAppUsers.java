@@ -31,16 +31,16 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
     private String password;
 
     // Fields for donorId and recipientId
-    @Column(name = "donor_id", unique = true, nullable = true)
+    @Column(name = "donor_id", nullable = true)
     private Long donorId;
 
-    @Column(name = "recipient_id", unique = true, nullable = true)
+    @Column(name = "recipient_id", nullable = true)
     private Long recipientId;
 
     @Column(nullable = false)
     private String userType; // Either donor or recipient.
 
-    @Column(name = "favorite_donors", nullable = true, columnDefinition = "VARCHAR(255) DEFAULT ''")
+    @Column(name = "favorite_donors", nullable = true)
     private String favoriteDonors = "";
 
     @Column(name = "matched_recipients")
@@ -48,6 +48,15 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
 
     @Column(name = "matched_donors")
     private String matchedDonors;
+
+    public List<Long> getMatchedDonorsList() {
+        if (matchedDonors == null || matchedDonors.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(matchedDonors.split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+    }
 
     public List<Long> getFavoriteDonorsList() {
         if (favoriteDonors == null || favoriteDonors.isEmpty()) {
