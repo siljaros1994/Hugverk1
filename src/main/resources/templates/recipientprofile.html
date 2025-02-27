@@ -54,7 +54,7 @@
                     <div class="form__field">
                         <label for="hairColor">Hair Color:</label>
                         <select th:field="*{hairColor}" id="hairColor" required>
-                            option value="">--Select Hair Color--</option>
+                            <option value="">--Select Hair Color--</option>
                             <option value="blonde">Blonde</option>
                             <option value="dark blonde">Dark Blonde</option>
                             <option value="brown">Brown</option>
@@ -197,7 +197,7 @@
                 <div class="profile-image">
                     <img th:src="${recipientProfile.imagePath != null ? recipientProfile.imagePath : '/uploads/default-recipient-avatar.png'}" alt="Recipient Image"/>
                 </div>
-                <p>Recipient ID: <span th:text="${recipientProfile.user?.recipientId ?: 'No ID available'}">Recipient ID</span></p>
+                <p>Recipient ID: <span th:text="${recipientProfile.recipientProfileId ?: 'No ID available'}">Recipient ID</span></p>
                 <p>Eye Color: <span th:text="${recipientProfile.eyeColor ?: 'Not specified'}">Eye Color</span></p>
                 <p>Hair Color: <span th:text="${recipientProfile.hairColor ?: 'Not specified'}">Hair Color</span></p>
                 <p>Education Level: <span th:text="${recipientProfile.educationLevel ?: 'Not specified'}">Education Level</span></p>

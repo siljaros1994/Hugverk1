@@ -54,8 +54,14 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        System.out.println("Loading user by username: " + username);
+        MyAppUsers user = userRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    System.out.println("User not found: " + username);
+                    return new UsernameNotFoundException("User not found");
+                });
+        System.out.println("User found: " + user.getUsername());
+        return user;
     }
 
     @Override

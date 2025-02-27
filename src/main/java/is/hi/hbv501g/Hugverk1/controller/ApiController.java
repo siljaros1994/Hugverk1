@@ -6,12 +6,16 @@ import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
 import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -20,24 +24,35 @@ public class ApiController {
     @Autowired
     private MyAppUserService myAppUserService;
 
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
-        Optional<MyAppUsers> user = myAppUserService.findByUsername(loginRequest.getUsername());
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
-        if (user.isPresent() && myAppUserService.matchPassword(loginRequest.getPassword(), user.get().getPassword())) {
-            MyAppUsers loggedInUser = user.get();
-            LoginResponse response = new LoginResponse(
-                    "success", // Token or session ID
-                    loggedInUser.getId(),
-                    loggedInUser.getUserType()
+    @PostMapping("/users/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
             );
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            MyAppUsers user = myAppUserService.findByUsername(loginRequest.getUsername())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+            LoginResponse response = new LoginResponse(
+                    "success", // session ID
+                    user.getId(),
+                    user.getUserType()
+            );
+
             return ResponseEntity.ok(response);
-        } else {
+        } catch (AuthenticationException e) {
+            System.out.println("Authentication failed: " + e.getMessage());
             return ResponseEntity.status(401).body(new LoginResponse("Invalid credentials", -1, null));
         }
     }
 
-    @PostMapping("/register")
+    @PostMapping("/users/register") // Match the updated register endpoint
     public ResponseEntity<LoginResponse> register(@RequestBody MyAppUsers user) {
         if (myAppUserService.findByUsername(user.getUsername()).isPresent()) {
             return ResponseEntity.badRequest().body(new LoginResponse("Username already exists", -1, null));

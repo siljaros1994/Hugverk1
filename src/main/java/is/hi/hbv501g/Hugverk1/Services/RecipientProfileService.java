@@ -11,7 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class RecipientProfileService {
 
     @Autowired
@@ -31,7 +32,6 @@ public class RecipientProfileService {
     public RecipientProfileService(RecipientProfileRepository recipientProfileRepository, @Value("${upload.path}") String uploadPath) {
         this.recipientProfileRepository = recipientProfileRepository;
         this.uploadPath = uploadPath;
-
         System.out.println("Upload path resolved to: " + this.uploadPath);
     }
 
@@ -67,7 +67,6 @@ public class RecipientProfileService {
     public RecipientProfile saveOrUpdateProfile(RecipientProfile profile) {
         // Retrieve the existing profile, if present
         Optional<RecipientProfile> existingProfile = recipientProfileRepository.findByUserId(profile.getUser().getId());
-
         if (existingProfile.isPresent()) {
             // Copy non-null properties from incoming profile to the existing profile
             RecipientProfile profileToUpdate = existingProfile.get();

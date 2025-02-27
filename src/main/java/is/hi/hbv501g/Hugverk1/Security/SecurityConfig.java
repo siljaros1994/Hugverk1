@@ -10,10 +10,10 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
 import static is.hi.hbv501g.Hugverk1.Security.PasswordEncoderConfig.passwordEncoder;
 
 // security configuration for the application, It handles login, user registration, password encoding, and more.
@@ -24,14 +24,17 @@ public class SecurityConfig {
     private final RestAuthenticationEntryPoint authenticationEntryPoint;
     private final MyAppUserService myAppUserService;
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;  // Inject handler
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public SecurityConfig(RestAuthenticationEntryPoint authenticationEntryPoint,
                           MyAppUserService myAppUserService,
-                          CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler) {
+                          CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler,
+                          PasswordEncoder passwordEncoder) {
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.myAppUserService = myAppUserService;
         this.customAuthenticationSuccessHandler = customAuthenticationSuccessHandler;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Bean
@@ -52,32 +55,38 @@ public class SecurityConfig {
                         .ignoringRequestMatchers("/api/**") // Disable CSRF for API endpoints
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)  // Here we always create a session
-                        .sessionFixation().migrateSession()  // Migrate the session to prevent session fixation attacks
-                        .maximumSessions(1).maxSessionsPreventsLogin(false))  // at last we allow only one session per user
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .sessionFixation().migrateSession()
+                        .maximumSessions(1).maxSessionsPreventsLogin(false)
+                )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/error").permitAll() // Allow access to /error
                         .requestMatchers("/api/**").permitAll() // Allow all API endpoints
                         .requestMatchers("/users/login", "/users/register", "/css/**", "/api/authenticate").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/admin/**", "/home/admin", "/donorlimits", "/delete/{username}", "/reports", "/history").hasRole("ADMIN")
                         .requestMatchers("/home/donor", "/donorprofile", "/donor/view/**", "/bookings/donor").authenticated()
-                        .requestMatchers("/home/recipient", "/recipientprofile",  "/recipient/view/**", "/bookings/recipient", "/recipient/favorite/**").authenticated()
+                        .requestMatchers("/home/recipient", "/recipientprofile", "/recipient/view/**", "/bookings/recipient", "/recipient/favorite/**").authenticated()
                         .requestMatchers("/messages/**", "/messages/{userType}/{id:[0-9]+}", "/dr").authenticated()
                         .requestMatchers("/match/donor/matches", "/match/recipient/matches", "/match/approveMatch", "/match/unmatch").authenticated()
-                        .anyRequest().authenticated())  // All other requests need authentication
+                        .anyRequest().authenticated()
+                )
                 .formLogin(login -> login
                         .loginPage("/users/login")
                         .successHandler(customAuthenticationSuccessHandler)
-                        .permitAll())
+                        .permitAll()
+                )
                 .httpBasic(httpBasic -> httpBasic
-                        .authenticationEntryPoint(authenticationEntryPoint))
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                )
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/users/logout", "POST"))
                         .logoutUrl("/users/logout")
                         .logoutSuccessUrl("/users/login?logout=true")
-                        .invalidateHttpSession(true) //This will invalidate session on logout
-                        .clearAuthentication(true) // This will clear authentication on logout
-                        .permitAll()) // Allow all users to access logout
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .permitAll()
+                )
                 .addFilterBefore(new CustomFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

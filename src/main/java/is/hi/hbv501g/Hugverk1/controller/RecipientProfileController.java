@@ -31,18 +31,18 @@ public class RecipientProfileController extends BaseController{
     // Displays the recipient profile page.
     @GetMapping
     public String showRecipientProfilePage(Model model) {
-        MyAppUsers loggedInUser = getLoggedInUser();
-
-        if (loggedInUser == null || !isUserType("recipient")) {
+        MyAppUsers sessionUser = getLoggedInUser();
+        if (sessionUser == null || !isUserType("recipient")) {
             return "redirect:/users/login";
         }
-
+        // Reload the user from the repository to get the latest data
+        MyAppUsers loggedInUser = myAppUserRepository.findById(sessionUser.getId())
+                .orElse(sessionUser);
         model.addAttribute("user", loggedInUser);
 
-        // Find or create a new profile
+        // Find or create a new profile (this will return the up‑to‑date profile)
         RecipientProfile recipientProfile = recipientProfileService.findOrCreateProfile(loggedInUser);
         model.addAttribute("recipientProfile", recipientProfile);
-
         return "recipientprofile";
     }
 
@@ -52,7 +52,17 @@ public class RecipientProfileController extends BaseController{
                                     @RequestParam("profileImage") MultipartFile profileImage) throws IOException {
 
         MyAppUsers loggedInUser = getLoggedInUser();
+        if (loggedInUser == null) {
+            return "redirect:/users/login";
+        }
+
+        // Bind the logged in user to the profile data
         profileData.setUser(loggedInUser);
+
+        // Log to see the incoming profile data
+        System.out.println("Profile Data: " + profileData + " Here we have our users profile data!!");
+
+        RecipientProfile updatedProfile;
 
         // Here we check if the profile already exists
         Optional<RecipientProfile> existingProfile = recipientProfileService.findByUserId(loggedInUser.getId());
@@ -61,15 +71,13 @@ public class RecipientProfileController extends BaseController{
             RecipientProfile profileToUpdate = existingProfile.get();
             BeanUtils.copyProperties(profileData, profileToUpdate, "recipientProfileId", "user");
             recipientProfileService.processProfileImage(profileToUpdate, profileImage);
-            recipientProfileService.saveOrUpdateProfile(profileToUpdate);
-            loggedInUser.setRecipientId(profileToUpdate.getRecipientProfileId());
+            updatedProfile = recipientProfileService.saveOrUpdateProfile(profileToUpdate);
         } else {
-            // Create a new profile if none exists
             profileData.setUser(loggedInUser);
             recipientProfileService.processProfileImage(profileData, profileImage);
-            recipientProfileService.saveOrUpdateProfile(profileData);
-            loggedInUser.setRecipientId(profileData.getRecipientProfileId());
+            updatedProfile = recipientProfileService.saveOrUpdateProfile(profileData);
         }
+        loggedInUser.setRecipientId(updatedProfile.getRecipientProfileId());
         myAppUserRepository.save(loggedInUser);
         System.out.println("Recipient ID set for user: " + loggedInUser.getRecipientId());
 
