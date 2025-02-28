@@ -60,9 +60,10 @@ public class SecurityConfig {
                         .maximumSessions(1).maxSessionsPreventsLogin(false)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/error").permitAll() // Allow access to /error
-                        .requestMatchers("/api/**").permitAll() // Allow all API endpoints
-                        .requestMatchers("/users/login", "/users/register", "/css/**", "/api/authenticate").permitAll()
+                        .requestMatchers("/api/users/login", "/api/users/register", "/uploads/**", "/api/authenticate", "/css/**").permitAll()
+                        .requestMatchers("/error").permitAll() // Allow all access to /error
+                        .requestMatchers("/api/**", "/api/recipient/profile/**", "/api/donor/profile/**").authenticated()
+                        .requestMatchers("/users/login", "/users/register").permitAll() //start of inellij
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/admin/**", "/home/admin", "/donorlimits", "/delete/{username}", "/reports", "/history").hasRole("ADMIN")
                         .requestMatchers("/home/donor", "/donorprofile", "/donor/view/**", "/bookings/donor").authenticated()
