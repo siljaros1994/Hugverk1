@@ -1,11 +1,14 @@
 package is.hi.hbv501g.Hugverk1.controller;
 
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.*;
+import is.hi.hbv501g.Hugverk1.Persistence.Repositories.MyAppUserRepository;
 import is.hi.hbv501g.Hugverk1.Services.DonorProfileService;
 import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import is.hi.hbv501g.Hugverk1.Services.RecipientProfileService;
+import is.hi.hbv501g.Hugverk1.dto.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +38,9 @@ public class ApiController {
 
     @Autowired
     private DonorProfileService donorProfileService;
+
+    @Autowired
+    private MyAppUserRepository myAppUserRepository;
 
     @PostMapping("/users/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest,
@@ -80,18 +86,17 @@ public class ApiController {
     }
 
     @GetMapping("/recipient/profile/{userId}")
-    public ResponseEntity<Object> getRecipientProfile(@PathVariable Long userId) {
+    public ResponseEntity<?> getRecipientProfile(@PathVariable Long userId) {
         MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (loggedInUser == null || !loggedInUser.getId().equals(userId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Unauthorized: Please log in.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Please log in.");
         }
         Optional<RecipientProfile> profileOpt = recipientProfileService.findByUserId(userId);
         if (profileOpt.isPresent()) {
-            return ResponseEntity.ok(profileOpt.get());
+            RecipientProfileDTO dto = RecipientProfileConverter.convertToDTO(profileOpt.get());
+            return ResponseEntity.ok(dto);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Profile not found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Profile not found.");
         }
     }
 
@@ -99,15 +104,43 @@ public class ApiController {
     public ResponseEntity<?> getDonorProfile(@PathVariable Long userId) {
         MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (loggedInUser == null || !loggedInUser.getId().equals(userId)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Unauthorized: Please log in.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Please log in.");
         }
         Optional<DonorProfile> profileOpt = donorProfileService.findByUserId(userId);
         if (profileOpt.isPresent()) {
-            return ResponseEntity.ok(profileOpt.get());
+            DonorProfileDTO dto = DonorProfileConverter.convertToDTO(profileOpt.get());
+            return ResponseEntity.ok(dto);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Profile not found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Profile not found.");
         }
+    }
+
+    // Here we accepts a JSON recipient profile, that updates or saves the profile.
+    @PostMapping("/recipient/profile/saveOrEdit")
+    public ResponseEntity<RecipientProfileDTO> saveOrEditRecipientProfile(@RequestBody RecipientProfile profile,
+                                                                          HttpServletRequest request) {
+        // Retrieve the logged-in user from the security context
+        MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (loggedInUser == null || (profile.getUser() != null && !loggedInUser.getId().equals(profile.getUser().getId()))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        RecipientProfile updatedProfile;
+        Optional<RecipientProfile> existingProfile = recipientProfileService.findByUserId(loggedInUser.getId());
+        if (existingProfile.isPresent()) {
+            RecipientProfile profileToUpdate = existingProfile.get();
+            // Copy properties from the incoming profile to the existing one, ignoring recipientProfileId and user.
+            BeanUtils.copyProperties(profile, profileToUpdate, "recipientProfileId", "user");
+            updatedProfile = recipientProfileService.saveOrUpdateProfile(profileToUpdate);
+        } else {
+            profile.setUser(loggedInUser);
+            updatedProfile = recipientProfileService.saveOrUpdateProfile(profile);
+        }
+        loggedInUser.setRecipientId(updatedProfile.getRecipientProfileId());
+        myAppUserRepository.save(loggedInUser);
+
+        // Convert the updated entity to a DTO to break any cyclic references.
+        RecipientProfileDTO dto = RecipientProfileConverter.convertToDTO(updatedProfile);
+        return ResponseEntity.ok(dto);
     }
 }

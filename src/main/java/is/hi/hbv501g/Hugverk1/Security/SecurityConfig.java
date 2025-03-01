@@ -62,7 +62,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/login", "/api/users/register", "/uploads/**", "/api/authenticate", "/css/**").permitAll()
                         .requestMatchers("/error").permitAll() // Allow all access to /error
-                        .requestMatchers("/api/**", "/api/recipient/profile/**", "/api/donor/profile/**").authenticated()
+                        .requestMatchers("/api/**", "/api/recipient/profile/**", "/api/donor/profile/**", "/api/recipient/profile/saveOrEdit").authenticated()
                         .requestMatchers("/users/login", "/users/register").permitAll() //start of inellij
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/admin/**", "/home/admin", "/donorlimits", "/delete/{username}", "/reports", "/history").hasRole("ADMIN")

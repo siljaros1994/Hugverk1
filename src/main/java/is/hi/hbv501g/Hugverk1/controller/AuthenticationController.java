@@ -1,6 +1,6 @@
 package is.hi.hbv501g.Hugverk1.controller;
 
-import is.hi.hbv501g.Hugverk1.Persistence.Entities.LoginRequest;
+import is.hi.hbv501g.Hugverk1.dto.LoginRequest;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.MyAppUsers;
 import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
