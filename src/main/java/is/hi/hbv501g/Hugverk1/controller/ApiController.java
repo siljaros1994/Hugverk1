@@ -6,7 +6,6 @@ import is.hi.hbv501g.Hugverk1.Services.DonorProfileService;
 import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import is.hi.hbv501g.Hugverk1.Services.RecipientProfileService;
 import is.hi.hbv501g.Hugverk1.dto.*;
-import is.hi.hbv501g.Hugverk1.util.BeanPropertyUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
@@ -21,10 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Optional;
-
-import static is.hi.hbv501g.Hugverk1.util.BeanPropertyUtils.copyNonNullProperties;
 
 @RestController
 @RequestMapping("/api")
@@ -132,14 +128,17 @@ public class ApiController {
         Optional<RecipientProfile> existingProfile = recipientProfileService.findByUserId(loggedInUser.getId());
         if (existingProfile.isPresent()) {
             RecipientProfile profileToUpdate = existingProfile.get();
+            profileToUpdate.setHairColor(profile.getHairColor());
+            profileToUpdate.setEyeColor(profile.getEyeColor());
+            profileToUpdate.setBloodType(profile.getBloodType());
             // Copy properties from the incoming profile to the existing one, ignoring recipientProfileId and user.
-            copyNonNullProperties(profile, profileToUpdate);
+            BeanUtils.copyProperties(profile, profileToUpdate, "recipientProfileId", "user");
             updatedProfile = recipientProfileService.saveOrUpdateProfile(profileToUpdate);
         } else {
             profile.setUser(loggedInUser);
             updatedProfile = recipientProfileService.saveOrUpdateProfile(profile);
         }
-        loggedInUser.setRecipientId(updatedProfile.getRecipientProfileId());
+        loggedInUser.setRecipientProfile(updatedProfile);
         myAppUserRepository.save(loggedInUser);
 
         // Convert the updated entity to a DTO to break any cyclic references.
@@ -161,17 +160,17 @@ public class ApiController {
         Optional<DonorProfile> existingProfile = donorProfileService.findByUserId(loggedInUser.getId());
         if (existingProfile.isPresent()) {
             DonorProfile profileToUpdate = existingProfile.get();
-            // Use our utility method to copy only non-null properties and also ignore donorProfileId and user.
-            BeanPropertyUtils.copyNonNullProperties(profile, profileToUpdate, "donorProfileId", "user");
+            // Here we use utility method to copy only non-null properties and also ignore donorProfileId and user.
+            BeanUtils.copyProperties(profile, profileToUpdate, "donorProfileId", "user");
             updatedProfile = donorProfileService.saveOrUpdateProfile(profileToUpdate);
         } else {
             profile.setUser(loggedInUser);
             updatedProfile = donorProfileService.saveOrUpdateProfile(profile);
         }
-        loggedInUser.setDonorId(updatedProfile.getDonorProfileId());
+        loggedInUser.setDonorProfile(updatedProfile);
         myAppUserRepository.save(loggedInUser);
 
-        // Convert the updated entity to a DTO to break any cyclic references.
+        // Here we convert the updated entity to a DTO to break any cyclic references.
         DonorProfileDTO dto = DonorProfileConverter.convertToDTO(updatedProfile);
         return ResponseEntity.ok(dto);
     }
