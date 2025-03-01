@@ -12,8 +12,12 @@ import java.util.List;
 @Controller
 public class AdminHomeController {
 
+    private final MyAppUserService myAppUserService;
+
     @Autowired
-    private MyAppUserService myAppUserService;
+    public AdminHomeController(MyAppUserService myAppUserService) {
+        this.myAppUserService = myAppUserService;
+    }
 
     @GetMapping("/home/admin")
     public String adminHome(Model model, HttpSession session) {

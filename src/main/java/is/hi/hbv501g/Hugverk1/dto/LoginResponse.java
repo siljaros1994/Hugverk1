@@ -1,4 +1,4 @@
-package is.hi.hbv501g.Hugverk1.Persistence.Entities;
+package is.hi.hbv501g.Hugverk1.dto;
 
 public class LoginResponse {
     private String message;

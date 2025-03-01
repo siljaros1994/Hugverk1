@@ -1,4 +1,4 @@
-package is.hi.hbv501g.Hugverk1.Persistence.Entities;
+package is.hi.hbv501g.Hugverk1.dto;
 
 //class that we use to pass login credentials (username and password) in API requests, such as from Postman.
 //It does not interact with our database.
