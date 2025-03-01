@@ -6,6 +6,7 @@ import is.hi.hbv501g.Hugverk1.Services.DonorProfileService;
 import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import is.hi.hbv501g.Hugverk1.Services.RecipientProfileService;
 import is.hi.hbv501g.Hugverk1.dto.*;
+import is.hi.hbv501g.Hugverk1.util.BeanPropertyUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
@@ -22,6 +23,8 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
+
+import static is.hi.hbv501g.Hugverk1.util.BeanPropertyUtils.copyNonNullProperties;
 
 @RestController
 @RequestMapping("/api")
@@ -130,7 +133,7 @@ public class ApiController {
         if (existingProfile.isPresent()) {
             RecipientProfile profileToUpdate = existingProfile.get();
             // Copy properties from the incoming profile to the existing one, ignoring recipientProfileId and user.
-            BeanUtils.copyProperties(profile, profileToUpdate, "recipientProfileId", "user");
+            copyNonNullProperties(profile, profileToUpdate);
             updatedProfile = recipientProfileService.saveOrUpdateProfile(profileToUpdate);
         } else {
             profile.setUser(loggedInUser);
@@ -141,6 +144,35 @@ public class ApiController {
 
         // Convert the updated entity to a DTO to break any cyclic references.
         RecipientProfileDTO dto = RecipientProfileConverter.convertToDTO(updatedProfile);
+        return ResponseEntity.ok(dto);
+    }
+
+    // Here we accepts a JSON recipient profile, that updates or saves the profile.
+    @PostMapping("/donor/profile/saveOrEdit")
+    public ResponseEntity<DonorProfileDTO> saveOrEditDonorProfile(@RequestBody DonorProfile profile,
+                                                                          HttpServletRequest request) {
+        // Retrieve the logged-in user from the security context
+        MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (loggedInUser == null || (profile.getUser() != null && !loggedInUser.getId().equals(profile.getUser().getId()))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        DonorProfile updatedProfile;
+        Optional<DonorProfile> existingProfile = donorProfileService.findByUserId(loggedInUser.getId());
+        if (existingProfile.isPresent()) {
+            DonorProfile profileToUpdate = existingProfile.get();
+            // Use our utility method to copy only non-null properties and also ignore donorProfileId and user.
+            BeanPropertyUtils.copyNonNullProperties(profile, profileToUpdate, "donorProfileId", "user");
+            updatedProfile = donorProfileService.saveOrUpdateProfile(profileToUpdate);
+        } else {
+            profile.setUser(loggedInUser);
+            updatedProfile = donorProfileService.saveOrUpdateProfile(profile);
+        }
+        loggedInUser.setDonorId(updatedProfile.getDonorProfileId());
+        myAppUserRepository.save(loggedInUser);
+
+        // Convert the updated entity to a DTO to break any cyclic references.
+        DonorProfileDTO dto = DonorProfileConverter.convertToDTO(updatedProfile);
         return ResponseEntity.ok(dto);
     }
 }
