@@ -29,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -178,30 +179,56 @@ public class ApiController {
         }
 
         DonorProfile profileToSave;
-        Optional<DonorProfile> existingProfile = donorProfileService.findByUserId(loggedInUser.getId());
-        if (existingProfile.isPresent()) {
-            DonorProfile existing = existingProfile.get();
-            existing.setEyeColor(profile.getEyeColor());
-            existing.setHairColor(profile.getHairColor());
-            existing.setEducationLevel(profile.getEducationLevel());
-            existing.setRace(profile.getRace());
-            existing.setEthnicity(profile.getEthnicity());
-            existing.setBloodType(profile.getBloodType());
-            existing.setMedicalHistory(profile.getMedicalHistory());
-            existing.setHeight(profile.getHeight());
-            existing.setWeight(profile.getWeight());
-            existing.setAge(profile.getAge());
-            existing.setGetToKnow(profile.getGetToKnow());
-
-            if (profile.getImagePath() != null && !profile.getImagePath().isEmpty()) {
+        Optional<DonorProfile> existingProfileOpt = donorProfileService.findByUserId(loggedInUser.getId());
+        if (existingProfileOpt.isPresent()) {
+            DonorProfile existing = existingProfileOpt.get();
+            // Only update the fields if the incoming value is not null (or non-empty for strings)
+            if (profile.getEyeColor() != null) {
+                existing.setEyeColor(profile.getEyeColor());
+            }
+            if (profile.getHairColor() != null) {
+                existing.setHairColor(profile.getHairColor());
+            }
+            if (profile.getEducationLevel() != null) {
+                existing.setEducationLevel(profile.getEducationLevel());
+            }
+            if (profile.getRace() != null) {
+                existing.setRace(profile.getRace());
+            }
+            if (profile.getEthnicity() != null) {
+                existing.setEthnicity(profile.getEthnicity());
+            }
+            if (profile.getBloodType() != null) {
+                existing.setBloodType(profile.getBloodType());
+            }
+            if (profile.getMedicalHistory() != null && !profile.getMedicalHistory().isEmpty()) {
+                // Convert list to set if needed
+                existing.setMedicalHistory(new HashSet<>(profile.getMedicalHistory()));
+            }
+            if (profile.getHeight() != null) {
+                existing.setHeight(profile.getHeight());
+            }
+            if (profile.getWeight() != null) {
+                existing.setWeight(profile.getWeight());
+            }
+            if (profile.getAge() != null) {
+                existing.setAge(profile.getAge());
+            }
+            if (profile.getGetToKnow() != null) {
+                existing.setGetToKnow(profile.getGetToKnow());
+            }
+            // Only update the imagePath if it is provided and non-empty
+            if (profile.getImagePath() != null && !profile.getImagePath().trim().isEmpty()) {
                 System.out.println("Updating imagePath to: " + profile.getImagePath());
                 existing.setImagePath(profile.getImagePath());
             }
             profileToSave = existing;
         } else {
+            // In case this is a new profile, make sure to set the user association
             profile.setUser(loggedInUser);
             profileToSave = profile;
         }
+
         DonorProfile updatedProfile = donorProfileService.saveOrUpdateProfile(profileToSave);
         loggedInUser.setDonorProfile(updatedProfile);
         myAppUserRepository.save(loggedInUser);
@@ -218,11 +245,7 @@ public class ApiController {
         try {
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) {
-                boolean created = uploadDir.mkdirs();
-                if (!created) {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body("Failed to create upload directory");
-                }
+                uploadDir.mkdirs();
             }
             String originalFilename = file.getOriginalFilename();
             String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
