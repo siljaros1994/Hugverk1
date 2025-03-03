@@ -10,6 +10,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,7 +25,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -40,6 +53,10 @@ public class ApiController {
 
     @Autowired
     private MyAppUserRepository myAppUserRepository;
+
+    // Inject the upload path from application.properties
+    @Value("${upload.path}")
+    private String uploadPath;
 
     @PostMapping("/users/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest,
@@ -114,11 +131,21 @@ public class ApiController {
         }
     }
 
-    // Here we accepts a JSON recipient profile, that updates or saves the profile.
+    @GetMapping("/donor/all")
+    public ResponseEntity<List<DonorProfileDTO>> getAllDonors(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("age").ascending());
+        Page<DonorProfile> donorPage = donorProfileService.findAll(pageable);
+        List<DonorProfileDTO> dtoList = donorPage.getContent().stream()
+                .map(DonorProfileConverter::convertToDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtoList);
+    }
+
     @PostMapping("/recipient/profile/saveOrEdit")
     public ResponseEntity<RecipientProfileDTO> saveOrEditRecipientProfile(@RequestBody RecipientProfile profile,
                                                                           HttpServletRequest request) {
-        // Retrieve the logged-in user from the security context
         MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (loggedInUser == null || (profile.getUser() != null && !loggedInUser.getId().equals(profile.getUser().getId()))) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -131,7 +158,6 @@ public class ApiController {
             profileToUpdate.setHairColor(profile.getHairColor());
             profileToUpdate.setEyeColor(profile.getEyeColor());
             profileToUpdate.setBloodType(profile.getBloodType());
-            // Copy properties from the incoming profile to the existing one, ignoring recipientProfileId and user.
             BeanUtils.copyProperties(profile, profileToUpdate, "recipientProfileId", "user");
             updatedProfile = recipientProfileService.saveOrUpdateProfile(profileToUpdate);
         } else {
@@ -140,38 +166,96 @@ public class ApiController {
         }
         loggedInUser.setRecipientProfile(updatedProfile);
         myAppUserRepository.save(loggedInUser);
-
-        // Convert the updated entity to a DTO to break any cyclic references.
         RecipientProfileDTO dto = RecipientProfileConverter.convertToDTO(updatedProfile);
         return ResponseEntity.ok(dto);
     }
 
-    // Here we accepts a JSON recipient profile, that updates or saves the profile.
     @PostMapping("/donor/profile/saveOrEdit")
     public ResponseEntity<DonorProfileDTO> saveOrEditDonorProfile(@RequestBody DonorProfile profile,
-                                                                          HttpServletRequest request) {
-        // Retrieve the logged-in user from the security context
+                                                                  HttpServletRequest request) {
         MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (loggedInUser == null || (profile.getUser() != null && !loggedInUser.getId().equals(profile.getUser().getId()))) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        DonorProfile updatedProfile;
-        Optional<DonorProfile> existingProfile = donorProfileService.findByUserId(loggedInUser.getId());
-        if (existingProfile.isPresent()) {
-            DonorProfile profileToUpdate = existingProfile.get();
-            // Here we use utility method to copy only non-null properties and also ignore donorProfileId and user.
-            BeanUtils.copyProperties(profile, profileToUpdate, "donorProfileId", "user");
-            updatedProfile = donorProfileService.saveOrUpdateProfile(profileToUpdate);
+        DonorProfile profileToSave;
+        Optional<DonorProfile> existingProfileOpt = donorProfileService.findByUserId(loggedInUser.getId());
+        if (existingProfileOpt.isPresent()) {
+            DonorProfile existing = existingProfileOpt.get();
+            // Only update the fields if the incoming value is not null (or non-empty for strings)
+            if (profile.getEyeColor() != null) {
+                existing.setEyeColor(profile.getEyeColor());
+            }
+            if (profile.getHairColor() != null) {
+                existing.setHairColor(profile.getHairColor());
+            }
+            if (profile.getEducationLevel() != null) {
+                existing.setEducationLevel(profile.getEducationLevel());
+            }
+            if (profile.getRace() != null) {
+                existing.setRace(profile.getRace());
+            }
+            if (profile.getEthnicity() != null) {
+                existing.setEthnicity(profile.getEthnicity());
+            }
+            if (profile.getBloodType() != null) {
+                existing.setBloodType(profile.getBloodType());
+            }
+            if (profile.getMedicalHistory() != null && !profile.getMedicalHistory().isEmpty()) {
+                // Convert list to set if needed
+                existing.setMedicalHistory(new HashSet<>(profile.getMedicalHistory()));
+            }
+            if (profile.getHeight() != null) {
+                existing.setHeight(profile.getHeight());
+            }
+            if (profile.getWeight() != null) {
+                existing.setWeight(profile.getWeight());
+            }
+            if (profile.getAge() != null) {
+                existing.setAge(profile.getAge());
+            }
+            if (profile.getGetToKnow() != null) {
+                existing.setGetToKnow(profile.getGetToKnow());
+            }
+            // Only update the imagePath if it is provided and non-empty
+            if (profile.getImagePath() != null && !profile.getImagePath().trim().isEmpty()) {
+                System.out.println("Updating imagePath to: " + profile.getImagePath());
+                existing.setImagePath(profile.getImagePath());
+            }
+            profileToSave = existing;
         } else {
+            // In case this is a new profile, make sure to set the user association
             profile.setUser(loggedInUser);
-            updatedProfile = donorProfileService.saveOrUpdateProfile(profile);
+            profileToSave = profile;
         }
+
+        DonorProfile updatedProfile = donorProfileService.saveOrUpdateProfile(profileToSave);
         loggedInUser.setDonorProfile(updatedProfile);
         myAppUserRepository.save(loggedInUser);
 
-        // Here we convert the updated entity to a DTO to break any cyclic references.
         DonorProfileDTO dto = DonorProfileConverter.convertToDTO(updatedProfile);
         return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("File is empty");
+        }
+        try {
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
+            String originalFilename = file.getOriginalFilename();
+            String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
+            File destinationFile = new File(uploadDir, uniqueFilename);
+            file.transferTo(destinationFile);
+            String filePath = "/uploads/" + uniqueFilename;
+            return ResponseEntity.ok(filePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving file");
+        }
     }
 }
