@@ -26,13 +26,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -58,6 +54,8 @@ public class ApiController {
     @Value("${upload.path}")
     private String uploadPath;
 
+    private final String BASE_URL = "http://192.168.101.4:8080";
+
     @PostMapping("/users/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest,
                                                HttpServletRequest request) {
@@ -67,7 +65,7 @@ public class ApiController {
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // Force creation of session and store the security context
+            // Force creation of session and store the security.
             HttpSession session = request.getSession(true);
             session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                     SecurityContextHolder.getContext());
@@ -75,30 +73,31 @@ public class ApiController {
             MyAppUsers user = myAppUserService.findByUsername(loginRequest.getUsername())
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-            LoginResponse response = new LoginResponse("success", user.getId(), user.getUserType());
+            LoginResponse response = new LoginResponse("success", user.getId(), user.getUserType(), user.getUsername());
             return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
             System.out.println("Authentication failed: " + e.getMessage());
-            return ResponseEntity.status(401).body(new LoginResponse("Invalid credentials", -1, null));
+            return ResponseEntity.status(401).body(new LoginResponse("Invalid credentials", -1, null, null));
+
         }
     }
 
     @PostMapping("/users/register")
     public ResponseEntity<LoginResponse> register(@RequestBody MyAppUsers user) {
         if (myAppUserService.findByUsername(user.getUsername()).isPresent()) {
-            return ResponseEntity.badRequest().body(new LoginResponse("Username already exists", -1, null));
+            return ResponseEntity.badRequest().body(new LoginResponse("Username already exists", -1, null, null));
         }
 
         if (!user.getPassword().equals(user.getConfirmPassword())) {
-            return ResponseEntity.badRequest().body(new LoginResponse("Passwords do not match", -1, null));
+            return ResponseEntity.badRequest().body(new LoginResponse("Passwords do not match", -1, null, null));
         }
 
         if (user.getUserType() == null || user.getUserType().isEmpty()) {
-            return ResponseEntity.badRequest().body(new LoginResponse("Please select a valid user type", -1, null));
+            return ResponseEntity.badRequest().body(new LoginResponse("Please select a valid user type", -1, null, null));
         }
 
         myAppUserService.saveUser(user);
-        return ResponseEntity.ok(new LoginResponse("User registered successfully", user.getId(), user.getUserType()));
+        return ResponseEntity.ok(new LoginResponse("User registered successfully", user.getId(), user.getUserType(),user.getUsername()));
     }
 
     @GetMapping("/recipient/profile/{userId}")
@@ -108,12 +107,21 @@ public class ApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Please log in.");
         }
         Optional<RecipientProfile> profileOpt = recipientProfileService.findByUserId(userId);
+
+        RecipientProfileDTO dto;
         if (profileOpt.isPresent()) {
-            RecipientProfileDTO dto = RecipientProfileConverter.convertToDTO(profileOpt.get());
-            return ResponseEntity.ok(dto);
+            dto = RecipientProfileConverter.convertToDTO(profileOpt.get());
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Profile not found.");
+            // return an empty profile DTO.
+            dto = new RecipientProfileDTO();
+            dto.setUserId(userId);
         }
+        // Format the image URL
+        String imagePath = dto.getImagePath();
+        if (imagePath != null && !imagePath.startsWith("http")) {
+            dto.setImagePath(BASE_URL + (imagePath.startsWith("/") ? "" : "/") + imagePath);
+        }
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/donor/profile/{userId}")
@@ -123,12 +131,21 @@ public class ApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Please log in.");
         }
         Optional<DonorProfile> profileOpt = donorProfileService.findByUserId(userId);
+
+        DonorProfileDTO dto;
         if (profileOpt.isPresent()) {
-            DonorProfileDTO dto = DonorProfileConverter.convertToDTO(profileOpt.get());
-            return ResponseEntity.ok(dto);
+            dto = DonorProfileConverter.convertToDTO(profileOpt.get());
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Profile not found.");
+            // return an empty profile DTO.
+            dto = new DonorProfileDTO();
+            dto.setUserId(userId);
         }
+        // Format the image URL
+        String imagePath = dto.getImagePath();
+        if (imagePath != null && !imagePath.startsWith("http")) {
+            dto.setImagePath(BASE_URL + (imagePath.startsWith("/") ? "" : "/") + imagePath);
+        }
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/donor/all")
@@ -138,7 +155,14 @@ public class ApiController {
         Pageable pageable = PageRequest.of(page, size, Sort.by("age").ascending());
         Page<DonorProfile> donorPage = donorProfileService.findAll(pageable);
         List<DonorProfileDTO> dtoList = donorPage.getContent().stream()
-                .map(DonorProfileConverter::convertToDTO)
+                .map(profile -> {
+                    DonorProfileDTO dto = DonorProfileConverter.convertToDTO(profile);
+                    String imagePath = dto.getImagePath();
+                    if (imagePath != null && !imagePath.startsWith("http")) {
+                        dto.setImagePath(BASE_URL + (imagePath.startsWith("/") ? "" : "/") + imagePath);
+                    }
+                    return dto;
+                })
                 .collect(Collectors.toList());
         return ResponseEntity.ok(dtoList);
     }
@@ -151,22 +175,24 @@ public class ApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        RecipientProfile updatedProfile;
-        Optional<RecipientProfile> existingProfile = recipientProfileService.findByUserId(loggedInUser.getId());
-        if (existingProfile.isPresent()) {
-            RecipientProfile profileToUpdate = existingProfile.get();
-            profileToUpdate.setHairColor(profile.getHairColor());
-            profileToUpdate.setEyeColor(profile.getEyeColor());
-            profileToUpdate.setBloodType(profile.getBloodType());
-            BeanUtils.copyProperties(profile, profileToUpdate, "recipientProfileId", "user");
-            updatedProfile = recipientProfileService.saveOrUpdateProfile(profileToUpdate);
+        RecipientProfile profileToSave;
+        Optional<RecipientProfile> existingOpt = recipientProfileService.findByUserId(loggedInUser.getId());
+        if (existingOpt.isPresent()) {
+            RecipientProfile existing = existingOpt.get();
+            BeanUtils.copyProperties(profile, existing, "recipientProfileId", "user");
+            profileToSave = existing;
         } else {
             profile.setUser(loggedInUser);
-            updatedProfile = recipientProfileService.saveOrUpdateProfile(profile);
+            profileToSave = profile;
         }
+
+        RecipientProfile updatedProfile = recipientProfileService.saveOrUpdateProfile(profileToSave);
         loggedInUser.setRecipientProfile(updatedProfile);
         myAppUserRepository.save(loggedInUser);
         RecipientProfileDTO dto = RecipientProfileConverter.convertToDTO(updatedProfile);
+        if (dto.getImagePath() != null && !dto.getImagePath().startsWith("http")) {
+            dto.setImagePath(BASE_URL + (dto.getImagePath().startsWith("/") ? "" : "/") + dto.getImagePath());
+        }
         return ResponseEntity.ok(dto);
     }
 
@@ -179,52 +205,13 @@ public class ApiController {
         }
 
         DonorProfile profileToSave;
-        Optional<DonorProfile> existingProfileOpt = donorProfileService.findByUserId(loggedInUser.getId());
-        if (existingProfileOpt.isPresent()) {
-            DonorProfile existing = existingProfileOpt.get();
-            // Only update the fields if the incoming value is not null (or non-empty for strings)
-            if (profile.getEyeColor() != null) {
-                existing.setEyeColor(profile.getEyeColor());
-            }
-            if (profile.getHairColor() != null) {
-                existing.setHairColor(profile.getHairColor());
-            }
-            if (profile.getEducationLevel() != null) {
-                existing.setEducationLevel(profile.getEducationLevel());
-            }
-            if (profile.getRace() != null) {
-                existing.setRace(profile.getRace());
-            }
-            if (profile.getEthnicity() != null) {
-                existing.setEthnicity(profile.getEthnicity());
-            }
-            if (profile.getBloodType() != null) {
-                existing.setBloodType(profile.getBloodType());
-            }
-            if (profile.getMedicalHistory() != null && !profile.getMedicalHistory().isEmpty()) {
-                // Convert list to set if needed
-                existing.setMedicalHistory(new HashSet<>(profile.getMedicalHistory()));
-            }
-            if (profile.getHeight() != null) {
-                existing.setHeight(profile.getHeight());
-            }
-            if (profile.getWeight() != null) {
-                existing.setWeight(profile.getWeight());
-            }
-            if (profile.getAge() != null) {
-                existing.setAge(profile.getAge());
-            }
-            if (profile.getGetToKnow() != null) {
-                existing.setGetToKnow(profile.getGetToKnow());
-            }
-            // Only update the imagePath if it is provided and non-empty
-            if (profile.getImagePath() != null && !profile.getImagePath().trim().isEmpty()) {
-                System.out.println("Updating imagePath to: " + profile.getImagePath());
-                existing.setImagePath(profile.getImagePath());
-            }
+        Optional<DonorProfile> existingOpt = donorProfileService.findByUserId(loggedInUser.getId());
+        if (existingOpt.isPresent()) {
+            DonorProfile existing = existingOpt.get();
+            // Copy all matching properties, ignoring the ID and user fields.
+            BeanUtils.copyProperties(profile, existing, "donorProfileId", "user");
             profileToSave = existing;
         } else {
-            // In case this is a new profile, make sure to set the user association
             profile.setUser(loggedInUser);
             profileToSave = profile;
         }
@@ -232,15 +219,18 @@ public class ApiController {
         DonorProfile updatedProfile = donorProfileService.saveOrUpdateProfile(profileToSave);
         loggedInUser.setDonorProfile(updatedProfile);
         myAppUserRepository.save(loggedInUser);
-
         DonorProfileDTO dto = DonorProfileConverter.convertToDTO(updatedProfile);
+        String imagePath = dto.getImagePath();
+        if (imagePath != null && !imagePath.startsWith("http")) {
+            dto.setImagePath(BASE_URL + (imagePath.startsWith("/") ? "" : "/") + imagePath);
+        }
         return ResponseEntity.ok(dto);
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Map<String, String>> uploadFile(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
-            return ResponseEntity.badRequest().body("File is empty");
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", "File is empty"));
         }
         try {
             File uploadDir = new File(uploadPath);
@@ -251,11 +241,14 @@ public class ApiController {
             String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
             File destinationFile = new File(uploadDir, uniqueFilename);
             file.transferTo(destinationFile);
-            String filePath = "/uploads/" + uniqueFilename;
-            return ResponseEntity.ok(filePath);
+
+            String fileUrl = BASE_URL + "/uploads/" + uniqueFilename;
+            // Here we return as a JSON object
+            return ResponseEntity.ok(Collections.singletonMap("fileUrl", fileUrl));
         } catch (IOException e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving file");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", "Error saving file"));
         }
     }
 }

@@ -4,11 +4,13 @@ public class LoginResponse {
     private String message;
     private long userId;
     private String userType;
+    private String username;
 
-    public LoginResponse(String message, long userId, String userType) {
+    public LoginResponse(String message, long userId, String userType, String userName) {
         this.message = message;
         this.userId = userId;
         this.userType = userType;
+        this.username = userName;
     }
 
     // Getters and setters
@@ -34,5 +36,13 @@ public class LoginResponse {
 
     public void setUserType(String userType) {
         this.userType = userType;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String userName) {
+        this.username = userName;
     }
 }
