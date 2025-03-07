@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +27,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -196,6 +194,17 @@ public class ApiController {
         loggedInUser.setDonorProfile(updatedProfile);
         myAppUserRepository.save(loggedInUser);
         DonorProfileDTO dto = DonorProfileConverter.convertToDTO(updatedProfile);
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/donor/view/{donorProfileId}")
+    public ResponseEntity<?> viewDonorProfile(@PathVariable Long donorProfileId) {
+        Optional<DonorProfile> profileOpt = donorProfileService.findByProfileId(donorProfileId);
+        if (!profileOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Donor profile not found.");
+        }
+        // Convert to DTO – imagePath is already a full URL.
+        DonorProfileDTO dto = DonorProfileConverter.convertToDTO(profileOpt.get());
         return ResponseEntity.ok(dto);
     }
 
