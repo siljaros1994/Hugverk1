@@ -231,4 +231,11 @@ public class ApiController {
                     .body(Collections.singletonMap("error", "Error uploading file"));
         }
     }
+    @GetMapping("/users/all")
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
+        List<MyAppUsers> users = myAppUserService.findAllUsers(); // Assuming this method exists
+        List<UserDTO> userDTOs = users.stream().map(user -> new UserDTO(user.getId(), user.getUsername(), user.getUserType())).collect(Collectors.toList());
+        return ResponseEntity.ok(userDTOs);
+    }
+
 }
