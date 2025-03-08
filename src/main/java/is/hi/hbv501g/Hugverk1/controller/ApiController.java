@@ -231,4 +231,23 @@ public class ApiController {
                     .body(Collections.singletonMap("error", "Error uploading file"));
         }
     }
+
+    @PostMapping("/users/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        //Get the session if it exists
+        HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            //Invalidate the session
+            session.invalidate();
+        }
+
+        //Clear the security context
+        SecurityContextHolder.clearContext();
+
+        //Return logout success response
+        return ResponseEntity.ok().body(Collections.singletonMap("message", "Logged out successfully"));
+    }
+
+
 }
