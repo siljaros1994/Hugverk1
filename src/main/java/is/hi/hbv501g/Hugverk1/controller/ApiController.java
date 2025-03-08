@@ -1,16 +1,21 @@
 package is.hi.hbv501g.Hugverk1.controller;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.*;
 import is.hi.hbv501g.Hugverk1.Persistence.Repositories.MyAppUserRepository;
 import is.hi.hbv501g.Hugverk1.Services.DonorProfileService;
 import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import is.hi.hbv501g.Hugverk1.Services.RecipientProfileService;
 import is.hi.hbv501g.Hugverk1.dto.*;
-import is.hi.hbv501g.Hugverk1.util.BeanPropertyUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,10 +26,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
-
-import static is.hi.hbv501g.Hugverk1.util.BeanPropertyUtils.copyNonNullProperties;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -54,7 +59,7 @@ public class ApiController {
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // Force creation of session and store the security context
+            // Force creation of session and store the security.
             HttpSession session = request.getSession(true);
             session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                     SecurityContextHolder.getContext());
@@ -62,30 +67,31 @@ public class ApiController {
             MyAppUsers user = myAppUserService.findByUsername(loginRequest.getUsername())
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-            LoginResponse response = new LoginResponse("success", user.getId(), user.getUserType());
+            LoginResponse response = new LoginResponse("success", user.getId(), user.getUserType(), user.getUsername());
             return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
             System.out.println("Authentication failed: " + e.getMessage());
-            return ResponseEntity.status(401).body(new LoginResponse("Invalid credentials", -1, null));
+            return ResponseEntity.status(401).body(new LoginResponse("Invalid credentials", -1, null, null));
+
         }
     }
 
     @PostMapping("/users/register")
     public ResponseEntity<LoginResponse> register(@RequestBody MyAppUsers user) {
         if (myAppUserService.findByUsername(user.getUsername()).isPresent()) {
-            return ResponseEntity.badRequest().body(new LoginResponse("Username already exists", -1, null));
+            return ResponseEntity.badRequest().body(new LoginResponse("Username already exists", -1, null, null));
         }
 
         if (!user.getPassword().equals(user.getConfirmPassword())) {
-            return ResponseEntity.badRequest().body(new LoginResponse("Passwords do not match", -1, null));
+            return ResponseEntity.badRequest().body(new LoginResponse("Passwords do not match", -1, null, null));
         }
 
         if (user.getUserType() == null || user.getUserType().isEmpty()) {
-            return ResponseEntity.badRequest().body(new LoginResponse("Please select a valid user type", -1, null));
+            return ResponseEntity.badRequest().body(new LoginResponse("Please select a valid user type", -1, null, null));
         }
 
         myAppUserService.saveUser(user);
-        return ResponseEntity.ok(new LoginResponse("User registered successfully", user.getId(), user.getUserType()));
+        return ResponseEntity.ok(new LoginResponse("User registered successfully", user.getId(), user.getUserType(),user.getUsername()));
     }
 
     @GetMapping("/recipient/profile/{userId}")
@@ -95,12 +101,16 @@ public class ApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Please log in.");
         }
         Optional<RecipientProfile> profileOpt = recipientProfileService.findByUserId(userId);
+
+        RecipientProfileDTO dto;
         if (profileOpt.isPresent()) {
-            RecipientProfileDTO dto = RecipientProfileConverter.convertToDTO(profileOpt.get());
-            return ResponseEntity.ok(dto);
+            dto = RecipientProfileConverter.convertToDTO(profileOpt.get());
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Profile not found.");
+            // Return an empty profile DTO.
+            dto = new RecipientProfileDTO();
+            dto.setUserId(userId);
         }
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/donor/profile/{userId}")
@@ -110,69 +120,115 @@ public class ApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Please log in.");
         }
         Optional<DonorProfile> profileOpt = donorProfileService.findByUserId(userId);
+
+        DonorProfileDTO dto;
         if (profileOpt.isPresent()) {
-            DonorProfileDTO dto = DonorProfileConverter.convertToDTO(profileOpt.get());
-            return ResponseEntity.ok(dto);
+            dto = DonorProfileConverter.convertToDTO(profileOpt.get());
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Profile not found.");
+            // Return an empty profile DTO.
+            dto = new DonorProfileDTO();
+            dto.setUserId(userId);
         }
+        return ResponseEntity.ok(dto);
     }
 
-    // Here we accepts a JSON recipient profile, that updates or saves the profile.
+    @GetMapping("/donor/all")
+    public ResponseEntity<List<DonorProfileDTO>> getAllDonors(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("age").ascending());
+        Page<DonorProfile> donorPage = donorProfileService.findAll(pageable);
+        List<DonorProfileDTO> dtoList = donorPage.getContent().stream()
+                .map(profile -> DonorProfileConverter.convertToDTO(profile))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtoList);
+    }
+
     @PostMapping("/recipient/profile/saveOrEdit")
     public ResponseEntity<RecipientProfileDTO> saveOrEditRecipientProfile(@RequestBody RecipientProfile profile,
                                                                           HttpServletRequest request) {
-        // Retrieve the logged-in user from the security context
         MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (loggedInUser == null || (profile.getUser() != null && !loggedInUser.getId().equals(profile.getUser().getId()))) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        RecipientProfile updatedProfile;
-        Optional<RecipientProfile> existingProfile = recipientProfileService.findByUserId(loggedInUser.getId());
-        if (existingProfile.isPresent()) {
-            RecipientProfile profileToUpdate = existingProfile.get();
-            // Copy properties from the incoming profile to the existing one, ignoring recipientProfileId and user.
-            copyNonNullProperties(profile, profileToUpdate);
-            updatedProfile = recipientProfileService.saveOrUpdateProfile(profileToUpdate);
+        RecipientProfile profileToSave;
+        Optional<RecipientProfile> existingOpt = recipientProfileService.findByUserId(loggedInUser.getId());
+        if (existingOpt.isPresent()) {
+            RecipientProfile existing = existingOpt.get();
+            BeanUtils.copyProperties(profile, existing, "recipientProfileId", "user");
+            profileToSave = existing;
         } else {
             profile.setUser(loggedInUser);
-            updatedProfile = recipientProfileService.saveOrUpdateProfile(profile);
+            profileToSave = profile;
         }
-        loggedInUser.setRecipientId(updatedProfile.getRecipientProfileId());
-        myAppUserRepository.save(loggedInUser);
 
-        // Convert the updated entity to a DTO to break any cyclic references.
+        RecipientProfile updatedProfile = recipientProfileService.saveOrUpdateProfile(profileToSave);
+        loggedInUser.setRecipientProfile(updatedProfile);
+        myAppUserRepository.save(loggedInUser);
         RecipientProfileDTO dto = RecipientProfileConverter.convertToDTO(updatedProfile);
         return ResponseEntity.ok(dto);
     }
 
-    // Here we accepts a JSON recipient profile, that updates or saves the profile.
     @PostMapping("/donor/profile/saveOrEdit")
     public ResponseEntity<DonorProfileDTO> saveOrEditDonorProfile(@RequestBody DonorProfile profile,
-                                                                          HttpServletRequest request) {
-        // Retrieve the logged-in user from the security context
+                                                                  HttpServletRequest request) {
         MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (loggedInUser == null || (profile.getUser() != null && !loggedInUser.getId().equals(profile.getUser().getId()))) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        DonorProfile updatedProfile;
-        Optional<DonorProfile> existingProfile = donorProfileService.findByUserId(loggedInUser.getId());
-        if (existingProfile.isPresent()) {
-            DonorProfile profileToUpdate = existingProfile.get();
-            // Use our utility method to copy only non-null properties and also ignore donorProfileId and user.
-            BeanPropertyUtils.copyNonNullProperties(profile, profileToUpdate, "donorProfileId", "user");
-            updatedProfile = donorProfileService.saveOrUpdateProfile(profileToUpdate);
+        DonorProfile profileToSave;
+        Optional<DonorProfile> existingOpt = donorProfileService.findByUserId(loggedInUser.getId());
+        if (existingOpt.isPresent()) {
+            DonorProfile existing = existingOpt.get();
+            // Copy all matching properties, ignoring the ID and user fields.
+            BeanUtils.copyProperties(profile, existing, "donorProfileId", "user");
+            profileToSave = existing;
         } else {
             profile.setUser(loggedInUser);
-            updatedProfile = donorProfileService.saveOrUpdateProfile(profile);
+            profileToSave = profile;
         }
-        loggedInUser.setDonorId(updatedProfile.getDonorProfileId());
-        myAppUserRepository.save(loggedInUser);
 
-        // Convert the updated entity to a DTO to break any cyclic references.
+        DonorProfile updatedProfile = donorProfileService.saveOrUpdateProfile(profileToSave);
+        loggedInUser.setDonorProfile(updatedProfile);
+        myAppUserRepository.save(loggedInUser);
         DonorProfileDTO dto = DonorProfileConverter.convertToDTO(updatedProfile);
         return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/donor/view/{donorProfileId}")
+    public ResponseEntity<?> viewDonorProfile(@PathVariable Long donorProfileId) {
+        Optional<DonorProfile> profileOpt = donorProfileService.findByProfileId(donorProfileId);
+        if (!profileOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Donor profile not found.");
+        }
+        // Convert to DTO – imagePath is already a full URL.
+        DonorProfileDTO dto = DonorProfileConverter.convertToDTO(profileOpt.get());
+        return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<Map<String, String>> uploadFile(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", "File is empty"));
+        }
+        try {
+            Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
+                    "cloud_name", "dlfi65u4o",
+                    "api_key", "753673256719356",
+                    "api_secret", "JAex3aiR466-p62KFPM3WQ15Z_I"));
+
+            // Here we upload the file
+            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            String fileUrl = (String) uploadResult.get("secure_url");
+
+            // Return the URL in your response
+            return ResponseEntity.ok(Collections.singletonMap("fileUrl", fileUrl));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", "Error uploading file"));
+        }
     }
 }
