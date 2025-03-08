@@ -54,7 +54,7 @@ public class ApiController {
     @Value("${upload.path}")
     private String uploadPath;
 
-    private final String BASE_URL = "http://192.168.101.4:8080";
+    private final String BASE_URL = "http://130.208.120.183:8080";
 
     @PostMapping("/users/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest,
@@ -251,4 +251,12 @@ public class ApiController {
                     .body(Collections.singletonMap("error", "Error saving file"));
         }
     }
+
+    @GetMapping("/users/all")
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
+        List<MyAppUsers> users = myAppUserService.findAllUsers(); // Assuming this method exists
+        List<UserDTO> userDTOs = users.stream().map(user -> new UserDTO(user.getId(), user.getUsername(), user.getUserType())).collect(Collectors.toList());
+        return ResponseEntity.ok(userDTOs);
+    }
+
 }
