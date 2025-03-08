@@ -1,5 +1,7 @@
 package is.hi.hbv501g.Hugverk1.controller;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.*;
 import is.hi.hbv501g.Hugverk1.Persistence.Repositories.MyAppUserRepository;
 import is.hi.hbv501g.Hugverk1.Services.DonorProfileService;
@@ -10,7 +12,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +27,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -49,12 +49,6 @@ public class ApiController {
 
     @Autowired
     private MyAppUserRepository myAppUserRepository;
-
-    // Inject the upload path from application.properties
-    @Value("${upload.path}")
-    private String uploadPath;
-
-    private final String BASE_URL = "http://130.208.120.183:8080";
 
     @PostMapping("/users/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest,
@@ -112,14 +106,9 @@ public class ApiController {
         if (profileOpt.isPresent()) {
             dto = RecipientProfileConverter.convertToDTO(profileOpt.get());
         } else {
-            // return an empty profile DTO.
+            // Return an empty profile DTO.
             dto = new RecipientProfileDTO();
             dto.setUserId(userId);
-        }
-        // Format the image URL
-        String imagePath = dto.getImagePath();
-        if (imagePath != null && !imagePath.startsWith("http")) {
-            dto.setImagePath(BASE_URL + (imagePath.startsWith("/") ? "" : "/") + imagePath);
         }
         return ResponseEntity.ok(dto);
     }
@@ -136,14 +125,9 @@ public class ApiController {
         if (profileOpt.isPresent()) {
             dto = DonorProfileConverter.convertToDTO(profileOpt.get());
         } else {
-            // return an empty profile DTO.
+            // Return an empty profile DTO.
             dto = new DonorProfileDTO();
             dto.setUserId(userId);
-        }
-        // Format the image URL
-        String imagePath = dto.getImagePath();
-        if (imagePath != null && !imagePath.startsWith("http")) {
-            dto.setImagePath(BASE_URL + (imagePath.startsWith("/") ? "" : "/") + imagePath);
         }
         return ResponseEntity.ok(dto);
     }
@@ -155,14 +139,7 @@ public class ApiController {
         Pageable pageable = PageRequest.of(page, size, Sort.by("age").ascending());
         Page<DonorProfile> donorPage = donorProfileService.findAll(pageable);
         List<DonorProfileDTO> dtoList = donorPage.getContent().stream()
-                .map(profile -> {
-                    DonorProfileDTO dto = DonorProfileConverter.convertToDTO(profile);
-                    String imagePath = dto.getImagePath();
-                    if (imagePath != null && !imagePath.startsWith("http")) {
-                        dto.setImagePath(BASE_URL + (imagePath.startsWith("/") ? "" : "/") + imagePath);
-                    }
-                    return dto;
-                })
+                .map(profile -> DonorProfileConverter.convertToDTO(profile))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(dtoList);
     }
@@ -190,9 +167,6 @@ public class ApiController {
         loggedInUser.setRecipientProfile(updatedProfile);
         myAppUserRepository.save(loggedInUser);
         RecipientProfileDTO dto = RecipientProfileConverter.convertToDTO(updatedProfile);
-        if (dto.getImagePath() != null && !dto.getImagePath().startsWith("http")) {
-            dto.setImagePath(BASE_URL + (dto.getImagePath().startsWith("/") ? "" : "/") + dto.getImagePath());
-        }
         return ResponseEntity.ok(dto);
     }
 
@@ -220,10 +194,17 @@ public class ApiController {
         loggedInUser.setDonorProfile(updatedProfile);
         myAppUserRepository.save(loggedInUser);
         DonorProfileDTO dto = DonorProfileConverter.convertToDTO(updatedProfile);
-        String imagePath = dto.getImagePath();
-        if (imagePath != null && !imagePath.startsWith("http")) {
-            dto.setImagePath(BASE_URL + (imagePath.startsWith("/") ? "" : "/") + imagePath);
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/donor/view/{donorProfileId}")
+    public ResponseEntity<?> viewDonorProfile(@PathVariable Long donorProfileId) {
+        Optional<DonorProfile> profileOpt = donorProfileService.findByProfileId(donorProfileId);
+        if (!profileOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Donor profile not found.");
         }
+        // Convert to DTO – imagePath is already a full URL.
+        DonorProfileDTO dto = DonorProfileConverter.convertToDTO(profileOpt.get());
         return ResponseEntity.ok(dto);
     }
 
@@ -233,25 +214,23 @@ public class ApiController {
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", "File is empty"));
         }
         try {
-            File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
-            String originalFilename = file.getOriginalFilename();
-            String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
-            File destinationFile = new File(uploadDir, uniqueFilename);
-            file.transferTo(destinationFile);
+            Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
+                    "cloud_name", "dlfi65u4o",
+                    "api_key", "753673256719356",
+                    "api_secret", "JAex3aiR466-p62KFPM3WQ15Z_I"));
 
-            String fileUrl = BASE_URL + "/uploads/" + uniqueFilename;
-            // Here we return as a JSON object
+            // Here we upload the file
+            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            String fileUrl = (String) uploadResult.get("secure_url");
+
+            // Return the URL in your response
             return ResponseEntity.ok(Collections.singletonMap("fileUrl", fileUrl));
         } catch (IOException e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("error", "Error saving file"));
+                    .body(Collections.singletonMap("error", "Error uploading file"));
         }
     }
-
     @GetMapping("/users/all")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<MyAppUsers> users = myAppUserService.findAllUsers(); // Assuming this method exists
