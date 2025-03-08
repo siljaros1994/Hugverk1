@@ -223,7 +223,7 @@ public class ApiController {
             Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
             String fileUrl = (String) uploadResult.get("secure_url");
 
-            // Return the URL in your response
+            // Here we return the URL in our response
             return ResponseEntity.ok(Collections.singletonMap("fileUrl", fileUrl));
         } catch (IOException e) {
             e.printStackTrace();
@@ -233,7 +233,7 @@ public class ApiController {
     }
     @GetMapping("/users/all")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
-        List<MyAppUsers> users = myAppUserService.findAllUsers(); // Assuming this method exists
+        List<MyAppUsers> users = myAppUserService.findAllUsers();
         List<UserDTO> userDTOs = users.stream().map(user -> new UserDTO(user.getId(), user.getUsername(), user.getUserType())).collect(Collectors.toList());
         return ResponseEntity.ok(userDTOs);
     }
