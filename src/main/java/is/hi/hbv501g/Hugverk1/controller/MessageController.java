@@ -102,9 +102,8 @@ public class MessageController extends BaseController{
     public String sendMessage(@ModelAttribute MessageForm messageForm, Model model, HttpSession session) {
         MyAppUsers sender = (MyAppUsers) session.getAttribute("user");
 
-        if (sender == null) {
-            throw new UsernameNotFoundException("User not found in session");
-        }
+        if (sender == null) {    throw new UsernameNotFoundException("User not found in session");}
+
 
         Long senderId = sender.getId();
         Long receiverId = messageForm.getReceiverId();
