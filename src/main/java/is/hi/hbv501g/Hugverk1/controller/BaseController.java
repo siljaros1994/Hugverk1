@@ -28,12 +28,8 @@ public abstract class BaseController {
         return null;
     }
 
-
-
-
     protected boolean isUserType(String userType) {
         MyAppUsers loggedInUser = getLoggedInUser();
         return loggedInUser != null && userType.equalsIgnoreCase(loggedInUser.getUserType());
     }
-
 }
