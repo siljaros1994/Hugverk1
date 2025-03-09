@@ -6,7 +6,10 @@ import is.hi.hbv501g.Hugverk1.Persistence.Entities.*;
 import is.hi.hbv501g.Hugverk1.Persistence.Repositories.MyAppUserRepository;
 import is.hi.hbv501g.Hugverk1.Services.DonorProfileService;
 import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
+import is.hi.hbv501g.Hugverk1.Services.MessageService;
 import is.hi.hbv501g.Hugverk1.Services.RecipientProfileService;
+import is.hi.hbv501g.Hugverk1.Persistence.forms.MessageForm;
+import java.time.LocalDateTime;
 import is.hi.hbv501g.Hugverk1.dto.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -49,6 +52,9 @@ public class ApiController {
 
     @Autowired
     private MyAppUserRepository myAppUserRepository;
+
+    @Autowired
+    private MessageService messageService;
 
     @PostMapping("/users/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest,
@@ -238,4 +244,21 @@ public class ApiController {
         return ResponseEntity.ok(userDTOs);
     }
 
+    @GetMapping("/messages/{userType}/{id}")
+    public ResponseEntity<List<MessageDTO>> getMessages(
+            @PathVariable String userType,
+            @PathVariable Long id) {
+
+        MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (loggedInUser == null || !loggedInUser.getId().equals(id)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        List<Message> messages = messageService.getConversationBetween(loggedInUser.getId(), id);
+        List<MessageDTO> messageDTOs = messages.stream()
+                .map(MessageConverter::convertToDTO)
+                .toList();
+
+        return ResponseEntity.ok(messageDTOs);
+    }
 }
