@@ -12,6 +12,7 @@ import is.hi.hbv501g.Hugverk1.Persistence.forms.MessageForm;
 import java.time.LocalDateTime;
 import is.hi.hbv501g.Hugverk1.dto.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -229,7 +230,7 @@ public class ApiController {
             Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
             String fileUrl = (String) uploadResult.get("secure_url");
 
-            // Return the URL in your response
+            // Here we return the URL in our response
             return ResponseEntity.ok(Collections.singletonMap("fileUrl", fileUrl));
         } catch (IOException e) {
             e.printStackTrace();
@@ -237,12 +238,34 @@ public class ApiController {
                     .body(Collections.singletonMap("error", "Error uploading file"));
         }
     }
+
+
+    @PostMapping("/users/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        //Get the session if it exists
+        HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            //Invalidate the session
+            session.invalidate();
+        }
+
+        //Clear the security context
+        SecurityContextHolder.clearContext();
+
+        //Return logout success response
+        return ResponseEntity.ok().body(Collections.singletonMap("message", "Logged out successfully"));
+    }
+
+
+
     @GetMapping("/users/all")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
-        List<MyAppUsers> users = myAppUserService.findAllUsers(); // Assuming this method exists
+        List<MyAppUsers> users = myAppUserService.findAllUsers();
         List<UserDTO> userDTOs = users.stream().map(user -> new UserDTO(user.getId(), user.getUsername(), user.getUserType())).collect(Collectors.toList());
         return ResponseEntity.ok(userDTOs);
     }
+
 
     @GetMapping("/messages/{userType}/{id}")
     public ResponseEntity<List<MessageDTO>> getMessages(
