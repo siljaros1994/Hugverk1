@@ -9,6 +9,7 @@ import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import is.hi.hbv501g.Hugverk1.Services.RecipientProfileService;
 import is.hi.hbv501g.Hugverk1.dto.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -231,11 +232,33 @@ public class ApiController {
                     .body(Collections.singletonMap("error", "Error uploading file"));
         }
     }
+
+
+    @PostMapping("/users/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        //Get the session if it exists
+        HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            //Invalidate the session
+            session.invalidate();
+        }
+
+        //Clear the security context
+        SecurityContextHolder.clearContext();
+
+        //Return logout success response
+        return ResponseEntity.ok().body(Collections.singletonMap("message", "Logged out successfully"));
+    }
+
+
+
     @GetMapping("/users/all")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<MyAppUsers> users = myAppUserService.findAllUsers();
         List<UserDTO> userDTOs = users.stream().map(user -> new UserDTO(user.getId(), user.getUsername(), user.getUserType())).collect(Collectors.toList());
         return ResponseEntity.ok(userDTOs);
     }
+
 
 }

@@ -6,6 +6,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import is.hi.hbv501g.Hugverk1.dto.LogoutResponse;
+import org.springframework.web.bind.annotation.*;
+
 
 public abstract class BaseController {
 
@@ -24,8 +29,11 @@ public abstract class BaseController {
     }
 
 
+
+
     protected boolean isUserType(String userType) {
         MyAppUsers loggedInUser = getLoggedInUser();
         return loggedInUser != null && userType.equalsIgnoreCase(loggedInUser.getUserType());
     }
+
 }
