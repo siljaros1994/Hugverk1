@@ -284,4 +284,26 @@ public class ApiController {
 
         return ResponseEntity.ok(messageDTOs);
     }
+    @PostMapping("/messages/send")
+    public ResponseEntity<?> sendMessage(@RequestBody MessageForm messageForm) {
+        MyAppUsers sender = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (sender == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+
+        Long senderId = sender.getId();
+        Long receiverId = messageForm.getReceiverId();
+        String content = messageForm.getText();
+
+        if (receiverId == null || content == null || content.isBlank()) {
+            return ResponseEntity.badRequest().body("Invalid message data");
+        }
+
+        Message newMessage = new Message(senderId, receiverId, content, LocalDateTime.now());
+        messageService.saveMessage(newMessage);
+
+        return ResponseEntity.ok("Message sent successfully");
+    }
+
 }
