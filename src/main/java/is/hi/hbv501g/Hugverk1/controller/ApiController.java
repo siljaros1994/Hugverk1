@@ -266,6 +266,31 @@ public class ApiController {
     public ResponseEntity<List<MessageDTO>> getMessages(
             @PathVariable String userType,
             @PathVariable Long id) {
+    //Returns a list of recipients who have favorited the donor
+    @GetMapping("/donor/favorites/{donorId}")
+    public ResponseEntity<List<RecipientProfileDTO>> getRecipientsWhoFavoritedDonor(@PathVariable Long donorId) {
+        Optional<MyAppUsers> donorOpt = myAppUserRepository.findByDonorId(donorId);
+
+        if (donorOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
+        }
+
+        MyAppUsers donor = donorOpt.get();
+
+        // Extract recipients from the `favorite_donors` column
+        List<Long> recipientIds = donor.getFavoriteDonors(); // Assuming it's stored as a list
+
+        List<RecipientProfileDTO> recipients = recipientIds.stream()
+                .map(recipientProfileService::findByUserId)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(RecipientProfileConverter::convertToDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(recipients);
+    }
+
+
 
         MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (loggedInUser == null || !loggedInUser.getId().equals(id)) {
