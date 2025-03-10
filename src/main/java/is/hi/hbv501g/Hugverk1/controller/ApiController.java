@@ -66,7 +66,6 @@ public class ApiController {
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // Force creation of session and store the security.
             HttpSession session = request.getSession(true);
             session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                     SecurityContextHolder.getContext());
@@ -113,7 +112,7 @@ public class ApiController {
         if (profileOpt.isPresent()) {
             dto = RecipientProfileConverter.convertToDTO(profileOpt.get());
         } else {
-            // Return an empty profile DTO.
+            // Here we return an empty profile DTO.
             dto = new RecipientProfileDTO();
             dto.setUserId(userId);
         }
@@ -132,7 +131,7 @@ public class ApiController {
         if (profileOpt.isPresent()) {
             dto = DonorProfileConverter.convertToDTO(profileOpt.get());
         } else {
-            // Return an empty profile DTO.
+            // Here we return an empty profile DTO, like before.
             dto = new DonorProfileDTO();
             dto.setUserId(userId);
         }
@@ -189,7 +188,7 @@ public class ApiController {
         Optional<DonorProfile> existingOpt = donorProfileService.findByUserId(loggedInUser.getId());
         if (existingOpt.isPresent()) {
             DonorProfile existing = existingOpt.get();
-            // Copy all matching properties, ignoring the ID and user fields.
+            // Here we copy all matching properties, while ignoring the ID and user fields.
             BeanUtils.copyProperties(profile, existing, "donorProfileId", "user");
             profileToSave = existing;
         } else {
@@ -210,7 +209,7 @@ public class ApiController {
         if (!profileOpt.isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Donor profile not found.");
         }
-        // Convert to DTO – imagePath is already a full URL.
+        // Here we convert to DTO (imagePath is already a full URL.)
         DonorProfileDTO dto = DonorProfileConverter.convertToDTO(profileOpt.get());
         return ResponseEntity.ok(dto);
     }
@@ -239,7 +238,6 @@ public class ApiController {
         }
     }
 
-
     @PostMapping("/users/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         //Get the session if it exists
@@ -257,15 +255,12 @@ public class ApiController {
         return ResponseEntity.ok().body(Collections.singletonMap("message", "Logged out successfully"));
     }
 
-
-
     @GetMapping("/users/all")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<MyAppUsers> users = myAppUserService.findAllUsers();
         List<UserDTO> userDTOs = users.stream().map(user -> new UserDTO(user.getId(), user.getUsername(), user.getUserType())).collect(Collectors.toList());
         return ResponseEntity.ok(userDTOs);
     }
-
 
     @GetMapping("/messages/{userType}/{id}")
     public ResponseEntity<List<MessageDTO>> getMessages(
@@ -284,6 +279,7 @@ public class ApiController {
 
         return ResponseEntity.ok(messageDTOs);
     }
+
     @PostMapping("/messages/send")
     public ResponseEntity<?> sendMessage(@RequestBody MessageForm messageForm) {
         MyAppUsers sender = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -305,5 +301,4 @@ public class ApiController {
 
         return ResponseEntity.ok("Message sent successfully");
     }
-
 }
