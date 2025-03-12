@@ -70,8 +70,15 @@ public class ApiController {
             session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                     SecurityContextHolder.getContext());
 
+            System.out.println("Session Created: " + session.getId());
+
+
             MyAppUsers user = myAppUserService.findByUsername(loginRequest.getUsername())
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+            // Ensure the token is being returned
+            //String token = session.getId(); // Or generate a JWT token here
+            //LoginResponse response = new LoginResponse(token, user.getId(), user.getUserType(), user.getUsername());
 
             LoginResponse response = new LoginResponse("success", user.getId(), user.getUserType(), user.getUsername());
             return ResponseEntity.ok(response);
@@ -261,11 +268,54 @@ public class ApiController {
         List<UserDTO> userDTOs = users.stream().map(user -> new UserDTO(user.getId(), user.getUsername(), user.getUserType())).collect(Collectors.toList());
         return ResponseEntity.ok(userDTOs);
     }
+    //For retrieving favorites on favorite page for recipients
 
-    @GetMapping("/messages/{userType}/{id}")
-    public ResponseEntity<List<MessageDTO>> getMessages(
-            @PathVariable String userType,
-            @PathVariable Long id) {
+    @GetMapping("/recipient/favorites/{recipientId}")
+    public ResponseEntity<List<DonorProfileDTO>> getFavoriteDonors(@PathVariable Long recipientId) {
+        Optional<MyAppUsers> userOpt = myAppUserRepository.findById(recipientId);
+
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
+        }
+
+
+        MyAppUsers recipient = userOpt.get();
+        String favoriteDonorsStr = recipient.getFavoriteDonors(); //Get stored string
+
+        // Convert the comma-separated string to a List<Long>
+        List<Long> favoriteDonorIds = new ArrayList<>();
+        if (favoriteDonorsStr != null && !favoriteDonorsStr.isEmpty()) {
+            try {
+                favoriteDonorIds = Arrays.stream(favoriteDonorsStr.split(","))
+                        .map(Long::parseLong)
+                        .collect(Collectors.toList());
+            } catch (NumberFormatException e) {
+                System.err.println("Error parsing favorite donor IDs: " + e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Collections.emptyList());
+            }
+        }
+        //Convert the comma-separated string to a list<Long>
+        //List<Long> favoriteDonorIds = recipient.getFavoriteDonors(); // Assuming stored as a list of IDs
+        //if (recipient.getFavoriteDonors() instanceof String) {
+            // Convert "1,2,3" into List<Long>
+        //    favoriteDonorIds = Arrays.stream(recipient.getFavoriteDonors().split(","))
+        //            .map(Long::parseLong)
+        //            .collect(Collectors.toList());
+        //} else {
+        //    favoriteDonorIds = recipient.getFavoriteDonors(); // Assume correct type
+        //}
+
+        List<DonorProfileDTO> favoriteDonors = favoriteDonorIds.stream()
+                .map(donorProfileService::findByUserId)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(DonorProfileConverter::convertToDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(favoriteDonors);
+    }
+
     //Returns a list of recipients who have favorited the donor
     @GetMapping("/donor/favorites/{donorId}")
     public ResponseEntity<List<RecipientProfileDTO>> getRecipientsWhoFavoritedDonor(@PathVariable Long donorId) {
@@ -287,6 +337,13 @@ public class ApiController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(recipientDTOs);
+    }
+
+    @GetMapping("/messages/{userType}/{id}")
+    public ResponseEntity<List<MessageDTO>> getMessages(
+            @PathVariable String userType,
+            @PathVariable Long id) {
+
 
 
         // Extract recipients from the `favorite_donors` column
@@ -300,7 +357,7 @@ public class ApiController {
         //        .collect(Collectors.toList());
 
         //return ResponseEntity.ok(recipients);
-    }
+
 
 
 
@@ -338,4 +395,56 @@ public class ApiController {
 
         return ResponseEntity.ok("Message sent successfully");
     }
+
+    //Debug logs to confirm session exits when favoriting
+    @PostMapping("/api/recipient/favorite/{recipientId}/{donorId}")
+    public ResponseEntity<?> favoriteDonor(@PathVariable Long recipientId, @PathVariable Long donorId, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            System.out.println("No session found for this request! User is NOT authenticated.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: No session found.");
+        } else {
+            System.out.println("Session found: " + session.getId());
+            System.out.println("User authenticated? " + (SecurityContextHolder.getContext().getAuthentication() != null));
+        }
+
+        MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (loggedInUser == null) {
+            System.out.println("No authenticated user found in security context.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Please log in.");
+        }
+        // Proceed with adding the favorite
+        Optional<MyAppUsers> recipientOpt = myAppUserRepository.findById(recipientId);
+        Optional<MyAppUsers> donorOpt = myAppUserRepository.findById(donorId);
+
+        if (recipientOpt.isEmpty() || donorOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Recipient or donor not found.");
+        }
+
+        MyAppUsers recipient = recipientOpt.get();
+        MyAppUsers donor = donorOpt.get();
+
+        // Get the current favorite donors list
+        String favoriteDonors = recipient.getFavoriteDonors();
+        List<Long> favoriteList = new ArrayList<>();
+        if (favoriteDonors != null && !favoriteDonors.isEmpty()) {
+            favoriteList = Arrays.stream(favoriteDonors.split(","))
+                    .map(Long::parseLong)
+                    .collect(Collectors.toList());
+        }
+
+        // Add the donor to the favorite list if not already present
+        if (!favoriteList.contains(donorId)) {
+            favoriteList.add(donorId);
+            recipient.setFavoriteDonors(favoriteList.stream().map(String::valueOf).collect(Collectors.joining(",")));
+            myAppUserRepository.save(recipient);
+            System.out.println("Donor " + donorId + " favorited by recipient " + recipientId);
+        } else {
+            System.out.println("Donor " + donorId + " is already in favorites.");
+        }
+
+        return ResponseEntity.ok().body("Favorite saved successfully!");
+
 }
+
+     }

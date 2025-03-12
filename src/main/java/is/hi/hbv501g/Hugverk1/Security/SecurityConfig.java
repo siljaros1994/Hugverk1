@@ -57,11 +57,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/**") // Disable CSRF for API endpoints
-                )
+                .csrf(csrf ->csrf.ignoringRequestMatchers("/api/**")) // Allow API calls without CSRF
+                        //csrf.disable()) // Fully disable CSRF
+                //.csrf(csrf -> csrf.ignoringRequestMatchers("/api/**") // Disable CSRF for API endpoints
+                //)
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) //Change IF_REQUIRED to ALWAYS
                         .sessionFixation().migrateSession()
                         .maximumSessions(1).maxSessionsPreventsLogin(false)
                 )
@@ -73,9 +74,13 @@ public class SecurityConfig {
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/admin/**", "/home/admin", "/donorlimits", "/delete/{username}", "/reports", "/history").hasRole("ADMIN")
                         .requestMatchers("/home/donor", "/donorprofile", "/donor/view/**", "/bookings/donor").authenticated()
-                        .requestMatchers("/home/recipient", "/recipientprofile", "/recipient/view/**", "/bookings/recipient", "/recipient/favorite/**").authenticated()
+                        .requestMatchers("/home/recipient", "/recipientprofile", "/recipient/view/**", "/bookings/recipient", "/api/recipient/favorite/**").authenticated()
+                        //added "/api" for /favorite/recipient for authentication debugging
                         .requestMatchers("/messages/**", "/messages/{userType}/{id:[0-9]+}", "/dr").authenticated()
                         .requestMatchers("/match/donor/matches", "/match/recipient/matches", "/match/approveMatch", "/match/unmatch").authenticated()
+                        .requestMatchers("/api/**").hasAnyRole("USER","ADMIN")//Ensures only logged-in users access API
+                        // .requestMatchers("/api/**").authenticated() //authentication for favorites
+                        //.requestMatchers("/api/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN") // Fix role issue
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
@@ -97,4 +102,22 @@ public class SecurityConfig {
                 .addFilterBefore(new CustomFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
+
+    //Favorite APIservice.kt
+    /*@Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**")) //Allow API calls
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //Use Stateless Sessions
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/users/login", "/api/users/register", "/uploads/**").permitAll()
+                        .requestMatchers("/api/**").authenticated()  //Ensure API requires authentication
+                )
+                //.addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) //Add JWT Filter
+                .httpBasic(httpBasic -> httpBasic.authenticationEntryPoint(authenticationEntryPoint))
+                .build();
+    }
+
+     */
+
 }

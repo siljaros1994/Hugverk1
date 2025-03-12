@@ -5,12 +5,14 @@ public class LoginResponse {
     private long userId;
     private String userType;
     private String username;
+    //private String token; //Token added for favorites
 
     public LoginResponse(String message, long userId, String userType, String userName) {
         this.message = message;
         this.userId = userId;
         this.userType = userType;
         this.username = userName;
+        //this.token = token;
     }
 
     // Getters and setters
@@ -45,4 +47,13 @@ public class LoginResponse {
     public void setUsername(String userName) {
         this.username = userName;
     }
+
+    // Getters and setters for token
+    //public String getToken() {
+       //return token;
+    //}
+    //public void setToken(String token) {
+    //    this.token = token;
+    //}
+
 }
