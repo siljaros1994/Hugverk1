@@ -266,27 +266,29 @@ public class ApiController {
     public ResponseEntity<List<MessageDTO>> getMessages(
             @PathVariable String userType,
             @PathVariable Long id) {
-    //Returns a list of recipients who have favorited the donor
-    @GetMapping("/donor/favorites/{donorId}")
-    public ResponseEntity<List<RecipientProfileDTO>> getRecipientsWhoFavoritedDonor(@PathVariable Long donorId) {
-        List<MyAppUsers> favoritingRecipients = myAppUserRepository.findRecipientsWhoFavoritedDonor(donorId);
 
-        if (favoritingRecipients.isEmpty()) {
-            return ResponseEntity.ok(Collections.emptyList()); // Return empty list if no recipients found
-        }
+
+    //Returns a list of recipients who have favorited the donor
+    //@GetMapping("/donor/favorites/{donorId}")
+    //public ResponseEntity<List<RecipientProfileDTO>> getRecipientsWhoFavoritedDonor(@PathVariable Long donorId) {
+        //List<MyAppUsers> favoritingRecipients = myAppUserRepository.findRecipientsWhoFavoritedDonor(donorId);
+
+        //if (favoritingRecipients.isEmpty()) {
+            //return ResponseEntity.ok(Collections.emptyList()); // Return empty list if no recipients found
+        //}
 
         //MyAppUsers donor = donorOpt.get();
         // Find all recipients who have this donor in their `favorite_donors` column
         //List<MyAppUsers> favoritingRecipients = myAppUserRepository.findByFavoriteDonorsContaining(donor.getId());
 
         // Convert to DTOs
-        List<RecipientProfileDTO> recipientDTOs = favoritingRecipients.stream()
-                .map(user -> user.getRecipientProfile()) //Extract RecipientProfile
-                .filter(Objects::nonNull) //Ensure there is a valid RecipientProfile
-                .map(RecipientProfileConverter::convertToDTO) //Convert to DTO
-                .collect(Collectors.toList());
+        //List<RecipientProfileDTO> recipientDTOs = favoritingRecipients.stream()
+                //.map(user -> user.getRecipientProfile()) //Extract RecipientProfile
+                //.filter(Objects::nonNull) //Ensure there is a valid RecipientProfile
+                //.map(RecipientProfileConverter::convertToDTO) //Convert to DTO
+                //.collect(Collectors.toList());
 
-        return ResponseEntity.ok(recipientDTOs);
+        //return ResponseEntity.ok(recipientDTOs);
 
 
         // Extract recipients from the `favorite_donors` column
@@ -300,10 +302,7 @@ public class ApiController {
         //        .collect(Collectors.toList());
 
         //return ResponseEntity.ok(recipients);
-    }
-
-
-
+    //}
         MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (loggedInUser == null || !loggedInUser.getId().equals(id)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
