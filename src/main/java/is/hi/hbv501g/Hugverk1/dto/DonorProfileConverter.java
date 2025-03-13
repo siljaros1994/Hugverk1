@@ -22,6 +22,7 @@ public class DonorProfileConverter {
         dto.setImagePath(profile.getImagePath());
         dto.setDonationLimit(profile.getDonationLimit());
         dto.setDonationsCompleted(profile.getDonationsCompleted());
+        dto.setLocation(profile.getLocation());
 
         if (profile.getUser() != null) {
             dto.setUserId(profile.getUser().getId());

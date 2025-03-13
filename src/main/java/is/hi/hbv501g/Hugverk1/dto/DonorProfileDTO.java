@@ -20,10 +20,11 @@ public class DonorProfileDTO {
     private String imagePath;
     private int donationLimit;
     private int donationsCompleted;
-
     private Long userId;
     private String username;
     private String email;
+    private String location;
+
 
     // Getters and Setters
 
@@ -146,5 +147,12 @@ public class DonorProfileDTO {
     }
     public void setEmail(String email) {
         this.email = email;
+    }
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }
