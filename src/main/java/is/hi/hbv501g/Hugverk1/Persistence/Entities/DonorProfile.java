@@ -68,6 +68,10 @@ public class DonorProfile {
     @Column(name = "donations_completed", nullable = false)
     private int donationsCompleted = 0;
 
+    @Column(name = "location")
+    private String location;
+
+
     // Getters and Setters.
 
     public Long getDonorProfileId() {
@@ -210,5 +214,13 @@ public class DonorProfile {
 
     public void incrementDonationsCompleted() {
        this.donationsCompleted++;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

@@ -95,4 +95,9 @@ public class DonorProfileService {
     public Page<DonorProfile> findAll(Pageable pageable) {
         return donorProfileRepository.findAll(pageable);
     }
+
+    public Page<DonorProfile> findByLocationContainingIgnoreCase(String location, Pageable pageable) {
+        return donorProfileRepository.findByLocationContainingIgnoreCase(location, pageable);
+    }
+
 }

@@ -19,6 +19,7 @@ public interface DonorProfileRepository extends JpaRepository<DonorProfile, Long
     Page<DonorProfile> findAll(Pageable pageable); // For all donors
     List<DonorProfile> findByDonorProfileIdIn(List<Long> donorProfileIds);
     List<DonorProfile> findByUserIdIn(List<Long> userIds);
+    Page<DonorProfile> findByLocationContainingIgnoreCase(String location, Pageable pageable);
 
     @Query("SELECT d FROM DonorProfile d WHERE " +
             "LOWER(d.eyeColor) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
