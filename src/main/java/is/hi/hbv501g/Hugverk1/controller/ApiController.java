@@ -262,12 +262,17 @@ public class ApiController {
         return ResponseEntity.ok(userDTOs);
     }
 
+
+    // afhverju eru tvö getmapping here? hér myndi ég byrja með að nota @GetMapping("/donor/favorites/{donorId}")
+
+
+    // fjarlæga eða breyta þessu:
     @GetMapping("/messages/{userType}/{id}")
     public ResponseEntity<List<MessageDTO>> getMessages(
             @PathVariable String userType,
             @PathVariable Long id) {
 
-
+        // byrjum hér:
     //Returns a list of recipients who have favorited the donor
     //@GetMapping("/donor/favorites/{donorId}")
     //public ResponseEntity<List<RecipientProfileDTO>> getRecipientsWhoFavoritedDonor(@PathVariable Long donorId) {
@@ -277,10 +282,14 @@ public class ApiController {
             //return ResponseEntity.ok(Collections.emptyList()); // Return empty list if no recipients found
         //}
 
+
+        // hér myndi ég taka þetta út:
         //MyAppUsers donor = donorOpt.get();
         // Find all recipients who have this donor in their `favorite_donors` column
         //List<MyAppUsers> favoritingRecipients = myAppUserRepository.findByFavoriteDonorsContaining(donor.getId());
 
+
+        // þessu myndi ég halda óbreytt
         // Convert to DTOs
         //List<RecipientProfileDTO> recipientDTOs = favoritingRecipients.stream()
                 //.map(user -> user.getRecipientProfile()) //Extract RecipientProfile
@@ -289,8 +298,9 @@ public class ApiController {
                 //.collect(Collectors.toList());
 
         //return ResponseEntity.ok(recipientDTOs);
+        // stoppa hér!
 
-
+        // Afhverju er þetta tvisvar?
         // Extract recipients from the `favorite_donors` column
         //List<Long> recipientIds = donor.getFavoriteDonors(); // Assuming it's stored as a list
 
@@ -303,6 +313,7 @@ public class ApiController {
 
         //return ResponseEntity.ok(recipients);
     //}
+        // þetta er ekki partur af favorite, gera einhverja breytingu hér.
         MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (loggedInUser == null || !loggedInUser.getId().equals(id)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -315,6 +326,17 @@ public class ApiController {
 
         return ResponseEntity.ok(messageDTOs);
     }
+
+    // svo myndi ég adda þessum part í @GetMapping("/donor/favorites/{donorId}"), þetta er auðkenningarathugun fyrir donors
+    // Þetta gerir það kleift að recipient geti favorite-að donor án þess að fá 401, og donor getur séð recipients sem hafa
+    // favorite-að hann án þess að þurfa að vera sama notandi.
+
+    //MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    //if (loggedInUser == null || !"donor".equalsIgnoreCase(loggedInUser.getUserType()) ||
+    //loggedInUser.getDonorId() == null ||
+    //!loggedInUser.getDonorId().equals(donorId)) {
+    //return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Not your account.");
+    //}
 
     @PostMapping("/messages/send")
     public ResponseEntity<?> sendMessage(@RequestBody MessageForm messageForm) {
