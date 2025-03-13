@@ -4,6 +4,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import is.hi.hbv501g.Hugverk1.Persistence.Entities.*;
 import is.hi.hbv501g.Hugverk1.Persistence.Repositories.MyAppUserRepository;
+import is.hi.hbv501g.Hugverk1.Persistence.Repositories.DonorProfileRepository;
 import is.hi.hbv501g.Hugverk1.Services.DonorProfileService;
 import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import is.hi.hbv501g.Hugverk1.Services.MessageService;
@@ -53,6 +54,9 @@ public class ApiController {
 
     @Autowired
     private MyAppUserRepository myAppUserRepository;
+
+    @Autowired
+    private DonorProfileRepository donorProfileRepository;
 
     @Autowired
     private MessageService messageService;
@@ -142,12 +146,19 @@ public class ApiController {
     @GetMapping("/donor/all")
     public ResponseEntity<List<DonorProfileDTO>> getAllDonors(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size) {
+            @RequestParam(defaultValue = "9") int size,
+            @RequestParam(required = false) String location){
         Pageable pageable = PageRequest.of(page, size, Sort.by("age").ascending());
-        Page<DonorProfile> donorPage = donorProfileService.findAll(pageable);
+        Page<DonorProfile> donorPage;
+        if (location != null && !location.isEmpty()) {
+            donorPage = donorProfileService.findByLocationContainingIgnoreCase(location, pageable);
+        } else {
+            donorPage = donorProfileService.findAll(pageable);
+        }
         List<DonorProfileDTO> dtoList = donorPage.getContent().stream()
-                .map(profile -> DonorProfileConverter.convertToDTO(profile))
+                .map(DonorProfileConverter::convertToDTO)
                 .collect(Collectors.toList());
+
         return ResponseEntity.ok(dtoList);
     }
 
