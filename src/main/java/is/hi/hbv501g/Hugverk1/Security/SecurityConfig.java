@@ -69,7 +69,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/login", "/api/users/register", "/uploads/**", "/api/authenticate", "/css/**").permitAll()
                         .requestMatchers("/error").permitAll() // Allow all access to /error
                         .requestMatchers("/api/**", "/api/recipient/profile/**", "/api/donor/profile/**", "/api/recipient/profile/saveOrEdit").authenticated()
-                        .requestMatchers("/users/login", "/users/register").permitAll() //start of inellij
+                        .requestMatchers("/api/recipient/**", "/api/donor/**", "/api/match/**").authenticated()
+                        .requestMatchers("/users/login", "/users/register").permitAll() //start of intellij
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/admin/**", "/home/admin", "/donorlimits", "/delete/{username}", "/reports", "/history").hasRole("ADMIN")
                         .requestMatchers("/home/donor", "/donorprofile", "/donor/view/**", "/bookings/donor").authenticated()

@@ -44,7 +44,7 @@ public class DonorHomeController extends BaseController{
         model.addAttribute("userType", loggedInUser.getUserType());
         model.addAttribute("recipientsWhoFavorited", recipientsWhoFavorited);
 
-        return "donorHome";  // Returns the donor-specific homepage
+        return "donorHome";  // Here we return the donor-specific homepage
     }
 
     @GetMapping("/donor/view/{recipientId}")

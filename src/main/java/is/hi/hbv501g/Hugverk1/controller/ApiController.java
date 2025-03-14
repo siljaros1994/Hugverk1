@@ -273,9 +273,74 @@ public class ApiController {
         return ResponseEntity.ok(userDTOs);
     }
 
+    @GetMapping("/recipient/favorites")
+    public ResponseEntity<List<DonorProfileDTO>> getFavoriteDonorsForRecipient() {
+        MyAppUsers user = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user == null || !"recipient".equalsIgnoreCase(user.getUserType())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Long recipientId = user.getRecipientId();
+        List<Long> favoriteIds = myAppUserService.getFavoriteDonors(recipientId);
+        List<DonorProfile> favoriteDonors = donorProfileService.getProfilesByIds(favoriteIds);
+        List<DonorProfileDTO> dtoList = favoriteDonors.stream()
+                .map(DonorProfileConverter::convertToDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtoList);
+    }
+
+    @GetMapping("/recipient/favoritedByDonor/{donorId}")
+    public ResponseEntity<List<RecipientProfileDTO>> getRecipientsWhoFavoritedDonor(
+            @PathVariable Long donorId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+
+        // Here we get the list of recipients who favored the donor
+        List<MyAppUsers> recipients = myAppUserService.getRecipientsWhoFavoritedTheDonor(donorId);
+        if (recipients == null) {
+            recipients = new ArrayList<>();
+        }
+
+        int fromIndex = page * size;
+        if (fromIndex >= recipients.size()) {
+            return ResponseEntity.ok(Collections.emptyList());
+        }
+
+        int toIndex = Math.min(fromIndex + size, recipients.size());
+        List<MyAppUsers> pageRecipients = recipients.subList(fromIndex, toIndex);
+        List<RecipientProfileDTO> dtoList = pageRecipients.stream()
+                .map(user -> {
+                    RecipientProfile profile = user.getRecipientProfile();
+                    return (profile != null)
+                            ? RecipientProfileConverter.convertToDTO(profile)
+                            : new RecipientProfileDTO();
+                })
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtoList);
+    }
+
+    @GetMapping("/recipient/favorite/{donorProfileId}")
+    public ResponseEntity<?> addFavoriteDonor(@PathVariable Long donorProfileId) {
+        MyAppUsers user = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user == null || !"recipient".equalsIgnoreCase(user.getUserType())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Long recipientId = user.getRecipientId();
+        myAppUserService.addFavoriteDonor(recipientId, donorProfileId);
+        return ResponseEntity.ok(Collections.singletonMap("message", "Donor added to favorites"));
+    }
+
+    @PostMapping("/recipient/unfavorite/{donorProfileId}")
+    public ResponseEntity<?> unfavoriteDonor(@PathVariable Long donorProfileId) {
+        MyAppUsers user = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user == null || !"recipient".equalsIgnoreCase(user.getUserType())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Long recipientId = user.getRecipientId();
+        myAppUserService.removeFavoriteDonor(recipientId, donorProfileId);
+        return ResponseEntity.ok(Collections.singletonMap("message", "Donor removed from favorites"));
+    }
 
     // afhverju eru tvö getmapping here? hér myndi ég byrja með að nota @GetMapping("/donor/favorites/{donorId}")
-
 
     // fjarlæga eða breyta þessu:
     @GetMapping("/messages/{userType}/{id}")

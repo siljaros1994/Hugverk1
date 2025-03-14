@@ -18,6 +18,6 @@ public interface MyAppUserRepository extends JpaRepository<MyAppUsers, Long> {
     Optional<MyAppUsers> findByDonorId(Long donorId);
     Optional<MyAppUsers> findByRecipientId(Long recipientId);
 
-    @Query("SELECT u FROM MyAppUsers u WHERE u.favoriteDonors LIKE %:userId% AND u.userType = 'recipient'")
+    @Query("SELECT u FROM MyAppUsers u WHERE CONCAT(',', u.favoriteDonors, ',') LIKE CONCAT('%,', :userId, ',%') AND u.userType = 'recipient'")
     List<MyAppUsers> findRecipientsWhoFavoritedDonor(@Param("userId") Long userId);
 }
