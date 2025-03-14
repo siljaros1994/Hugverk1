@@ -26,9 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -75,40 +73,40 @@ public class ApiController {
                     SecurityContextHolder.getContext());
 
             MyAppUsers user = myAppUserService.findByUsername(loginRequest.getUsername())
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
             LoginResponse response;
             if ("donor".equalsIgnoreCase(user.getUserType())) {
-                // Call the constructor that accepts 5 parameters.
                 response = new LoginResponse("success", user.getId(), user.getUserType(), user.getUsername(), user.getDonorId());
             } else if ("recipient".equalsIgnoreCase(user.getUserType())) {
-                // Call the constructor that accepts 6 parameters.
                 response = new LoginResponse("success", user.getId(), user.getUserType(), user.getUsername(), user.getRecipientId(), true);
             } else {
-                // For any other type, pass null for the extra id and a default boolean (false)
                 response = new LoginResponse("success", user.getId(), user.getUserType(), user.getUsername(), null, false);
             }
             return ResponseEntity.ok(response);
-
-        } catch (AuthenticationException e) {
+        } catch (Exception e) {
             System.err.println("Authentication failed: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.status(401).body(new LoginResponse("Invalid credentials", -1, null, null, null, false));
+            return ResponseEntity.status(401)
+                    .body(new LoginResponse("Invalid credentials", -1, null, null, null, false));
         }
     }
 
     @PostMapping("/users/register")
     public ResponseEntity<LoginResponse> register(@RequestBody MyAppUsers user) {
         if (myAppUserService.findByUsername(user.getUsername()).isPresent()) {
-            return ResponseEntity.badRequest().body(new LoginResponse("Username already exists", -1, null, null, null, false));
+            return ResponseEntity.badRequest()
+                    .body(new LoginResponse("Username already exists", -1, null, null, null, false));
         }
 
         if (!user.getPassword().equals(user.getConfirmPassword())) {
-            return ResponseEntity.badRequest().body(new LoginResponse("Passwords do not match", -1, null, null, null, false));
+            return ResponseEntity.badRequest()
+                    .body(new LoginResponse("Passwords do not match", -1, null, null, null, false));
         }
 
         if (user.getUserType() == null || user.getUserType().isEmpty()) {
-            return ResponseEntity.badRequest().body(new LoginResponse("Please select a valid user type", -1, null, null, null, false));
+            return ResponseEntity.badRequest()
+                    .body(new LoginResponse("Please select a valid user type", -1, null, null, null, false));
         }
 
         myAppUserService.saveUser(user);
@@ -357,56 +355,11 @@ public class ApiController {
         return ResponseEntity.ok(Collections.singletonMap("message", "Donor removed from favorites"));
     }
 
-    // afhverju eru tvö getmapping here? hér myndi ég byrja með að nota @GetMapping("/donor/favorites/{donorId}")
-
-    // fjarlæga eða breyta þessu:
     @GetMapping("/messages/{userType}/{id}")
     public ResponseEntity<List<MessageDTO>> getMessages(
             @PathVariable String userType,
             @PathVariable Long id) {
 
-        // byrjum hér:
-    //Returns a list of recipients who have favorited the donor
-    //@GetMapping("/donor/favorites/{donorId}")
-    //public ResponseEntity<List<RecipientProfileDTO>> getRecipientsWhoFavoritedDonor(@PathVariable Long donorId) {
-        //List<MyAppUsers> favoritingRecipients = myAppUserRepository.findRecipientsWhoFavoritedDonor(donorId);
-
-        //if (favoritingRecipients.isEmpty()) {
-            //return ResponseEntity.ok(Collections.emptyList()); // Return empty list if no recipients found
-        //}
-
-
-        // hér myndi ég taka þetta út:
-        //MyAppUsers donor = donorOpt.get();
-        // Find all recipients who have this donor in their `favorite_donors` column
-        //List<MyAppUsers> favoritingRecipients = myAppUserRepository.findByFavoriteDonorsContaining(donor.getId());
-
-
-        // þessu myndi ég halda óbreytt
-        // Convert to DTOs
-        //List<RecipientProfileDTO> recipientDTOs = favoritingRecipients.stream()
-                //.map(user -> user.getRecipientProfile()) //Extract RecipientProfile
-                //.filter(Objects::nonNull) //Ensure there is a valid RecipientProfile
-                //.map(RecipientProfileConverter::convertToDTO) //Convert to DTO
-                //.collect(Collectors.toList());
-
-        //return ResponseEntity.ok(recipientDTOs);
-        // stoppa hér!
-
-        // Afhverju er þetta tvisvar?
-        // Extract recipients from the `favorite_donors` column
-        //List<Long> recipientIds = donor.getFavoriteDonors(); // Assuming it's stored as a list
-
-        //List<RecipientProfileDTO> recipients = recipientIds.stream()
-        //        .map(recipientProfileService::findByUserId)
-        //        .filter(Optional::isPresent)
-        //        .map(Optional::get)
-        //        .map(RecipientProfileConverter::convertToDTO)
-        //        .collect(Collectors.toList());
-
-        //return ResponseEntity.ok(recipients);
-    //}
-        // þetta er ekki partur af favorite, gera einhverja breytingu hér.
         MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (loggedInUser == null || !loggedInUser.getId().equals(id)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -420,16 +373,29 @@ public class ApiController {
         return ResponseEntity.ok(messageDTOs);
     }
 
-    // svo myndi ég adda þessum part í @GetMapping("/donor/favorites/{donorId}"), þetta er auðkenningarathugun fyrir donors
-    // Þetta gerir það kleift að recipient geti favorite-að donor án þess að fá 401, og donor getur séð recipients sem hafa
-    // favorite-að hann án þess að þurfa að vera sama notandi.
+    @PostMapping("/match/approveMatch")
+    public ResponseEntity<?> approveMatch(@RequestParam("donorId") Long donorId,
+                                          @RequestParam("recipientId") Long recipientId) {
+        try {
+            myAppUserService.approveFavoriteAsMatch(donorId, recipientId);
+            return ResponseEntity.ok(Collections.singletonMap("message", "Match approved successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("error", e.getMessage()));
+        }
+    }
 
-    //MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    //if (loggedInUser == null || !"donor".equalsIgnoreCase(loggedInUser.getUserType()) ||
-    //loggedInUser.getDonorId() == null ||
-    //!loggedInUser.getDonorId().equals(donorId)) {
-    //return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Not your account.");
-    //}
+    @PostMapping("/match/unmatch")
+    public ResponseEntity<?> unmatch(@RequestParam("donorId") Long donorId,
+                                     @RequestParam("recipientId") Long recipientId) {
+        try {
+            myAppUserService.removeMatch(donorId, recipientId);
+            return ResponseEntity.ok(Collections.singletonMap("message", "Unmatched successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("error", e.getMessage()));
+        }
+    }
 
     @PostMapping("/messages/send")
     public ResponseEntity<?> sendMessage(@RequestBody MessageForm messageForm) {
