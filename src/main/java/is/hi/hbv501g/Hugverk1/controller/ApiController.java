@@ -77,31 +77,48 @@ public class ApiController {
             MyAppUsers user = myAppUserService.findByUsername(loginRequest.getUsername())
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-            LoginResponse response = new LoginResponse("success", user.getId(), user.getUserType(), user.getUsername());
+            LoginResponse response;
+            if ("donor".equalsIgnoreCase(user.getUserType())) {
+                // Call the constructor that accepts 5 parameters.
+                response = new LoginResponse("success", user.getId(), user.getUserType(), user.getUsername(), user.getDonorId());
+            } else if ("recipient".equalsIgnoreCase(user.getUserType())) {
+                // Call the constructor that accepts 6 parameters.
+                response = new LoginResponse("success", user.getId(), user.getUserType(), user.getUsername(), user.getRecipientId(), true);
+            } else {
+                // For any other type, pass null for the extra id and a default boolean (false)
+                response = new LoginResponse("success", user.getId(), user.getUserType(), user.getUsername(), null, false);
+            }
             return ResponseEntity.ok(response);
-        } catch (AuthenticationException e) {
-            System.out.println("Authentication failed: " + e.getMessage());
-            return ResponseEntity.status(401).body(new LoginResponse("Invalid credentials", -1, null, null));
 
+        } catch (AuthenticationException e) {
+            System.err.println("Authentication failed: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(401).body(new LoginResponse("Invalid credentials", -1, null, null, null, false));
         }
     }
 
     @PostMapping("/users/register")
     public ResponseEntity<LoginResponse> register(@RequestBody MyAppUsers user) {
         if (myAppUserService.findByUsername(user.getUsername()).isPresent()) {
-            return ResponseEntity.badRequest().body(new LoginResponse("Username already exists", -1, null, null));
+            return ResponseEntity.badRequest().body(new LoginResponse("Username already exists", -1, null, null, null, false));
         }
 
         if (!user.getPassword().equals(user.getConfirmPassword())) {
-            return ResponseEntity.badRequest().body(new LoginResponse("Passwords do not match", -1, null, null));
+            return ResponseEntity.badRequest().body(new LoginResponse("Passwords do not match", -1, null, null, null, false));
         }
 
         if (user.getUserType() == null || user.getUserType().isEmpty()) {
-            return ResponseEntity.badRequest().body(new LoginResponse("Please select a valid user type", -1, null, null));
+            return ResponseEntity.badRequest().body(new LoginResponse("Please select a valid user type", -1, null, null, null, false));
         }
 
         myAppUserService.saveUser(user);
-        return ResponseEntity.ok(new LoginResponse("User registered successfully", user.getId(), user.getUserType(),user.getUsername()));
+        if ("donor".equalsIgnoreCase(user.getUserType())) {
+            return ResponseEntity.ok(new LoginResponse("User registered successfully", user.getId(), user.getUserType(), user.getUsername(), user.getDonorId()));
+        } else if ("recipient".equalsIgnoreCase(user.getUserType())) {
+            return ResponseEntity.ok(new LoginResponse("User registered successfully", user.getId(), user.getUserType(), user.getUsername(), user.getRecipientId(), true));
+        } else {
+            return ResponseEntity.ok(new LoginResponse("User registered successfully", user.getId(), user.getUserType(), user.getUsername(), null, false));
+        }
     }
 
     @GetMapping("/recipient/profile/{userId}")
