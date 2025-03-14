@@ -235,7 +235,7 @@ public class ApiController {
         if (!profileOpt.isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Donor profile not found.");
         }
-        // Here we convert to DTO (imagePath is already a full URL.)
+        // Here we convert to DTO
         DonorProfileDTO dto = DonorProfileConverter.convertToDTO(profileOpt.get());
         return ResponseEntity.ok(dto);
     }
