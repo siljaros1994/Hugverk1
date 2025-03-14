@@ -5,12 +5,27 @@ public class LoginResponse {
     private long userId;
     private String userType;
     private String username;
+    private Long donorId;
+    private Long recipientId;
 
-    public LoginResponse(String message, long userId, String userType, String userName) {
+    // Constructor for donors
+    public LoginResponse(String message, long userId, String userType, String username, Long donorId) {
         this.message = message;
         this.userId = userId;
         this.userType = userType;
-        this.username = userName;
+        this.username = username;
+        this.donorId = donorId;
+        this.recipientId = null;
+    }
+
+    // Constructor for recipients
+    public LoginResponse(String message, long userId, String userType, String username, Long recipientId, boolean isRecipient) {
+        this.message = message;
+        this.userId = userId;
+        this.userType = userType;
+        this.username = username;
+        this.recipientId = recipientId;
+        this.donorId = null;
     }
 
     // Getters and setters
@@ -44,5 +59,21 @@ public class LoginResponse {
 
     public void setUsername(String userName) {
         this.username = userName;
+    }
+
+    public Long getDonorId() {
+        return donorId;
+    }
+
+    public void setDonorId(Long donorId) {
+        this.donorId = donorId;
+    }
+
+    public Long getRecipientId() {
+        return recipientId;
+    }
+
+    public void setRecipientId(Long recipientId) {
+        this.recipientId = recipientId;
     }
 }

@@ -26,9 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -75,33 +73,50 @@ public class ApiController {
                     SecurityContextHolder.getContext());
 
             MyAppUsers user = myAppUserService.findByUsername(loginRequest.getUsername())
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
-            LoginResponse response = new LoginResponse("success", user.getId(), user.getUserType(), user.getUsername());
+            LoginResponse response;
+            if ("donor".equalsIgnoreCase(user.getUserType())) {
+                response = new LoginResponse("success", user.getId(), user.getUserType(), user.getUsername(), user.getDonorId());
+            } else if ("recipient".equalsIgnoreCase(user.getUserType())) {
+                response = new LoginResponse("success", user.getId(), user.getUserType(), user.getUsername(), user.getRecipientId(), true);
+            } else {
+                response = new LoginResponse("success", user.getId(), user.getUserType(), user.getUsername(), null, false);
+            }
             return ResponseEntity.ok(response);
-        } catch (AuthenticationException e) {
-            System.out.println("Authentication failed: " + e.getMessage());
-            return ResponseEntity.status(401).body(new LoginResponse("Invalid credentials", -1, null, null));
-
+        } catch (Exception e) {
+            System.err.println("Authentication failed: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(401)
+                    .body(new LoginResponse("Invalid credentials", -1, null, null, null, false));
         }
     }
 
     @PostMapping("/users/register")
     public ResponseEntity<LoginResponse> register(@RequestBody MyAppUsers user) {
         if (myAppUserService.findByUsername(user.getUsername()).isPresent()) {
-            return ResponseEntity.badRequest().body(new LoginResponse("Username already exists", -1, null, null));
+            return ResponseEntity.badRequest()
+                    .body(new LoginResponse("Username already exists", -1, null, null, null, false));
         }
 
         if (!user.getPassword().equals(user.getConfirmPassword())) {
-            return ResponseEntity.badRequest().body(new LoginResponse("Passwords do not match", -1, null, null));
+            return ResponseEntity.badRequest()
+                    .body(new LoginResponse("Passwords do not match", -1, null, null, null, false));
         }
 
         if (user.getUserType() == null || user.getUserType().isEmpty()) {
-            return ResponseEntity.badRequest().body(new LoginResponse("Please select a valid user type", -1, null, null));
+            return ResponseEntity.badRequest()
+                    .body(new LoginResponse("Please select a valid user type", -1, null, null, null, false));
         }
 
         myAppUserService.saveUser(user);
-        return ResponseEntity.ok(new LoginResponse("User registered successfully", user.getId(), user.getUserType(),user.getUsername()));
+        if ("donor".equalsIgnoreCase(user.getUserType())) {
+            return ResponseEntity.ok(new LoginResponse("User registered successfully", user.getId(), user.getUserType(), user.getUsername(), user.getDonorId()));
+        } else if ("recipient".equalsIgnoreCase(user.getUserType())) {
+            return ResponseEntity.ok(new LoginResponse("User registered successfully", user.getId(), user.getUserType(), user.getUsername(), user.getRecipientId(), true));
+        } else {
+            return ResponseEntity.ok(new LoginResponse("User registered successfully", user.getId(), user.getUserType(), user.getUsername(), null, false));
+        }
     }
 
     @GetMapping("/recipient/profile/{userId}")
@@ -273,58 +288,78 @@ public class ApiController {
         return ResponseEntity.ok(userDTOs);
     }
 
+    @GetMapping("/recipient/favorites")
+    public ResponseEntity<List<DonorProfileDTO>> getFavoriteDonorsForRecipient() {
+        MyAppUsers user = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user == null || !"recipient".equalsIgnoreCase(user.getUserType())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Long recipientId = user.getRecipientId();
+        List<Long> favoriteIds = myAppUserService.getFavoriteDonors(recipientId);
+        List<DonorProfile> favoriteDonors = donorProfileService.getProfilesByIds(favoriteIds);
+        List<DonorProfileDTO> dtoList = favoriteDonors.stream()
+                .map(DonorProfileConverter::convertToDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtoList);
+    }
 
-    // afhverju eru tvö getmapping here? hér myndi ég byrja með að nota @GetMapping("/donor/favorites/{donorId}")
+    @GetMapping("/recipient/favoritedByDonor/{donorId}")
+    public ResponseEntity<List<RecipientProfileDTO>> getRecipientsWhoFavoritedDonor(
+            @PathVariable Long donorId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
 
+        // Here we get the list of recipients who favored the donor
+        List<MyAppUsers> recipients = myAppUserService.getRecipientsWhoFavoritedTheDonor(donorId);
+        if (recipients == null) {
+            recipients = new ArrayList<>();
+        }
 
-    // fjarlæga eða breyta þessu:
+        int fromIndex = page * size;
+        if (fromIndex >= recipients.size()) {
+            return ResponseEntity.ok(Collections.emptyList());
+        }
+
+        int toIndex = Math.min(fromIndex + size, recipients.size());
+        List<MyAppUsers> pageRecipients = recipients.subList(fromIndex, toIndex);
+        List<RecipientProfileDTO> dtoList = pageRecipients.stream()
+                .map(user -> {
+                    RecipientProfile profile = user.getRecipientProfile();
+                    return (profile != null)
+                            ? RecipientProfileConverter.convertToDTO(profile)
+                            : new RecipientProfileDTO();
+                })
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtoList);
+    }
+
+    @GetMapping("/recipient/favorite/{donorProfileId}")
+    public ResponseEntity<?> addFavoriteDonor(@PathVariable Long donorProfileId) {
+        MyAppUsers user = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user == null || !"recipient".equalsIgnoreCase(user.getUserType())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Long recipientId = user.getRecipientId();
+        myAppUserService.addFavoriteDonor(recipientId, donorProfileId);
+        return ResponseEntity.ok(Collections.singletonMap("message", "Donor added to favorites"));
+    }
+
+    @PostMapping("/recipient/unfavorite/{donorProfileId}")
+    public ResponseEntity<?> unfavoriteDonor(@PathVariable Long donorProfileId) {
+        MyAppUsers user = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user == null || !"recipient".equalsIgnoreCase(user.getUserType())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Long recipientId = user.getRecipientId();
+        myAppUserService.removeFavoriteDonor(recipientId, donorProfileId);
+        return ResponseEntity.ok(Collections.singletonMap("message", "Donor removed from favorites"));
+    }
+
     @GetMapping("/messages/{userType}/{id}")
     public ResponseEntity<List<MessageDTO>> getMessages(
             @PathVariable String userType,
             @PathVariable Long id) {
 
-        // byrjum hér:
-    //Returns a list of recipients who have favorited the donor
-    //@GetMapping("/donor/favorites/{donorId}")
-    //public ResponseEntity<List<RecipientProfileDTO>> getRecipientsWhoFavoritedDonor(@PathVariable Long donorId) {
-        //List<MyAppUsers> favoritingRecipients = myAppUserRepository.findRecipientsWhoFavoritedDonor(donorId);
-
-        //if (favoritingRecipients.isEmpty()) {
-            //return ResponseEntity.ok(Collections.emptyList()); // Return empty list if no recipients found
-        //}
-
-
-        // hér myndi ég taka þetta út:
-        //MyAppUsers donor = donorOpt.get();
-        // Find all recipients who have this donor in their `favorite_donors` column
-        //List<MyAppUsers> favoritingRecipients = myAppUserRepository.findByFavoriteDonorsContaining(donor.getId());
-
-
-        // þessu myndi ég halda óbreytt
-        // Convert to DTOs
-        //List<RecipientProfileDTO> recipientDTOs = favoritingRecipients.stream()
-                //.map(user -> user.getRecipientProfile()) //Extract RecipientProfile
-                //.filter(Objects::nonNull) //Ensure there is a valid RecipientProfile
-                //.map(RecipientProfileConverter::convertToDTO) //Convert to DTO
-                //.collect(Collectors.toList());
-
-        //return ResponseEntity.ok(recipientDTOs);
-        // stoppa hér!
-
-        // Afhverju er þetta tvisvar?
-        // Extract recipients from the `favorite_donors` column
-        //List<Long> recipientIds = donor.getFavoriteDonors(); // Assuming it's stored as a list
-
-        //List<RecipientProfileDTO> recipients = recipientIds.stream()
-        //        .map(recipientProfileService::findByUserId)
-        //        .filter(Optional::isPresent)
-        //        .map(Optional::get)
-        //        .map(RecipientProfileConverter::convertToDTO)
-        //        .collect(Collectors.toList());
-
-        //return ResponseEntity.ok(recipients);
-    //}
-        // þetta er ekki partur af favorite, gera einhverja breytingu hér.
         MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (loggedInUser == null || !loggedInUser.getId().equals(id)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -338,16 +373,29 @@ public class ApiController {
         return ResponseEntity.ok(messageDTOs);
     }
 
-    // svo myndi ég adda þessum part í @GetMapping("/donor/favorites/{donorId}"), þetta er auðkenningarathugun fyrir donors
-    // Þetta gerir það kleift að recipient geti favorite-að donor án þess að fá 401, og donor getur séð recipients sem hafa
-    // favorite-að hann án þess að þurfa að vera sama notandi.
+    @PostMapping("/match/approveMatch")
+    public ResponseEntity<?> approveMatch(@RequestParam("donorId") Long donorId,
+                                          @RequestParam("recipientId") Long recipientId) {
+        try {
+            myAppUserService.approveFavoriteAsMatch(donorId, recipientId);
+            return ResponseEntity.ok(Collections.singletonMap("message", "Match approved successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("error", e.getMessage()));
+        }
+    }
 
-    //MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    //if (loggedInUser == null || !"donor".equalsIgnoreCase(loggedInUser.getUserType()) ||
-    //loggedInUser.getDonorId() == null ||
-    //!loggedInUser.getDonorId().equals(donorId)) {
-    //return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Not your account.");
-    //}
+    @PostMapping("/match/unmatch")
+    public ResponseEntity<?> unmatch(@RequestParam("donorId") Long donorId,
+                                     @RequestParam("recipientId") Long recipientId) {
+        try {
+            myAppUserService.removeMatch(donorId, recipientId);
+            return ResponseEntity.ok(Collections.singletonMap("message", "Unmatched successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("error", e.getMessage()));
+        }
+    }
 
     @PostMapping("/messages/send")
     public ResponseEntity<?> sendMessage(@RequestBody MessageForm messageForm) {
