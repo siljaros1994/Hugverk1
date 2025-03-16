@@ -68,22 +68,45 @@ public class ApiController {
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
+            // Here we create the HTTP session
             HttpSession session = request.getSession(true);
-            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                    SecurityContextHolder.getContext());
-
+            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
+            // Get the user from the database
             MyAppUsers user = myAppUserService.findByUsername(loginRequest.getUsername())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            LoginResponse response;
+            // For donors, we need to ensure donorId is not null
             if ("donor".equalsIgnoreCase(user.getUserType())) {
-                response = new LoginResponse("success", user.getId(), user.getUserType(), user.getUsername(), user.getDonorId());
-            } else if ("recipient".equalsIgnoreCase(user.getUserType())) {
-                response = new LoginResponse("success", user.getId(), user.getUserType(), user.getUsername(), user.getRecipientId(), true);
-            } else {
-                response = new LoginResponse("success", user.getId(), user.getUserType(), user.getUsername(), null, false);
+                if (user.getDonorId() == null) {
+                    // Here we create a default donor profile for the donor user.
+                    DonorProfile defaultProfile = new DonorProfile();
+                    defaultProfile.setUser(user);
+                    defaultProfile = donorProfileService.saveOrUpdateProfile(defaultProfile);
+                    user.setDonorId(defaultProfile.getDonorProfileId());
+                    myAppUserRepository.save(user);
+                }
+                LoginResponse response = new LoginResponse("success", user.getId(), user.getUserType(),
+                        user.getUsername(), user.getDonorId());
+                return ResponseEntity.ok(response);
             }
-            return ResponseEntity.ok(response);
+            // For recipients we also need to ensure recipientId is not null
+            else if ("recipient".equalsIgnoreCase(user.getUserType())) {
+                if (user.getRecipientId() == null) {
+                    // Here we create a default recipient profile for the recipient user.
+                    RecipientProfile defaultProfile = new RecipientProfile();
+                    defaultProfile.setUser(user);
+                    defaultProfile = recipientProfileService.saveOrUpdateProfile(defaultProfile);
+                    user.setRecipientId(defaultProfile.getRecipientProfileId());
+                    myAppUserRepository.save(user);
+                }
+                LoginResponse response = new LoginResponse("success", user.getId(), user.getUserType(),
+                        user.getUsername(), user.getRecipientId(), true);
+                return ResponseEntity.ok(response);
+            } else {
+                LoginResponse response = new LoginResponse("success", user.getId(), user.getUserType(),
+                        user.getUsername(), null, false);
+                return ResponseEntity.ok(response);
+            }
         } catch (Exception e) {
             System.err.println("Authentication failed: " + e.getMessage());
             e.printStackTrace();
@@ -240,6 +263,17 @@ public class ApiController {
         return ResponseEntity.ok(dto);
     }
 
+    @GetMapping("/recipient/view/{recipientProfileId}")
+    public ResponseEntity<?> viewRecipientProfile(@PathVariable Long recipientProfileId) {
+        Optional<RecipientProfile> profileOpt = recipientProfileService.findByProfileId(recipientProfileId);
+        if (!profileOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Donor profile not found.");
+        }
+        // Here we convert to DTO
+        RecipientProfileDTO dto = RecipientProfileConverter.convertToDTO(profileOpt.get());
+        return ResponseEntity.ok(dto);
+    }
+
     @PostMapping("/upload")
     public ResponseEntity<Map<String, String>> uploadFile(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
@@ -333,13 +367,18 @@ public class ApiController {
         return ResponseEntity.ok(dtoList);
     }
 
-    @GetMapping("/recipient/favorite/{donorProfileId}")
+    @PostMapping("/recipient/favorite/{donorProfileId}")
     public ResponseEntity<?> addFavoriteDonor(@PathVariable Long donorProfileId) {
         MyAppUsers user = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (user == null || !"recipient".equalsIgnoreCase(user.getUserType())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Unauthorized: Please log in.");
         }
         Long recipientId = user.getRecipientId();
+        if(recipientId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Please complete your recipient profile before adding favorites.");
+        }
         myAppUserService.addFavoriteDonor(recipientId, donorProfileId);
         return ResponseEntity.ok(Collections.singletonMap("message", "Donor added to favorites"));
     }
@@ -355,22 +394,30 @@ public class ApiController {
         return ResponseEntity.ok(Collections.singletonMap("message", "Donor removed from favorites"));
     }
 
-    @GetMapping("/messages/{userType}/{id}")
-    public ResponseEntity<List<MessageDTO>> getMessages(
-            @PathVariable String userType,
-            @PathVariable Long id) {
+    @GetMapping("/match/donor/matches")
+    public ResponseEntity<List<RecipientProfileDTO>> getDonorMatches() {
+        // Here we get the user from the database using their ID.
+        MyAppUsers sessionUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        MyAppUsers donor = myAppUserService.findById(sessionUser.getId())
+                .orElseThrow(() -> new RuntimeException("Donor not found"));
 
-        MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (loggedInUser == null || !loggedInUser.getId().equals(id)) {
+        if (donor == null || !"donor".equalsIgnoreCase(donor.getUserType())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        List<Message> messages = messageService.getConversationBetween(loggedInUser.getId(), id);
-        List<MessageDTO> messageDTOs = messages.stream()
-                .map(MessageConverter::convertToDTO)
-                .toList();
+        // Here we get the IDs of matched recipients
+        List<Long> matchedRecipientIds = donor.getMatchRecipients();
+        System.out.println("Donor " + donor.getId() + " matched recipients: " + matchedRecipientIds);
 
-        return ResponseEntity.ok(messageDTOs);
+        // Here we retrieve the corresponding recipient profiles for the donors match page.
+        List<RecipientProfile> matchedRecipients = recipientProfileService.getProfilesByUserIds(matchedRecipientIds);
+
+        // Here we convert profiles to DTOs
+        List<RecipientProfileDTO> dtoList = matchedRecipients.stream()
+                .map(RecipientProfileConverter::convertToDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtoList);
     }
 
     @PostMapping("/match/approveMatch")
@@ -395,6 +442,24 @@ public class ApiController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Collections.singletonMap("error", e.getMessage()));
         }
+    }
+
+    @GetMapping("/messages/{userType}/{id}")
+    public ResponseEntity<List<MessageDTO>> getMessages(
+            @PathVariable String userType,
+            @PathVariable Long id) {
+
+        MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (loggedInUser == null || !loggedInUser.getId().equals(id)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        List<Message> messages = messageService.getConversationBetween(loggedInUser.getId(), id);
+        List<MessageDTO> messageDTOs = messages.stream()
+                .map(MessageConverter::convertToDTO)
+                .toList();
+
+        return ResponseEntity.ok(messageDTOs);
     }
 
     @PostMapping("/messages/send")
