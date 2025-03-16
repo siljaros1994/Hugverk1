@@ -151,7 +151,6 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
         }
     }
 
-
     @Override
     public void approveFavoriteAsMatch(Long donorId, Long recipientId) {
         System.out.println("Approving match: Donor ID " + donorId + " with Recipient ID " + recipientId);
@@ -163,21 +162,19 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
                 .orElseThrow(() -> new RuntimeException("Recipient not found"));
 
         // Update donor's matchedRecipients (recipient IDs)
-        List<Long> matchedRecipients = donor.getMatchRecipients();
-        if (!matchedRecipients.contains(recipientId)) {
-            matchedRecipients.add(recipientId);
-            donor.setMatchRecipients(matchedRecipients);
+        if (!donor.getMatchRecipients().contains(recipientId)) {
+            donor.addMatchedRecipient(recipientId);
             userRepository.save(donor);
-            System.out.println("Donor's matched recipients updated: " + matchedRecipients);
+            System.out.println("Donor's matched recipients updated: " + donor.getMatchRecipients());
         }
 
         // Update recipient's matchedDonors (donor IDs)
-        List<Long> matchedDonors = recipient.getMatchDonorsList();
-        if (!matchedDonors.contains(donorId)) {
-            matchedDonors.add(donorId);
-            recipient.setMatchDonorsList(matchedDonors);
+        if (!recipient.getMatchDonorsList().contains(donorId)) {
+            recipient.addMatchedDonor(donorId);
             userRepository.save(recipient);
-            System.out.println("Recipient's matched donors updated: " + matchedDonors);
+            System.out.println("Recipient's matched donors updated: " + recipient.getMatchDonorsList());
+        } else {
+            System.out.println("Recipient already has donor in match list.");
         }
     }
 
@@ -248,7 +245,6 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
 
         System.out.println("Removed match: Donor ID " + donorId + " with Recipient ID " + recipientId);
     }
-
 
     @Override
     public List<Long> getMatchesForRecipient(Long userId) {

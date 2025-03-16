@@ -396,19 +396,27 @@ public class ApiController {
 
     @GetMapping("/match/donor/matches")
     public ResponseEntity<List<RecipientProfileDTO>> getDonorMatches() {
-        // Here we retrieve the authenticated user
-        MyAppUsers user = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (user == null || !"donor".equalsIgnoreCase(user.getUserType())) {
+        // Here we get the user from the database using their ID.
+        MyAppUsers sessionUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        MyAppUsers donor = myAppUserService.findById(sessionUser.getId())
+                .orElseThrow(() -> new RuntimeException("Donor not found"));
+
+        if (donor == null || !"donor".equalsIgnoreCase(donor.getUserType())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+
         // Here we get the IDs of matched recipients
-        List<Long> matchedRecipientIds = user.getMatchRecipients();
-        // then we retrieve the corresponding recipient profiles
+        List<Long> matchedRecipientIds = donor.getMatchRecipients();
+        System.out.println("Donor " + donor.getId() + " matched recipients: " + matchedRecipientIds);
+
+        // Here we retrieve the corresponding recipient profiles for the donors match page.
         List<RecipientProfile> matchedRecipients = recipientProfileService.getProfilesByUserIds(matchedRecipientIds);
+
         // Here we convert profiles to DTOs
         List<RecipientProfileDTO> dtoList = matchedRecipients.stream()
                 .map(RecipientProfileConverter::convertToDTO)
                 .collect(Collectors.toList());
+
         return ResponseEntity.ok(dtoList);
     }
 

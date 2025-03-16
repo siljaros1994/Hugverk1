@@ -49,14 +49,6 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
     @Column(name = "matched_donors")
     private String matchedDonors;
 
-    public List<Long> getMatchedDonorsList() {
-        if (matchedDonors == null || matchedDonors.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return Arrays.stream(matchedDonors.split(","))
-                .map(Long::parseLong)
-                .collect(Collectors.toList());
-    }
 
     public List<Long> getFavoriteDonorsList() {
         if (favoriteDonors == null || favoriteDonors.isEmpty()) {
@@ -96,7 +88,14 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
         }
     }
 
-    // Getter for matchedDonorsList
+    public void addMatchedRecipient(Long recipientId) {
+        List<Long> recipients = getMatchRecipients();
+        if (!recipients.contains(recipientId)) {
+            recipients.add(recipientId);
+            setMatchRecipients(recipients);
+        }
+    }
+
     public List<Long> getMatchDonorsList() {
         if (matchedDonors == null || matchedDonors.isEmpty()) {
             return new ArrayList<>();
@@ -106,7 +105,6 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
                 .collect(Collectors.toList());
     }
 
-    // Setter for matchedDonorsList
     public void setMatchDonorsList(List<Long> donorIds) {
         if (donorIds == null || donorIds.isEmpty()) {
             this.matchedDonors = "";
@@ -117,19 +115,11 @@ public class MyAppUsers implements UserDetails { // Implement UserDetails
         }
     }
 
-    public void addMatchedRecipient(Long recipientId) {
-        List<Long> recipients = getMatchRecipients();
-        if (!recipients.contains(recipientId)) {
-            recipients.add(recipientId);
-            setMatchRecipients(recipients);
-        }
-    }
-
     public void addMatchedDonor(Long donorId) {
-        List<Long> matchedDonors = getMatchDonorsList();
-        if (!matchedDonors.contains(donorId)) {
-            matchedDonors.add(donorId);
-            setMatchDonorsList(matchedDonors);
+        List<Long> donors = getMatchDonorsList();
+        if (!donors.contains(donorId)) {
+            donors.add(donorId);
+            setMatchDonorsList(donors);
         }
     }
 
