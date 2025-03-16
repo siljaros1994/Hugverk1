@@ -420,6 +420,28 @@ public class ApiController {
         return ResponseEntity.ok(dtoList);
     }
 
+    @GetMapping("/match/recipient/matches")
+    public ResponseEntity<List<DonorProfileDTO>> getRecipientMatches() {
+        MyAppUsers sessionUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (sessionUser == null || !"recipient".equalsIgnoreCase(sessionUser.getUserType())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // Here we get the list of matched donor IDs from the recipient's record.
+        List<Long> matchedDonorIds = sessionUser.getMatchDonorsList();
+        System.out.println("Recipient " + sessionUser.getId() + " matched donors: " + matchedDonorIds);
+
+        // Here we retrieve the corresponding donor profiles.
+        List<DonorProfile> matchedDonors = donorProfileService.getProfilesByIds(matchedDonorIds);
+
+        // Here we convert donor profiles to DTOs.
+        List<DonorProfileDTO> dtoList = matchedDonors.stream()
+                .map(DonorProfileConverter::convertToDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtoList);
+    }
+
     @PostMapping("/match/approveMatch")
     public ResponseEntity<?> approveMatch(@RequestParam("donorId") Long donorId,
                                           @RequestParam("recipientId") Long recipientId) {
