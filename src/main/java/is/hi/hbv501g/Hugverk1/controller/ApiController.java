@@ -59,6 +59,10 @@ public class ApiController {
     @Autowired
     private MessageService messageService;
 
+    @Autowired
+    private AppointmentService appointmentService;
+
+
     @PostMapping("/users/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest,
                                                HttpServletRequest request) {
@@ -505,4 +509,60 @@ public class ApiController {
 
         return ResponseEntity.ok("Message sent successfully");
     }
+
+    //Booking appointments
+    //Url: POST /api/apointments/book
+    @PostMapping("/book")
+    public ResponseEntity<String> bookAppointment(@RequestBody AppointmentRequest request) {
+        boolean success = appointmentService.bookAppointment(request);
+        if (success) {
+            return ResponseEntity.status(HttpStatus.CREATED).body("Appointment booked successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to book appointment");
+        }
+
+    }
+
+    //Get Recipient's Current Appointments
+    //Allows a recipient to view their booked appointments
+    //URL:GET /api/appointments/recipient
+    @GetMapping("/recipient/{recipientId}")
+    public ResponseEntity<List<Appointment>> getRecipientAppointments(@PathVariable Long recipient Id) {
+        List<Appointment> appointments = appointmentService.getAppointmentsByRecipient(recipientId);
+        return ResponseEntity.ok(appointments);
+    }
+
+    //Donor Confirms or Cancels an Appointment
+    @PostMapping("/confirm/{appointmentId}")
+    public ResponseEntity<String> confirmAppointment(@PathVariable Long appointmentId) {
+        boolean success = appointmentService.confirmAppointment(appointmentId);
+        if (success) {
+            return ResponseEntity.ok("Appointment confirmed successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to confirm appointment");
+        }
+    }
+
+    //If donor cancels an appointment
+    //URl to confirm: POST /api/appointments/confirm
+    //URL to cancel: POST /api/appointments/cancel
+    @PostMapping("/cancel/{appointmentId}")
+    public ResponseEntity<String> cancelAppointment(@PathVariable Long appointmentId) {
+        boolean success = appointmentService.cancelAppointment(appointmentId);
+        if (success) {
+            return ResponseEntity.ok("Appointment canceled successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to cancel appointment");
+        }
+    }
+
+    //API to see appointments waiting for confirmation
+    //URL: GET /api/appointments/donor
+    @GetMapping("/donor/{donorId}/pending")
+    public ResponseEntity<List<Appointment>> getPendingAppointments(@PathVariable Long donorId) {
+        List<Appointment> appointments = appointmentService.getPendingAppointmentsByDonor (donorId);
+        return ResponseEntity.ok(appointments);
+    }
+
+
 }
