@@ -1,4 +1,5 @@
 package is.hi.hbv501g.Hugverk1.controller;
+//package is.hi.hbv501g.Hugverk1.Services;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
@@ -9,6 +10,7 @@ import is.hi.hbv501g.Hugverk1.Services.DonorProfileService;
 import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import is.hi.hbv501g.Hugverk1.Services.MessageService;
 import is.hi.hbv501g.Hugverk1.Services.RecipientProfileService;
+import is.hi.hbv501g.Hugverk1.Services.BookingService;
 import is.hi.hbv501g.Hugverk1.Persistence.forms.MessageForm;
 import java.time.LocalDateTime;
 import is.hi.hbv501g.Hugverk1.dto.*;
@@ -33,6 +35,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import is.hi.hbv501g.Hugverk1.dto.BookingDTO;
+
+
+
 
 @RestController
 @RequestMapping("/api")
@@ -60,7 +66,7 @@ public class ApiController {
     private MessageService messageService;
 
     @Autowired
-    private AppointmentService appointmentService;
+    private BookingService bookingService;
 
 
     @PostMapping("/users/login")
@@ -513,13 +519,21 @@ public class ApiController {
     //Booking appointments
     //Url: POST /api/apointments/book
     @PostMapping("/book")
-    public ResponseEntity<String> bookAppointment(@RequestBody AppointmentRequest request) {
-        boolean success = appointmentService.bookAppointment(request);
-        if (success) {
-            return ResponseEntity.status(HttpStatus.CREATED).body("Appointment booked successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to book appointment");
-        }
+    public ResponseEntity<String> bookAppointment(@RequestBody BookingDTO request) {
+        Booking booking = bookingService.createBooking(
+                request.getDonorId(),
+                request.getRecipientId(),
+                request.getDate(),
+                request.getTime()
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body("Appointment booked successfully with ID: "+booking.getId());
+
+        //boolean success = bookingService.bookAppointment(request);
+        //if (success) {
+        //    return ResponseEntity.status(HttpStatus.CREATED).body("Appointment booked successfully");
+        //} else {
+        //    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to book appointment");
+        //}
 
     }
 
@@ -527,20 +541,37 @@ public class ApiController {
     //Allows a recipient to view their booked appointments
     //URL:GET /api/appointments/recipient
     @GetMapping("/recipient/{recipientId}")
-    public ResponseEntity<List<Appointment>> getRecipientAppointments(@PathVariable Long recipient Id) {
-        List<Appointment> appointments = appointmentService.getAppointmentsByRecipient(recipientId);
-        return ResponseEntity.ok(appointments);
+    public ResponseEntity<List<BookingDTO>> getRecipientAppointments(@PathVariable Long recipientId) {
+        List<Booking> bookings = bookingService.getBookingsByRecipientId(recipientId);
+        List<BookingDTO> bookingDTOs = bookings.stream().map(booking -> new BookingDTO(
+                booking.getId(),
+                booking.getDonorId(),
+                booking.getRecipientId(),
+                booking.getDate(),
+                booking.getTime(),
+                booking.isConfirmed(),
+                booking.getStatus()
+        )).toList();
+        return ResponseEntity.ok(bookingDTOs);
+        //List<Booking> appointments = bookingService.getAppointmentsByRecipient(recipientId);
+        //return ResponseEntity.ok(appointments);
     }
 
     //Donor Confirms or Cancels an Appointment
     @PostMapping("/confirm/{appointmentId}")
     public ResponseEntity<String> confirmAppointment(@PathVariable Long appointmentId) {
-        boolean success = appointmentService.confirmAppointment(appointmentId);
-        if (success) {
+        try {
+            bookingService.confirmBooking(appointmentId);
             return ResponseEntity.ok("Appointment confirmed successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to confirm appointment");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to confirm appointment:" + e.getMessage());
         }
+        //boolean success = bookingService.confirmAppointment(appointmentId);
+        //if (success) {
+        //    return ResponseEntity.ok("Appointment confirmed successfully");
+        //} else {
+        //    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to confirm appointment");
+        //}
     }
 
     //If donor cancels an appointment
@@ -548,20 +579,37 @@ public class ApiController {
     //URL to cancel: POST /api/appointments/cancel
     @PostMapping("/cancel/{appointmentId}")
     public ResponseEntity<String> cancelAppointment(@PathVariable Long appointmentId) {
-        boolean success = appointmentService.cancelAppointment(appointmentId);
-        if (success) {
+        try {
+            bookingService.cancelBooking(appointmentId);
             return ResponseEntity.ok("Appointment canceled successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to cancel appointment");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to cancel appointment:"+ e.getMessage());
         }
+        //boolean success = bookingService.cancelAppointment(appointmentId);
+        //if (success) {
+        //    return ResponseEntity.ok("Appointment canceled successfully");
+        //} else {
+        //    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to cancel appointment");
+        //}
     }
 
     //API to see appointments waiting for confirmation
     //URL: GET /api/appointments/donor
     @GetMapping("/donor/{donorId}/pending")
-    public ResponseEntity<List<Appointment>> getPendingAppointments(@PathVariable Long donorId) {
-        List<Appointment> appointments = appointmentService.getPendingAppointmentsByDonor (donorId);
-        return ResponseEntity.ok(appointments);
+    public ResponseEntity<List<BookingDTO>> getPendingAppointments(@PathVariable Long donorId) {
+        List<Booking> pendingBookings = bookingService.getPendingBookingsForDonor(donorId);
+        List<BookingDTO> bookingDTOs = pendingBookings.stream().map(booking -> new BookingDTO(
+                booking.getId(),
+                booking.getDonorId(),
+                booking.getRecipientId(),
+                booking.getDate(),
+                booking.getTime(),
+                booking.isConfirmed(),
+                booking.getStatus()
+        )).collect(Collectors.toList());
+        return ResponseEntity.ok(bookingDTOs);
+        //List<Booking> appointments = bookingService.getPendingAppointmentsByDonor (donorId);
+        //return ResponseEntity.ok(appointments);
     }
 
 
