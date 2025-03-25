@@ -235,7 +235,8 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
         userRepository.save(donor);
 
         MyAppUsers recipient = userRepository.findById(recipientId)
-                .orElseThrow(() -> new RuntimeException("Recipient not found"));
+                .orElseGet(() -> userRepository.findByRecipientId(recipientId)
+                        .orElseThrow(() -> new RuntimeException("Recipient not found")));
 
         List<Long> updatedRecipientMatches = recipient.getMatchDonorsList().stream()
                 .filter(id -> !id.equals(donorId))

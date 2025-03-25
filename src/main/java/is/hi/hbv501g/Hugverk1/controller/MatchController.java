@@ -116,7 +116,6 @@ public class  MatchController extends BaseController {
     @PostMapping("/unmatch")
     public String unmatch(@RequestParam Long donorId, @RequestParam Long recipientId, HttpSession session) {
         MyAppUsers loggedInUser = getLoggedInUser();
-
         if (loggedInUser == null) {
             return "redirect:/users/login";
         }
@@ -127,7 +126,10 @@ public class  MatchController extends BaseController {
             System.out.println("Recipient (ID: " + loggedInUser.getId() + ") unmatched with Donor ID: " + donorId);
             return "redirect:/match/recipient/matches";
         } else if ("donor".equalsIgnoreCase(loggedInUser.getUserType())) {
+            // Remove match first
             myAppUserService.removeMatch(loggedInUser.getId(), recipientId);
+            // Also remove the donor's profile id from the recipient's favorites list.
+            myAppUserService.removeFavoriteDonor(recipientId, loggedInUser.getDonorId());
             System.out.println("Donor (ID: " + loggedInUser.getId() + ") unmatched with Recipient ID: " + recipientId);
             return "redirect:/match/donor/matches";
         } else {

@@ -30,6 +30,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -153,6 +154,27 @@ public class ApiController {
         } else {
             return ResponseEntity.ok(new LoginResponse("User registered successfully", user.getId(), user.getUserType(), user.getUsername(), null, false));
         }
+    }
+
+    @PostMapping("/migrateRecipients")
+    @Transactional
+    public ResponseEntity<String> migrateRecipients() {
+        List<MyAppUsers> recipients = myAppUserService.findAllUsers().stream()
+                .filter(user -> "recipient".equalsIgnoreCase(user.getUserType()) && user.getRecipientId() == null)
+                .collect(Collectors.toList());
+
+        for (MyAppUsers recipient : recipients) {
+            try {
+                RecipientProfile defaultProfile = new RecipientProfile();
+                defaultProfile.setUser(recipient);
+                defaultProfile = recipientProfileService.saveOrUpdateProfile(defaultProfile);
+                recipient.setRecipientId(defaultProfile.getRecipientProfileId());
+                myAppUserRepository.save(recipient);
+            } catch (Exception e) {
+                System.err.println("Error migrating user " + recipient.getUsername() + ": " + e.getMessage());
+            }
+        }
+        return ResponseEntity.ok("Migration completed: Updated " + recipients.size() + " recipient(s).");
     }
 
     @GetMapping("/recipient/profile/{userId}")
@@ -471,7 +493,15 @@ public class ApiController {
     public ResponseEntity<?> unmatch(@RequestParam("donorId") Long donorId,
                                      @RequestParam("recipientId") Long recipientId) {
         try {
+            // Here we remove match from both donor and recipient match lists
             myAppUserService.removeMatch(donorId, recipientId);
+
+            // Here we get the logged-in user to determine if it's a donor
+            MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (loggedInUser != null && "donor".equalsIgnoreCase(loggedInUser.getUserType())) {
+                // Here we also remove the donor's profile ID from the recipient's favorites list.
+                myAppUserService.removeFavoriteDonor(recipientId, loggedInUser.getDonorId());
+            }
             return ResponseEntity.ok(Collections.singletonMap("message", "Unmatched successfully"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
