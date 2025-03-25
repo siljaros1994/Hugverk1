@@ -1,4 +1,5 @@
 package is.hi.hbv501g.Hugverk1.controller;
+//package is.hi.hbv501g.Hugverk1.Services;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
@@ -9,6 +10,7 @@ import is.hi.hbv501g.Hugverk1.Services.DonorProfileService;
 import is.hi.hbv501g.Hugverk1.Services.MyAppUserService;
 import is.hi.hbv501g.Hugverk1.Services.MessageService;
 import is.hi.hbv501g.Hugverk1.Services.RecipientProfileService;
+import is.hi.hbv501g.Hugverk1.Services.BookingService;
 import is.hi.hbv501g.Hugverk1.Persistence.forms.MessageForm;
 import java.time.LocalDateTime;
 import is.hi.hbv501g.Hugverk1.dto.*;
@@ -34,8 +36,15 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import is.hi.hbv501g.Hugverk1.dto.BookingDTO;
+import org.springframework.security.core.Authentication;
+
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
+
 
 @RestController
+//private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
 @RequestMapping("/api")
 public class ApiController {
 
@@ -59,6 +68,10 @@ public class ApiController {
 
     @Autowired
     private MessageService messageService;
+
+    @Autowired
+    private BookingService bookingService;
+
 
     @PostMapping("/users/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest,
@@ -535,4 +548,158 @@ public class ApiController {
 
         return ResponseEntity.ok("Message sent successfully");
     }
+
+    //Booking appointments
+    //Url: POST /api/apointments/book
+    @PostMapping("/bookings/book")
+    public ResponseEntity<String> bookAppointment(@RequestBody BookingDTO request) {
+        //Log the request details
+        System.out.println("Incoming booking request: " + request);
+        // Retrieve the authenticated user from Spring Security Context
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            System.out.println("ERROR: No authenticated user in SecurityContext");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Please log in.");
+        }
+        //Extract authenticated user
+        Object principal = authentication.getPrincipal();
+        if (!(principal instanceof MyAppUsers sessionUser)) {
+            System.out.println("ERROR: Principal is not a valid user.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Invalid session.");
+        }
+
+        //Ensure only recipients can book
+        if (!"recipient".equalsIgnoreCase(sessionUser.getUserType())) {
+            System.out.println("ERROR: User is not a recipient.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only recipients can book an appointment.");
+        }
+        //Override request recipient ID with the authenticated user's ID
+        request.setRecipientId(sessionUser.getId());
+        //Log recipient details
+        System.out.println("Booking for recipient ID: " + request.getRecipientId() + " with donor ID: " + request.getDonorId());
+        try {
+        //Create the booking
+        Booking booking = bookingService.createBooking(
+                request.getDonorId(),
+                request.getRecipientId(), // Now using session user ID
+                request.getDate(),
+                request.getTime()
+        );
+
+        System.out.println("SUCCESS: Appointment booked with ID: " + booking.getId());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("Appointment booked successfully with ID: " + booking.getId());
+        } catch (Exception e) {
+            System.out.println("ERROR: Booking failed - " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to book appointment: " + e.getMessage());
+        }
+
+    }
+
+
+
+    //Get Recipient's Current Appointments
+    //Allows a recipient to view their booked appointments
+    //URL:GET /api/appointments/recipient
+    @GetMapping("/recipient/{recipientId}")
+    @ResponseBody
+    public ResponseEntity<?> getRecipientAppointments(@PathVariable Long recipientId) {
+        // Ensure the user is authenticated
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Please log in.");
+        }
+
+        MyAppUsers sessionUser = (MyAppUsers) authentication.getPrincipal();
+        if (sessionUser == null || !sessionUser.getId().equals(recipientId) || !"recipient".equalsIgnoreCase(sessionUser.getUserType())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access");
+        }
+
+            List<BookingDTO> bookingDTOs = bookingService.getBookingsByRecipientId(recipientId)
+                    .stream().map(booking ->
+            new BookingDTO(
+                booking.getId(),
+                booking.getDonorId(),
+                booking.getRecipientId(),
+                booking.getDate(),
+                booking.getTime(),
+                booking.isConfirmed(),
+                booking.getStatus()
+        )).collect(Collectors.toList());
+        return ResponseEntity.ok(bookingDTOs);
+
+    }
+
+
+
+    //Donor Confirms or Cancels an Appointment
+    @PostMapping("/confirm/{appointmentId}")
+    @ResponseBody
+    public ResponseEntity<?> confirmAppointment(@PathVariable Long appointmentId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Please log in.");
+        }
+        MyAppUsers sessionUser = (MyAppUsers) authentication.getPrincipal();
+        if (!"donor".equalsIgnoreCase(sessionUser.getUserType())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only donors can confirm appointments.");
+        }
+
+        try {
+            bookingService.confirmBooking(appointmentId);
+            return ResponseEntity.ok("Appointment confirmed successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to confirm appointment:" + e.getMessage());
+        }
+
+    }
+
+    //If donor cancels an appointment
+    //URl to confirm: POST /api/appointments/confirm
+    //URL to cancel: POST /api/appointments/cancel
+    @PostMapping("/cancel/{appointmentId}")
+    public ResponseEntity<String> cancelAppointment(@PathVariable Long appointmentId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Please log in.");
+        }
+
+        try {
+            bookingService.cancelBooking(appointmentId);
+            return ResponseEntity.ok("Appointment canceled successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to cancel appointment: " + e.getMessage());
+        }
+    }
+
+
+    //API to see appointments waiting for confirmation
+    //URL: GET /api/bookings/donor/{donorId}/pending
+    @GetMapping("/bookings/donor/{donorId}/pending")
+    @ResponseBody
+    public ResponseEntity<?> getPendingAppointments(@PathVariable Long donorId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Please log in.");
+        }
+        MyAppUsers sessionUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (sessionUser == null || !sessionUser.getId().equals(donorId) || !"donor".equalsIgnoreCase(sessionUser.getUserType())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access");
+        }
+
+        List<BookingDTO> bookingDTOs = bookingService.getPendingBookingsForDonor(donorId).stream().map(booking ->
+                new BookingDTO(
+                booking.getId(),
+                booking.getDonorId(),
+                booking.getRecipientId(),
+                booking.getDate(),
+                booking.getTime(),
+                booking.isConfirmed(),
+                booking.getStatus()
+        )).collect(Collectors.toList());
+        return ResponseEntity.ok(bookingDTOs);
+
+    }
+
+
 }

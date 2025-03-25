@@ -69,7 +69,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/login", "/api/users/register", "/uploads/**", "/api/authenticate", "/css/**").permitAll()
                         .requestMatchers("/error").permitAll() // Allow all access to /error
                         .requestMatchers("/api/**", "/api/recipient/profile/**", "/api/donor/profile/**", "/api/recipient/profile/saveOrEdit").authenticated()
-                        .requestMatchers("/api/recipient/**", "/api/donor/**", "/api/match/**").authenticated()
+                        .requestMatchers("/api/recipient/**", "/api/donor/**", "/api/match/**", "/api/bookings/book").authenticated()
+                        .requestMatchers("/api/bookings/donor/{donorId}/pending").authenticated()
                         .requestMatchers("/users/login", "/users/register").permitAll() //start of intellij
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/admin/**", "/home/admin", "/donorlimits", "/delete/{username}", "/reports", "/history").hasRole("ADMIN")
@@ -77,6 +78,10 @@ public class SecurityConfig {
                         .requestMatchers("/home/recipient", "/recipientprofile", "/recipient/view/**", "/bookings/recipient", "/recipient/favorite/**").authenticated()
                         .requestMatchers("/messages/**", "/messages/{userType}/{id:[0-9]+}", "/dr").authenticated()
                         .requestMatchers("/match/donor/matches", "/match/recipient/matches", "/match/approveMatch", "/match/unmatch").authenticated()
+                        .requestMatchers("/bookings/book").authenticated()
+                        .requestMatchers("/bookings/donor/{donorId}/pending").authenticated()
+
+
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
