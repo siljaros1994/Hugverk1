@@ -600,6 +600,8 @@ public class ApiController {
 
     }
 
+
+
     //Donor Confirms or Cancels an Appointment
     @PostMapping("/confirm/{appointmentId}")
     @ResponseBody
@@ -642,8 +644,8 @@ public class ApiController {
 
 
     //API to see appointments waiting for confirmation
-    //URL: GET /api/appointments/donor
-    @GetMapping("/donor/{donorId}/pending")
+    //URL: GET /api/bookings/donor/{donorId}/pending
+    @GetMapping("/bookings/donor/{donorId}/pending")
     @ResponseBody
     public ResponseEntity<?> getPendingAppointments(@PathVariable Long donorId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
