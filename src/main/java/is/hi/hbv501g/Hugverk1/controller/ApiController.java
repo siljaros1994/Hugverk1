@@ -564,33 +564,6 @@ public class ApiController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to book appointment: " + e.getMessage());
         }
 
-        /*
-        // Check if the session contains an authenticated user
-        MyAppUsers sessionUser = (MyAppUsers) principal; //session.getAttribute("user");
-        // Ensure only recipients can book an appointment
-        //Log user details
-        System.out.println("Authenticated user: ID=" + sessionUser.getId() + ", Type=" + sessionUser.getUserType());
-        if (!"recipient".equalsIgnoreCase(sessionUser.getUserType())) {
-            System.out.println("ERROR: User is not a recipient.");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only recipients can book an appointment.");
-        }
-
-        // Ensure recipient ID is correctly assigned from session user
-        Long recipientId = sessionUser.getId();
-        System.out.println("Booking for recipient ID: " + recipientId + " with donor ID: " + request.getDonorId());
-
-
-        Booking booking = bookingService.createBooking(
-                request.getDonorId(),
-                request.getId(), //getRecipientId(), ensure recipient ID is set from the authenticated user
-                request.getDate(),
-                request.getTime()
-        );
-        System.out.println("SUCCESS: Appointment booked with ID: " + booking.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body("Appointment booked successfully with ID: "
-                +booking.getId());
-
-         */
     }
 
 

@@ -77,7 +77,7 @@ public class SecurityConfig {
                         .requestMatchers("/home/recipient", "/recipientprofile", "/recipient/view/**", "/bookings/recipient", "/recipient/favorite/**").authenticated()
                         .requestMatchers("/messages/**", "/messages/{userType}/{id:[0-9]+}", "/dr").authenticated()
                         .requestMatchers("/match/donor/matches", "/match/recipient/matches", "/match/approveMatch", "/match/unmatch").authenticated()
-                        .requestMatchers("/bookings/book").authenticated() //Skip the api, debugging
+                        .requestMatchers("/bookings/book").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
