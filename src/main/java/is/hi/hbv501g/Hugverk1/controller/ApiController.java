@@ -596,8 +596,36 @@ public class ApiController {
 
     }
 
+    // Fetch confirmed appointments for a recipient
+    @GetMapping("/bookings/recipient/{recipientId}/confirmed")
+    @ResponseBody
+    public ResponseEntity<?> getConfirmedAppointmentsForRecipient(@PathVariable Long recipientId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Please log in.");
+        }
+        MyAppUsers sessionUser = (MyAppUsers) authentication.getPrincipal();
+        if (!sessionUser.getId().equals(recipientId) || !"recipient".equalsIgnoreCase(sessionUser.getUserType())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access");
+        }
+
+        List<BookingDTO> bookingDTOs = bookingService.getConfirmedBookingsForRecipient(recipientId).stream()
+                .map(booking -> new BookingDTO(
+                        booking.getId(),
+                        booking.getDonorId(),
+                        booking.getRecipientId(),
+                        booking.getDate(),
+                        booking.getTime(),
+                        booking.isConfirmed(),
+                        booking.getStatus()
+                )).collect(Collectors.toList());
+
+        return ResponseEntity.ok(bookingDTOs);
+    }
 
 
+
+    /*
     //Get Recipient's Current Appointments
     //Allows a recipient to view their booked appointments
     //URL:GET /api/appointments/recipient
@@ -629,6 +657,8 @@ public class ApiController {
         return ResponseEntity.ok(bookingDTOs);
 
     }
+
+     */
 
 
 
@@ -700,6 +730,37 @@ public class ApiController {
         return ResponseEntity.ok(bookingDTOs);
 
     }
+
+    // Fetch confirmed appointments for a donor
+    @GetMapping("/bookings/donor/{donorId}/confirmed")
+    @ResponseBody
+    public ResponseEntity<?> getConfirmedAppointmentsForDonor(@PathVariable Long donorId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Please log in.");
+        }
+        MyAppUsers sessionUser = (MyAppUsers) authentication.getPrincipal();
+        if (!sessionUser.getId().equals(donorId) || !"donor".equalsIgnoreCase(sessionUser.getUserType())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access");
+        }
+
+        List<BookingDTO> bookingDTOs = bookingService.getConfirmedBookingsForDonor(donorId).stream()
+                .map(booking -> new BookingDTO(
+                        booking.getId(),
+                        booking.getDonorId(),
+                        booking.getRecipientId(),
+                        booking.getDate(),
+                        booking.getTime(),
+                        booking.isConfirmed(),
+                        booking.getStatus()
+                )).collect(Collectors.toList());
+
+        return ResponseEntity.ok(bookingDTOs);
+    }
+
+
+
+
 
 
 }
