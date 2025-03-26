@@ -624,44 +624,6 @@ public class ApiController {
     }
 
 
-
-    /*
-    //Get Recipient's Current Appointments
-    //Allows a recipient to view their booked appointments
-    //URL:GET /api/appointments/recipient
-    @GetMapping("/recipient/{recipientId}")
-    @ResponseBody
-    public ResponseEntity<?> getRecipientAppointments(@PathVariable Long recipientId) {
-        // Ensure the user is authenticated
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Please log in.");
-        }
-
-        MyAppUsers sessionUser = (MyAppUsers) authentication.getPrincipal();
-        if (sessionUser == null || !sessionUser.getId().equals(recipientId) || !"recipient".equalsIgnoreCase(sessionUser.getUserType())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access");
-        }
-
-            List<BookingDTO> bookingDTOs = bookingService.getBookingsByRecipientId(recipientId)
-                    .stream().map(booking ->
-            new BookingDTO(
-                booking.getId(),
-                booking.getDonorId(),
-                booking.getRecipientId(),
-                booking.getDate(),
-                booking.getTime(),
-                booking.isConfirmed(),
-                booking.getStatus()
-        )).collect(Collectors.toList());
-        return ResponseEntity.ok(bookingDTOs);
-
-    }
-
-     */
-
-
-
     //Donor Confirms (or Cancels (see endpoint below) an Appointment
     @PostMapping("/bookings/confirm/{bookingId}")
     @ResponseBody
