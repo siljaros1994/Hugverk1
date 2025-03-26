@@ -1,5 +1,4 @@
 package is.hi.hbv501g.Hugverk1.controller;
-//package is.hi.hbv501g.Hugverk1.Services;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
@@ -39,8 +38,7 @@ import java.util.stream.Collectors;
 import is.hi.hbv501g.Hugverk1.dto.BookingDTO;
 import org.springframework.security.core.Authentication;
 
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
+
 
 
 @RestController
@@ -549,6 +547,8 @@ public class ApiController {
         return ResponseEntity.ok("Message sent successfully");
     }
 
+
+
     //Booking appointments
     //Url: POST /api/apointments/book
     @PostMapping("/bookings/book")
@@ -632,10 +632,10 @@ public class ApiController {
 
 
 
-    //Donor Confirms or Cancels an Appointment
-    @PostMapping("/confirm/{appointmentId}")
+    //Donor Confirms (or Cancels (see endpoint below) an Appointment
+    @PostMapping("/bookings/confirm/{bookingId}")
     @ResponseBody
-    public ResponseEntity<?> confirmAppointment(@PathVariable Long appointmentId) {
+    public ResponseEntity<?> confirmAppointment(@PathVariable Long bookingId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Please log in.");
@@ -646,7 +646,7 @@ public class ApiController {
         }
 
         try {
-            bookingService.confirmBooking(appointmentId);
+            bookingService.confirmBooking(bookingId);
             return ResponseEntity.ok("Appointment confirmed successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to confirm appointment:" + e.getMessage());
@@ -657,15 +657,15 @@ public class ApiController {
     //If donor cancels an appointment
     //URl to confirm: POST /api/appointments/confirm
     //URL to cancel: POST /api/appointments/cancel
-    @PostMapping("/cancel/{appointmentId}")
-    public ResponseEntity<String> cancelAppointment(@PathVariable Long appointmentId) {
+    @PostMapping("/bookings/cancel/{bookingId}")
+    public ResponseEntity<String> cancelAppointment(@PathVariable Long bookingId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Please log in.");
         }
 
         try {
-            bookingService.cancelBooking(appointmentId);
+            bookingService.cancelBooking(bookingId);
             return ResponseEntity.ok("Appointment canceled successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to cancel appointment: " + e.getMessage());
