@@ -24,7 +24,7 @@ public class SecurityConfig {
 
     private final RestAuthenticationEntryPoint authenticationEntryPoint;
     private final MyAppUserService myAppUserService;
-    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;  // Inject handler
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
