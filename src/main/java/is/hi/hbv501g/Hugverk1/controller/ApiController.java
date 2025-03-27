@@ -509,23 +509,19 @@ public class ApiController {
         }
     }
 
-    @GetMapping("/messages/{userType}/{id}")
-    public ResponseEntity<List<MessageDTO>> getMessages(
-            @PathVariable String userType,
-            @PathVariable Long id) {
+    @GetMapping("/messages/conversation/{receiverId}")
+    public ResponseEntity<List<MessageDTO>> getConversationWith(@PathVariable Long receiverId) {
+        MyAppUsers sender = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (sender == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
-        MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (loggedInUser == null || !loggedInUser.getId().equals(id)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        List<Message> messages = messageService.getConversationBetween(loggedInUser.getId(), id);
+        List<Message> messages = messageService.getConversationBetween(sender.getId(), receiverId);
         List<MessageDTO> messageDTOs = messages.stream()
                 .map(MessageConverter::convertToDTO)
                 .toList();
 
         return ResponseEntity.ok(messageDTOs);
     }
+
 
     @PostMapping("/messages/send")
     public ResponseEntity<?> sendMessage(@RequestBody MessageForm messageForm) {

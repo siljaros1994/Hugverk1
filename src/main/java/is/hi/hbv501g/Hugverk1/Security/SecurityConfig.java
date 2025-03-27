@@ -70,6 +70,7 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll() // Allow all access to /error
                         .requestMatchers("/api/**", "/api/recipient/profile/**", "/api/donor/profile/**", "/api/recipient/profile/saveOrEdit").authenticated()
                         .requestMatchers("/api/recipient/**", "/api/donor/**", "/api/match/**", "/api/bookings/book").authenticated()
+                        .requestMatchers("/api/**","/api/messages/send", "/api/messages/conversation/**").authenticated()
                         .requestMatchers("/api/bookings/donor/{donorId}/pending").authenticated()
                         .requestMatchers("/users/login", "/users/register").permitAll() //start of intellij
                         .requestMatchers("/uploads/**").permitAll()
