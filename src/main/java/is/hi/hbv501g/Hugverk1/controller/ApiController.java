@@ -38,9 +38,6 @@ import java.util.stream.Collectors;
 import is.hi.hbv501g.Hugverk1.dto.BookingDTO;
 import org.springframework.security.core.Authentication;
 
-
-
-
 @RestController
 //private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
 @RequestMapping("/api")
@@ -543,8 +540,6 @@ public class ApiController {
         return ResponseEntity.ok("Message sent successfully");
     }
 
-
-
     //Booking appointments
     //Url: POST /api/apointments/book
     @PostMapping("/bookings/book")
@@ -619,7 +614,6 @@ public class ApiController {
         return ResponseEntity.ok(bookingDTOs);
     }
 
-
     //Donor Confirms (or Cancels (see endpoint below) an Appointment
     @PostMapping("/bookings/confirm/{bookingId}")
     @ResponseBody
@@ -660,7 +654,6 @@ public class ApiController {
         }
     }
 
-
     //API to see appointments waiting for confirmation
     //URL: GET /api/bookings/donor/{donorId}/pending
     @GetMapping("/bookings/donor/{donorId}/pending")
@@ -686,7 +679,6 @@ public class ApiController {
                 booking.getStatus()
         )).collect(Collectors.toList());
         return ResponseEntity.ok(bookingDTOs);
-
     }
 
     // Fetch confirmed appointments for a donor
@@ -712,13 +704,6 @@ public class ApiController {
                         booking.isConfirmed(),
                         booking.getStatus()
                 )).collect(Collectors.toList());
-
         return ResponseEntity.ok(bookingDTOs);
     }
-
-
-
-
-
-
 }
