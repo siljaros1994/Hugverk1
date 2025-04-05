@@ -10,7 +10,7 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // Allow all endpoints
-                .allowedOrigins("http://localhost:8080", "http://192.168.101.4:8080") // Allow requests from these origins
+                .allowedOrigins("http://localhost:8080", "http://192.168.56.1:8080/") // Allow requests from these origins //School:"http://130.208.102.35:8080/"
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allow these HTTP methods
                 .allowedHeaders("*") // Allow all headers
                 .allowCredentials(true); // Allow cookies (JSESSIONID)
