@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/recipient")
@@ -65,13 +66,27 @@ public class FavoriteController extends BaseController{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
+
     @PostMapping("/unfavorite/{donorProfileId}")
     public String unfavoriteDonor(@PathVariable Long donorProfileId, HttpSession session) {
         MyAppUsers user = (MyAppUsers) session.getAttribute("user");
-        Long userId = user != null ? user.getRecipientId() : null;
+        if (user == null || user.getRecipientId() == null) {
+            return "redirect:/users/login";
+        }
 
-        if (userId != null) {
-            myAppUserService.removeFavoriteDonor(userId, donorProfileId);
+        Long recipientProfileId = user.getRecipientId();
+
+        // Remove donor from favorites list only.
+        myAppUserService.removeFavoriteDonor(recipientProfileId, donorProfileId);
+
+        // Here we also add unfavoriting, so we can also cancel an approved match,
+        Optional<DonorProfile> donorProfileOpt = donorProfileService.findByProfileId(donorProfileId);
+        if (donorProfileOpt.isPresent()) {
+            Long donorUserId = donorProfileOpt.get().getUser().getId();
+            Long recipientUserId = user.getId();
+            myAppUserService.removeMatch(donorUserId, recipientUserId);
+        } else {
+            System.err.println("Donor profile not found for ID: " + donorProfileId);
         }
 
         return "redirect:/recipient/favorites";

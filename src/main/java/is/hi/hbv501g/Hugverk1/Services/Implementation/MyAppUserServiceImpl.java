@@ -169,8 +169,8 @@ public class MyAppUserServiceImpl implements MyAppUserService, UserDetailsServic
         }
 
         // Update recipient's matchedDonors (donor IDs)
-        if (!recipient.getMatchDonorsList().contains(donorId)) {
-            recipient.addMatchedDonor(donorId);
+        if (!recipient.getMatchDonorsList().contains(donor.getDonorId())) {
+            recipient.addMatchedDonor(donor.getDonorId());
             userRepository.save(recipient);
             System.out.println("Recipient's matched donors updated: " + recipient.getMatchDonorsList());
         } else {

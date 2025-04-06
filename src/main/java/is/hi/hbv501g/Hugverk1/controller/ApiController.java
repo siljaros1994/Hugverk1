@@ -36,10 +36,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import is.hi.hbv501g.Hugverk1.dto.BookingDTO;
-import org.springframework.security.core.Authentication;
 
 @RestController
-//private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
 @RequestMapping("/api")
 public class ApiController {
 
@@ -419,9 +417,23 @@ public class ApiController {
         if (user == null || !"recipient".equalsIgnoreCase(user.getUserType())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        Long recipientId = user.getRecipientId();
-        myAppUserService.removeFavoriteDonor(recipientId, donorProfileId);
-        return ResponseEntity.ok(Collections.singletonMap("message", "Donor removed from favorites"));
+        Long recipientProfileId = user.getRecipientId();
+        myAppUserService.removeFavoriteDonor(recipientProfileId, donorProfileId);
+
+        // Here we also remove match as well. we look up the donor profile to retrieve the donor's user ID.
+        Optional<DonorProfile> donorProfileOpt = donorProfileService.findByProfileId(donorProfileId);
+        if (!donorProfileOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("error", "Donor profile not found"));
+        }
+        DonorProfile donorProfile = donorProfileOpt.get();
+        Long donorUserId = donorProfile.getUser().getId();
+        Long recipientUserId = user.getId();
+
+        // Remove the match using the donor's and recipient's user IDs.
+        myAppUserService.removeMatch(donorUserId, recipientUserId);
+
+        return ResponseEntity.ok(Collections.singletonMap("message", "Donor removed from favorites and match"));
     }
 
     @GetMapping("/match/donor/matches")
@@ -457,9 +469,13 @@ public class ApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        // Reload user to get updated match list
+        MyAppUsers updatedUser = myAppUserService.findById(sessionUser.getId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         // Here we get the list of matched donor IDs from the recipient's record.
-        List<Long> matchedDonorIds = sessionUser.getMatchDonorsList();
-        System.out.println("Recipient " + sessionUser.getId() + " matched donors: " + matchedDonorIds);
+        List<Long> matchedDonorIds = updatedUser.getMatchDonorsList();
+        System.out.println("Recipient " + updatedUser.getId() + " matched donors: " + matchedDonorIds);
 
         // Here we retrieve the corresponding donor profiles.
         List<DonorProfile> matchedDonors = donorProfileService.getProfilesByIds(matchedDonorIds);
@@ -488,14 +504,21 @@ public class ApiController {
     public ResponseEntity<?> unmatch(@RequestParam("donorId") Long donorId,
                                      @RequestParam("recipientId") Long recipientId) {
         try {
-            // Here we remove match from both donor and recipient match lists
+            // Here we remove the match using user IDs
             myAppUserService.removeMatch(donorId, recipientId);
 
-            // Here we get the logged-in user to determine if it's a donor
             MyAppUsers loggedInUser = (MyAppUsers) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if (loggedInUser != null && "donor".equalsIgnoreCase(loggedInUser.getUserType())) {
-                // Here we also remove the donor's profile ID from the recipient's favorites list.
-                myAppUserService.removeFavoriteDonor(recipientId, loggedInUser.getDonorId());
+            if (loggedInUser != null) {
+                if ("donor".equalsIgnoreCase(loggedInUser.getUserType())) {
+                    // When donor is logged in, we look up the recipient’s profile id from their user record.
+                    Optional<MyAppUsers> recipientOpt = myAppUserService.findById(recipientId);
+                    if (recipientOpt.isPresent() && recipientOpt.get().getRecipientId() != null) {
+                        myAppUserService.removeFavoriteDonor(recipientOpt.get().getRecipientId(), loggedInUser.getDonorId());
+                    }
+                } else if ("recipient".equalsIgnoreCase(loggedInUser.getUserType())) {
+                    // When recipient is logged in, we use their profile id, which is stored in getRecipientId().
+                    myAppUserService.removeFavoriteDonor(loggedInUser.getRecipientId(), donorId);
+                }
             }
             return ResponseEntity.ok(Collections.singletonMap("message", "Unmatched successfully"));
         } catch (Exception e) {

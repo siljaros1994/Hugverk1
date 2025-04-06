@@ -32,6 +32,3 @@ public interface MyAppUserService extends UserDetailsService {
     void removeFavoriteDonor(Long userId, Long donorId);
 
 }
-
-
-
