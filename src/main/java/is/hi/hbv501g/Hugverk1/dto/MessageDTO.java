@@ -8,14 +8,16 @@ public class MessageDTO {
     private Long receiverId;
     private String content;
     private LocalDateTime timestamp;
+    private String senderProfilePictureUrl;
 
     // Constructor
-    public MessageDTO(Long id, Long senderId, Long receiverId, String content, LocalDateTime timestamp) {
+    public MessageDTO(Long id, Long senderId, Long receiverId, String content, LocalDateTime timestamp, String senderProfilePictureUrl) {
         this.id = id;
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.content = content;
         this.timestamp = timestamp;
+        this.senderProfilePictureUrl = senderProfilePictureUrl;
     }
 
     // Getters and Setters
@@ -33,4 +35,11 @@ public class MessageDTO {
 
     public LocalDateTime getTimestamp() { return timestamp; }
     public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
+
+    public String getSenderProfilePictureUrl() {
+        return senderProfilePictureUrl;
+    }
+    public void setSenderProfilePictureUrl(String senderProfilePictureUrl) {
+        this.senderProfilePictureUrl = senderProfilePictureUrl;
+    }
 }

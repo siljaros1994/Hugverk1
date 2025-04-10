@@ -534,8 +534,8 @@ public class ApiController {
 
         List<Message> messages = messageService.getConversationBetween(sender.getId(), receiverId);
         List<MessageDTO> messageDTOs = messages.stream()
-                .map(MessageConverter::convertToDTO)
-                .toList();
+                .map(message -> MessageConverter.convertToDTO(message, myAppUserService, donorProfileService, recipientProfileService))
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok(messageDTOs);
     }
